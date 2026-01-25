@@ -8,7 +8,7 @@ export const authClientProvider = {
     ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        port: 4001,
+        port: 4000,
       },
     }),
 };
