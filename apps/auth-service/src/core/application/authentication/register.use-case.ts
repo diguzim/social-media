@@ -1,6 +1,6 @@
-import { User } from 'src/core/domain/user/user.entity';
 import { UserRepository } from 'src/core/domain/user/user.repository';
 import { hash } from 'bcrypt';
+import { Injectable } from '@nestjs/common';
 
 interface RegisterUserInput {
   name: string;
@@ -14,6 +14,7 @@ interface RegisterUserOutput {
   email: string;
 }
 
+@Injectable()
 export class RegisterUserUseCase {
   constructor(private readonly userRepository: UserRepository) {}
 

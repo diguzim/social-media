@@ -4,7 +4,7 @@ export class User {
   email: string;
   passwordHash: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt: Date | null;
 
   constructor(props: Partial<User>) {
     Object.assign(this, props);
