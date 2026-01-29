@@ -1,4 +1,6 @@
 import { User } from 'src/core/domain/user/user.entity';
+import { UserRepository } from 'src/core/domain/user/user.repository';
+import { hash } from 'bcrypt';
 
 interface RegisterUserInput {
   name: string;
@@ -13,15 +15,18 @@ interface RegisterUserOutput {
 }
 
 export class RegisterUserUseCase {
-  async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
-    const user = new User();
+  constructor(private readonly userRepository: UserRepository) {}
 
-    user.id = crypto.randomUUID();
-    user.name = input.name;
-    user.email = input.email;
-    user.passwordHash = `hashed-${input.password}`;
-    user.createdAt = new Date();
-    user.updatedAt = new Date();
+  async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
+    const saltRounds = 10;
+    const hashedPassword = await hash(input.password, saltRounds);
+    const createUserData = {
+      name: input.name,
+      email: input.email,
+      passwordHash: hashedPassword,
+    };
+
+    const user = await this.userRepository.create(createUserData);
 
     return {
       id: user.id,
