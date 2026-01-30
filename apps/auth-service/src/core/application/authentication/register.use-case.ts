@@ -1,26 +1,26 @@
 import { UserRepository } from 'src/core/domain/user/user.repository';
-import { hash } from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 
-interface RegisterUserInput {
+export interface RegisterInput {
   name: string;
   email: string;
   password: string;
 }
 
-interface RegisterUserOutput {
+export interface RegisterOutput {
   id: string;
   name: string;
   email: string;
 }
 
 @Injectable()
-export class RegisterUserUseCase {
+export class RegisterUseCase {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
-    const saltRounds = 10;
-    const hashedPassword = await hash(input.password, saltRounds);
+  async execute(input: RegisterInput): Promise<RegisterOutput> {
+    const salt = 10;
+    const hashedPassword = await bcrypt.hash(input.password, salt);
     const createUserData = {
       name: input.name,
       email: input.email,
