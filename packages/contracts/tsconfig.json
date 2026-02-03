@@ -1,11 +1,12 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "emitDecoratorMetadata": false,
-    "experimentalDecorators": false
+    "experimentalDecorators": false,
+    "noEmit": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules"]
 }

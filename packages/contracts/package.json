@@ -3,25 +3,13 @@
     "version": "0.0.0",
     "private": true,
     "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
         "check-types": "tsc --noEmit"
     },
     "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "default": "./dist/index.js"
-        },
-        "./auth": {
-            "types": "./dist/auth/index.d.ts",
-            "default": "./dist/auth/index.js"
-        }
+        ".": "./src/index.ts",
+        "./auth": "./src/auth/index.ts"
     },
-    "files": [
-        "dist"
-    ],
     "devDependencies": {
         "@repo/typescript-config": "workspace:*",
         "typescript": "5.9.2"
