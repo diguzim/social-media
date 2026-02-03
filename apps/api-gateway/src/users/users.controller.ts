@@ -1,6 +1,7 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from 'src/auth/auth.client';
+import { AUTH_COMMANDS } from '@repo/contracts';
 
 @Controller('users')
 export class UsersController {

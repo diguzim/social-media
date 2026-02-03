@@ -32,6 +32,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.1.12(@nestjs/common@11.1.12(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.12)
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -205,6 +208,12 @@ importers:
       typescript-eslint:
         specifier: ^8.20.0
         version: 8.50.0(eslint@9.39.1)(typescript@5.9.2)
+
+  packages/contracts:
+    devDependencies:
+      typescript:
+        specifier: latest
+        version: 5.9.3
 
   packages/eslint-config:
     devDependencies:
