@@ -29,4 +29,10 @@ export class InMemoryUserRepository implements UserRepository {
     const user = this.users.find((item) => item.email === email);
     return user ?? null;
   }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async findById(id: string): Promise<User | null> {
+    const user = this.users.find((item) => item.id === id);
+    return user ?? null;
+  }
 }

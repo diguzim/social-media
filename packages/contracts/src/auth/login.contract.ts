@@ -6,4 +6,5 @@ export interface LoginRequest {
 export interface LoginReply {
   id: string;
   email: string;
+  accessToken: string;
 }
