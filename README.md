@@ -12,7 +12,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 ## Apps
 
 - `api-gateway`: HTTP entrypoint for clients
-- `auth-service`: Auth microservice listening on TCP port 4000
+- `auth-service`: Auth microservice listening on TCP
 
 ## Packages
 
@@ -27,8 +27,8 @@ The API gateway and microservices share message contracts through `@repo/contrac
 Example usage:
 
 ```ts
-import { AUTH_COMMANDS } from '@repo/contracts';
-import type { RegisterRequest, RegisterReply } from '@repo/contracts';
+import { AUTH_COMMANDS } from "@repo/contracts";
+import type { RegisterRequest, RegisterReply } from "@repo/contracts";
 
 this.authClient.send<RegisterReply>({ cmd: AUTH_COMMANDS.register }, payload);
 ```
@@ -67,12 +67,23 @@ pnpm --filter auth-service dev
 - `pnpm lint`: Lint all apps and packages
 - `pnpm check-types`: Type-check all packages
 
-## Ports
+## TODO
 
-- API Gateway: 3000
-- Auth Service (TCP): 4000
+- [ ] Logs (Pino)
+- [ ] Errors (Sentry)
+- [ ] Observability platform (Datadog)
+- [ ] Tracing (OpenTelemetry)
+- [ ] CI/CD pipeline (GitHub Actions)
+- [ ] Dockerization
+- [ ] Kubernetes deployment
+- [ ] API documentation (Swagger)
+- [ ] Testing (Jest)
+- [ ] Code coverage
+- [ ] Caching (Redis)
+- [ ] Rate limiting (Redis)
+- [ ] Database integration (PostgreSQL)
+- [ ] Message broker integration (RabbitMQ, Kafka)
 
 ## Notes
 
 - The contracts package is compiled to `dist/` and exported from there.
-- If port 3000 is already in use, stop the other process or set `PORT` before running `pnpm dev`.
