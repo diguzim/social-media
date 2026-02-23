@@ -69,7 +69,6 @@ pnpm --filter auth-service dev
 
 ## TODO
 
-- [ ] Logs (Pino)
 - [ ] Errors (Sentry)
 - [ ] Observability platform (Datadog)
 - [ ] Tracing (OpenTelemetry)
