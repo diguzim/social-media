@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Logger,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from 'src/auth/auth.client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -14,11 +23,13 @@ import type {
 
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(@Inject(AUTH_SERVICE) private readonly authClient: ClientProxy) {}
 
   @Post()
   createUser(@Body() user: RegisterRequest) {
-    console.log(
+    this.logger.debug(
       'API Gateway: forwarding user registration to auth service',
       user,
     );
@@ -30,7 +41,7 @@ export class UsersController {
 
   @Post('login')
   login(@Body() payload: LoginRequest) {
-    console.log('API Gateway: forwarding login to auth service', payload);
+    this.logger.debug('API Gateway: forwarding login to auth service', payload);
     return this.authClient.send<LoginReply>(
       { cmd: AUTH_COMMANDS.login },
       payload,
@@ -40,7 +51,10 @@ export class UsersController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getProfile(@Request() req: { user: { userId: string } }) {
-    console.log('API Gateway: forwarding getProfile to auth service', req.user);
+    this.logger.debug(
+      'API Gateway: forwarding getProfile to auth service',
+      req.user,
+    );
     return this.authClient.send<GetProfileReply>(
       { cmd: AUTH_COMMANDS.getProfile },
       { userId: req.user.userId } as GetProfileRequest,

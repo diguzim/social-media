@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { RegisterUseCase } from 'src/core/application/authentication/register.use-case';
 import { LoginUseCase } from 'src/core/application/authentication/login.use-case';
@@ -15,6 +15,8 @@ import type {
 
 @Controller()
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private registerUseCase: RegisterUseCase,
     private loginUseCase: LoginUseCase,
@@ -23,7 +25,7 @@ export class AuthController {
 
   @MessagePattern({ cmd: AUTH_COMMANDS.register })
   async handleRegister(request: RegisterRequest): Promise<RegisterReply> {
-    console.log('Auth service: handling register command', request);
+    this.logger.debug('Auth service: handling register command', request);
 
     const createdUser = await this.registerUseCase.execute({
       name: request.name,
@@ -39,7 +41,7 @@ export class AuthController {
 
   @MessagePattern({ cmd: AUTH_COMMANDS.login })
   async handleLogin(request: LoginRequest): Promise<LoginReply> {
-    console.log('Auth service: handling login command', request);
+    this.logger.debug('Auth service: handling login command', request);
 
     return this.loginUseCase.execute({
       email: request.email,
@@ -49,7 +51,7 @@ export class AuthController {
 
   @MessagePattern({ cmd: AUTH_COMMANDS.getProfile })
   async handleGetProfile(request: GetProfileRequest): Promise<GetProfileReply> {
-    console.log('Auth service: handling getProfile command', request);
+    this.logger.debug('Auth service: handling getProfile command', request);
 
     return this.getProfileUseCase.execute({
       userId: request.userId,

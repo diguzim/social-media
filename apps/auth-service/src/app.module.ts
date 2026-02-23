@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { LoggerModule } from 'nestjs-pino';
 import { AuthController } from './auth/auth.controller';
 import { DatabaseModule } from './infra/database/database.module';
 import { RegisterUseCase } from './core/application/authentication/register.use-case';
@@ -12,6 +13,7 @@ import { GetProfileUseCase } from './core/application/authentication/get-profile
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    LoggerModule.forRoot(),
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
