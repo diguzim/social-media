@@ -72,7 +72,6 @@ pnpm --filter auth-service dev
 - [ ] Errors (Sentry)
 - [ ] Observability platform (Datadog)
 - [ ] Tracing (OpenTelemetry)
-- [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Dockerization
 - [ ] Kubernetes deployment
 - [ ] API documentation (Swagger)
