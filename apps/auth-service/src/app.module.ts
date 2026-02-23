@@ -7,13 +7,20 @@ import { DatabaseModule } from './infra/database/database.module';
 import { RegisterUseCase } from './core/application/authentication/register.use-case';
 import { LoginUseCase } from './core/application/authentication/login.use-case';
 import { GetProfileUseCase } from './core/application/authentication/get-profile.use-case';
+import { getCorrelationId } from './common/correlation-id/correlation-id.storage';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    LoggerModule.forRoot(),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        customProps: () => ({
+          correlationId: getCorrelationId(),
+        }),
+      },
+    }),
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],

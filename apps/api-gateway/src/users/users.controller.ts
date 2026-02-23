@@ -12,6 +12,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from 'src/auth/auth.client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AUTH_COMMANDS } from '@repo/contracts';
+import { getCorrelationId } from 'src/common/correlation-id/correlation-id.storage';
 import type {
   RegisterRequest,
   RegisterReply,
@@ -35,7 +36,7 @@ export class UsersController {
     );
     return this.authClient.send<RegisterReply>(
       { cmd: AUTH_COMMANDS.register },
-      user,
+      { ...user, correlationId: getCorrelationId() },
     );
   }
 
@@ -44,7 +45,7 @@ export class UsersController {
     this.logger.debug('API Gateway: forwarding login to auth service', payload);
     return this.authClient.send<LoginReply>(
       { cmd: AUTH_COMMANDS.login },
-      payload,
+      { ...payload, correlationId: getCorrelationId() },
     );
   }
 
@@ -57,7 +58,10 @@ export class UsersController {
     );
     return this.authClient.send<GetProfileReply>(
       { cmd: AUTH_COMMANDS.getProfile },
-      { userId: req.user.userId } as GetProfileRequest,
+      {
+        userId: req.user.userId,
+        correlationId: getCorrelationId(),
+      } as GetProfileRequest,
     );
   }
 }

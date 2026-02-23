@@ -1,5 +1,6 @@
 export interface GetProfileRequest {
   userId: string;
+  correlationId?: string;
 }
 
 export interface GetProfileReply {
