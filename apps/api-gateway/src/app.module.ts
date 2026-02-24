@@ -6,7 +6,11 @@ import { PostsController } from './posts/posts.controller';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { CorrelationIdMiddleware } from './common/correlation-id/correlation-id.middleware';
-import { getCorrelationId } from './common/correlation-id/correlation-id.storage';
+import {
+  getCorrelationId,
+  getRequestDurationMs,
+  getUserId,
+} from './common/correlation-id/correlation-id.storage';
 
 @Module({
   imports: [
@@ -15,8 +19,15 @@ import { getCorrelationId } from './common/correlation-id/correlation-id.storage
     }),
     LoggerModule.forRoot({
       pinoHttp: {
-        customProps: () => ({
+        customProps: (req, res) => ({
           correlationId: getCorrelationId(),
+          userId:
+            (req as { user?: { userId?: string } }).user?.userId ?? getUserId(),
+          requestDurationMs:
+            (res as { responseTime?: number }).responseTime ??
+            getRequestDurationMs(),
+          service: 'api-gateway',
+          environment: process.env.NODE_ENV ?? 'development',
         }),
       },
     }),

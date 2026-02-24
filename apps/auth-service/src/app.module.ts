@@ -8,7 +8,11 @@ import { DatabaseModule } from './infra/database/database.module';
 import { RegisterUseCase } from './core/application/authentication/register.use-case';
 import { LoginUseCase } from './core/application/authentication/login.use-case';
 import { GetProfileUseCase } from './core/application/authentication/get-profile.use-case';
-import { getCorrelationId } from './common/correlation-id/correlation-id.storage';
+import {
+  getCorrelationId,
+  getRequestDurationMs,
+  getUserId,
+} from './common/correlation-id/correlation-id.storage';
 import { CorrelationIdInterceptor } from './common/correlation-id/correlation-id.interceptor';
 
 @Module({
@@ -20,6 +24,10 @@ import { CorrelationIdInterceptor } from './common/correlation-id/correlation-id
       pinoHttp: {
         customProps: () => ({
           correlationId: getCorrelationId(),
+          userId: getUserId(),
+          requestDurationMs: getRequestDurationMs(),
+          service: 'auth-service',
+          environment: process.env.NODE_ENV ?? 'development',
         }),
       },
     }),

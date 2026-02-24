@@ -6,7 +6,11 @@ import { PostsController } from "./posts/posts.controller";
 import { DatabaseModule } from "./infra/database/database.module";
 import { CreatePostUseCase } from "./core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
-import { getCorrelationId } from "./common/correlation-id/correlation-id.storage";
+import {
+  getCorrelationId,
+  getRequestDurationMs,
+  getUserId,
+} from "./common/correlation-id/correlation-id.storage";
 import { CorrelationIdInterceptor } from "./common/correlation-id/correlation-id.interceptor";
 
 @Module({
@@ -18,6 +22,10 @@ import { CorrelationIdInterceptor } from "./common/correlation-id/correlation-id
       pinoHttp: {
         customProps: () => ({
           correlationId: getCorrelationId(),
+          userId: getUserId(),
+          requestDurationMs: getRequestDurationMs(),
+          service: "posts-service",
+          environment: process.env.NODE_ENV ?? "development",
         }),
       },
     }),

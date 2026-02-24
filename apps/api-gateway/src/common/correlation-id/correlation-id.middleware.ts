@@ -13,7 +13,7 @@ export class CorrelationIdMiddleware implements NestMiddleware {
     res.setHeader('x-correlation-id', correlationId);
 
     // Run next handlers in this async context
-    correlationIdStorage.run({ correlationId }, () => {
+    correlationIdStorage.run({ correlationId, startTime: Date.now() }, () => {
       next();
     });
   }
