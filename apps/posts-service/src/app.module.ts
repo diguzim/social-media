@@ -7,11 +7,11 @@ import { DatabaseModule } from "./infra/database/database.module";
 import { CreatePostUseCase } from "./core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
 import {
+  LogContextInterceptor,
   getCorrelationId,
   getRequestDurationMs,
   getUserId,
-} from "./common/correlation-id/correlation-id.storage";
-import { CorrelationIdInterceptor } from "./common/correlation-id/correlation-id.interceptor";
+} from "@repo/log-context";
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { CorrelationIdInterceptor } from "./common/correlation-id/correlation-id
     GetPostUseCase,
     {
       provide: APP_INTERCEPTOR,
-      useClass: CorrelationIdInterceptor,
+      useClass: LogContextInterceptor,
     },
   ],
 })

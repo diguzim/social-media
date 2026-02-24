@@ -12,7 +12,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from 'src/auth/auth.client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AUTH_COMMANDS } from '@repo/contracts';
-import { getCorrelationId } from 'src/common/correlation-id/correlation-id.storage';
+import { getCorrelationId } from '@repo/log-context';
 import type {
   RegisterRequest,
   RegisterReply,

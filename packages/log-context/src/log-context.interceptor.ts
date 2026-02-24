@@ -5,18 +5,17 @@ import {
   CallHandler,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { correlationIdStorage } from "./correlation-id.storage";
+import { logContextStorage } from "./log-context.storage.js";
 
 @Injectable()
-export class CorrelationIdInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+export class LogContextInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const data = context.switchToRpc().getData();
     const correlationId = data?.correlationId || "unknown";
     const userId = data?.userId ?? data?.authorId;
 
-    // Wrap the entire handler execution in AsyncLocalStorage context
     return new Observable((subscriber) => {
-      correlationIdStorage.run(
+      logContextStorage.run(
         { correlationId, userId, startTime: Date.now() },
         () => {
           next.handle().subscribe({

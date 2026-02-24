@@ -13,7 +13,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { POSTS_SERVICE } from './posts.client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { POST_COMMANDS } from '@repo/contracts';
-import { getCorrelationId } from 'src/common/correlation-id/correlation-id.storage';
+import { getCorrelationId } from '@repo/log-context';
 import type {
   CreatePostRequest,
   CreatePostReply,

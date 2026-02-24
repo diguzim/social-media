@@ -5,12 +5,12 @@ import { UsersController } from './users/users.controller';
 import { PostsController } from './posts/posts.controller';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
-import { CorrelationIdMiddleware } from './common/correlation-id/correlation-id.middleware';
 import {
+  LogContextMiddleware,
   getCorrelationId,
   getRequestDurationMs,
   getUserId,
-} from './common/correlation-id/correlation-id.storage';
+} from '@repo/log-context';
 
 @Module({
   imports: [
@@ -39,6 +39,6 @@ import {
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer.apply(LogContextMiddleware).forRoutes('*');
   }
 }
