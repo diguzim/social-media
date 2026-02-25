@@ -1,6 +1,6 @@
 import { UserRepository } from 'src/core/domain/user/user.repository';
 import bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 export interface RegisterInput {
   name: string;
@@ -19,6 +19,11 @@ export class RegisterUseCase {
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(input: RegisterInput): Promise<RegisterOutput> {
+    const existingUser = await this.userRepository.findByEmail(input.email);
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+
     const salt = 10;
     const hashedPassword = await bcrypt.hash(input.password, salt);
     const createUserData = {

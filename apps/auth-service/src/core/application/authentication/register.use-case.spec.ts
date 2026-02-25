@@ -18,12 +18,14 @@ describe('RegisterUseCase', () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
     };
+    jest.clearAllMocks();
   });
 
   it('should hash the password and create a user', async () => {
     const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
     bcryptMock.hash.mockResolvedValue('hashed-password');
 
+    userRepository.findByEmail.mockResolvedValue(null);
     userRepository.create.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
@@ -41,6 +43,7 @@ describe('RegisterUseCase', () => {
       password: 'plain-password',
     });
 
+    expect(userRepository.findByEmail).toHaveBeenCalledWith('john@doe.com');
     expect(bcryptMock.hash).toHaveBeenCalledWith('plain-password', 10);
     expect(userRepository.create).toHaveBeenCalledWith({
       name: 'John Doe',
@@ -54,10 +57,34 @@ describe('RegisterUseCase', () => {
     });
   });
 
-  it('should propagate repository errors', async () => {
+  it('should throw ConflictException if email already exists', async () => {
+    userRepository.findByEmail.mockResolvedValue({
+      id: 'user-existing',
+      name: 'Existing User',
+      email: 'john@doe.com',
+      passwordHash: 'existing-hash',
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: null,
+    });
+
+    const useCase = new RegisterUseCase(userRepository);
+
+    await expect(
+      useCase.execute({
+        name: 'John Doe',
+        email: 'john@doe.com',
+        password: 'plain-password',
+      }),
+    ).rejects.toThrow('Email already registered');
+
+    expect(userRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('should propagate repository errors during creation', async () => {
     const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
     bcryptMock.hash.mockResolvedValue('hashed-password');
 
+    userRepository.findByEmail.mockResolvedValue(null);
     userRepository.create.mockRejectedValue(new Error('db failure'));
 
     const useCase = new RegisterUseCase(userRepository);
