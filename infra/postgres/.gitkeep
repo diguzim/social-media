@@ -1,0 +1,2 @@
+# This directory is for PostgreSQL initialization scripts (*.sql, *.sh)
+# Files here will be executed automatically when the container starts for the first time
