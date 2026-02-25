@@ -2,12 +2,15 @@ import { Controller, Logger } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { CreatePostUseCase } from "src/core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "src/core/application/posts/get-post.use-case";
+import { GetPostsUseCase } from "src/core/application/posts/get-posts.use-case";
 import { POST_COMMANDS } from "@repo/contracts";
 import type {
   CreatePostRequest,
   CreatePostReply,
   GetPostRequest,
   GetPostReply,
+  GetPostsRequest,
+  GetPostsReply,
 } from "@repo/contracts";
 
 @Controller()
@@ -17,6 +20,7 @@ export class PostsController {
   constructor(
     private createPostUseCase: CreatePostUseCase,
     private getPostUseCase: GetPostUseCase,
+    private getPostsUseCase: GetPostsUseCase,
   ) {}
 
   @MessagePattern({ cmd: POST_COMMANDS.createPost })
@@ -52,6 +56,32 @@ export class PostsController {
       content: post.content,
       authorId: post.authorId,
       createdAt: post.createdAt.toISOString(),
+    };
+  }
+
+  @MessagePattern({ cmd: POST_COMMANDS.getPosts })
+  async handleGetPosts(request: GetPostsRequest): Promise<GetPostsReply> {
+    this.logger.debug("Posts service: handling get posts command", request);
+
+    const result = await this.getPostsUseCase.execute({
+      page: request.page,
+      limit: request.limit,
+      authorId: request.authorId,
+      sortOrder: request.sortOrder,
+    });
+
+    return {
+      data: result.data.map((post) => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        authorId: post.authorId,
+        createdAt: post.createdAt.toISOString(),
+      })),
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
     };
   }
 }

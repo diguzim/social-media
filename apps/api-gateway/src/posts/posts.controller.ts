@@ -6,6 +6,7 @@ import {
   Logger,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import type {
   CreatePostReply,
   GetPostRequest,
   GetPostReply,
+  GetPostsRequest,
+  GetPostsReply,
 } from '@repo/contracts';
 
 @Controller('posts')
@@ -43,6 +46,26 @@ export class PostsController {
         authorId: req.user.userId,
         correlationId: getCorrelationId(),
       } as CreatePostRequest,
+    );
+  }
+
+  @Get()
+  getPosts(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('authorId') authorId?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+  ) {
+    this.logger.debug('API Gateway: forwarding list posts to posts service');
+    return this.postsClient.send<GetPostsReply>(
+      { cmd: POST_COMMANDS.getPosts },
+      {
+        page: page ? parseInt(page, 10) : undefined,
+        limit: limit ? parseInt(limit, 10) : undefined,
+        authorId,
+        sortOrder,
+        correlationId: getCorrelationId(),
+      } as GetPostsRequest,
     );
   }
 

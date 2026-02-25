@@ -6,6 +6,7 @@ import { PostsController } from "./posts/posts.controller";
 import { DatabaseModule } from "./infra/database/database.module";
 import { CreatePostUseCase } from "./core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
+import { GetPostsUseCase } from "./core/application/posts/get-posts.use-case";
 import {
   LogContextInterceptor,
   getCorrelationId,
@@ -35,6 +36,7 @@ import {
   providers: [
     CreatePostUseCase,
     GetPostUseCase,
+    GetPostsUseCase,
     {
       provide: APP_INTERCEPTOR,
       useClass: LogContextInterceptor,

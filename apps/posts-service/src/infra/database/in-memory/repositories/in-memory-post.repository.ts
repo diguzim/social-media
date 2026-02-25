@@ -3,6 +3,8 @@ import { Post } from "src/core/domain/post/post.entity";
 import {
   PostRepository,
   CreatePostData,
+  FindPostsOptions,
+  FindPostsResult,
 } from "src/core/domain/post/post.repository";
 
 @Injectable()
@@ -28,6 +30,45 @@ export class InMemoryPostRepository implements PostRepository {
   async findById(id: string): Promise<Post | null> {
     const post = this.posts.find((item) => item.id === id);
     return post ?? null;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async findMany(options: FindPostsOptions): Promise<FindPostsResult> {
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 10;
+    const authorId = options.authorId;
+    const sortOrder = options.sortOrder ?? "desc";
+
+    // Filter posts by authorId if provided
+    let filtered = this.posts;
+    if (authorId) {
+      filtered = filtered.filter((post) => post.authorId === authorId);
+    }
+
+    // Sort by createdAt (newest first by default)
+    const sorted = filtered.sort((a, b) => {
+      if (sortOrder === "desc") {
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      }
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
+
+    // Calculate pagination
+    const total = sorted.length;
+    const totalPages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    const end = start + limit;
+
+    // Get paginated data
+    const data = sorted.slice(start, end);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   }
 
   private seedPosts(): Post[] {
