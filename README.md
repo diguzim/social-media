@@ -20,6 +20,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 
 - `@repo/contracts`: Shared message contracts and commands
 - `@repo/eslint-config`: Shared ESLint configuration
+- `@repo/exception-filters`: Shared NestJS exception filters
 - `@repo/log-context`: Correlation id, user id, and request duration context
 - `@repo/typescript-config`: Shared TypeScript base config
 
@@ -91,6 +92,11 @@ Run a single app:
 pnpm --filter api-gateway dev
 pnpm --filter auth-service dev
 pnpm --filter posts-service dev
+
+## Error Handling
+
+Microservices serialize NestJS exceptions over TCP and the API gateway maps them
+back to HTTP responses (for example, duplicate email returns 409 Conflict).
 ```
 
 ## Useful Scripts
