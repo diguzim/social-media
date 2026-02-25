@@ -44,6 +44,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@repo/exception-filters':
+        specifier: workspace:*
+        version: link:../../packages/exception-filters
       '@repo/log-context':
         specifier: workspace:*
         version: link:../../packages/log-context
@@ -165,6 +168,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@repo/exception-filters':
+        specifier: workspace:*
+        version: link:../../packages/exception-filters
       '@repo/log-context':
         specifier: workspace:*
         version: link:../../packages/log-context
@@ -280,6 +286,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@repo/exception-filters':
+        specifier: workspace:*
+        version: link:../../packages/exception-filters
       '@repo/log-context':
         specifier: workspace:*
         version: link:../../packages/log-context
@@ -404,6 +413,24 @@ importers:
       typescript-eslint:
         specifier: ^8.50.0
         version: 8.50.0(eslint@9.39.1)(typescript@5.9.2)
+
+  packages/exception-filters:
+    devDependencies:
+      '@nestjs/common':
+        specifier: ^11.0.1
+        version: 11.1.12(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices':
+        specifier: ^11.1.12
+        version: 11.1.12(@nestjs/common@11.1.12(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.12)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.2
 
   packages/log-context:
     dependencies:
