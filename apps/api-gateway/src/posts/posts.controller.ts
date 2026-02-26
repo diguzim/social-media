@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Logger,
   Param,
   Post,
+  Patch,
   Query,
   Request,
   UseGuards,
@@ -22,6 +24,10 @@ import type {
   GetPostReply,
   GetPostsRequest,
   GetPostsReply,
+  UpdatePostRequest,
+  UpdatePostReply,
+  DeletePostRequest,
+  DeletePostReply,
 } from '@repo/contracts';
 
 @Controller('posts')
@@ -76,5 +82,42 @@ export class PostsController {
       postId: id,
       correlationId: getCorrelationId(),
     } as GetPostRequest);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  updatePost(
+    @Param('id') id: string,
+    @Body()
+    payload: Omit<UpdatePostRequest, 'correlationId' | 'authorId' | 'postId'>,
+    @Request() req: { user: { userId: string } },
+  ) {
+    this.logger.debug('API Gateway: forwarding update post to posts service');
+    return this.postsClient.send<UpdatePostReply>(
+      { cmd: POST_COMMANDS.updatePost },
+      {
+        postId: id,
+        authorId: req.user.userId,
+        ...payload,
+        correlationId: getCorrelationId(),
+      } as UpdatePostRequest,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  deletePost(
+    @Param('id') id: string,
+    @Request() req: { user: { userId: string } },
+  ) {
+    this.logger.debug('API Gateway: forwarding delete post to posts service');
+    return this.postsClient.send<DeletePostReply>(
+      { cmd: POST_COMMANDS.deletePost },
+      {
+        postId: id,
+        authorId: req.user.userId,
+        correlationId: getCorrelationId(),
+      } as DeletePostRequest,
+    );
   }
 }

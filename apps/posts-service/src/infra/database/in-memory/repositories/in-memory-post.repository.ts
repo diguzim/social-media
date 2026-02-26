@@ -3,6 +3,8 @@ import { Post } from "src/core/domain/post/post.entity";
 import {
   PostRepository,
   CreatePostData,
+  UpdatePostData,
+  DeletePostData,
   FindPostsOptions,
   FindPostsResult,
 } from "src/core/domain/post/post.repository";
@@ -33,6 +35,44 @@ export class InMemoryPostRepository implements PostRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
+  async update(updatePostData: UpdatePostData): Promise<Post> {
+    const index = this.posts.findIndex(
+      (item) => item.id === updatePostData.postId,
+    );
+    if (index === -1) {
+      throw new Error("Post not found");
+    }
+
+    const current = this.posts[index];
+    if (!current) {
+      throw new Error("Post not found");
+    }
+    const updated = new Post({
+      id: current.id,
+      title: updatePostData.title ?? current.title,
+      content: updatePostData.content ?? current.content,
+      authorId: current.authorId,
+      createdAt: current.createdAt,
+    });
+
+    this.posts[index] = updated;
+
+    return updated;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async delete(deletePostData: DeletePostData): Promise<void> {
+    const index = this.posts.findIndex(
+      (item) => item.id === deletePostData.postId,
+    );
+    if (index === -1) {
+      throw new Error("Post not found");
+    }
+
+    this.posts.splice(index, 1);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
   async findMany(options: FindPostsOptions): Promise<FindPostsResult> {
     const page = options.page ?? 1;
     const limit = options.limit ?? 10;
@@ -46,7 +86,7 @@ export class InMemoryPostRepository implements PostRepository {
     }
 
     // Sort by createdAt (newest first by default)
-    const sorted = filtered.sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
       if (sortOrder === "desc") {
         return b.createdAt.getTime() - a.createdAt.getTime();
       }

@@ -6,6 +6,16 @@ export interface CreatePostData {
   authorId: string;
 }
 
+export interface UpdatePostData {
+  postId: string;
+  title?: string;
+  content?: string;
+}
+
+export interface DeletePostData {
+  postId: string;
+}
+
 export interface FindPostsOptions {
   page?: number; // 1-indexed, defaults to 1
   limit?: number; // defaults to 10
@@ -25,5 +35,7 @@ export interface FindPostsResult {
 export abstract class PostRepository {
   abstract create(createPostData: CreatePostData): Promise<Post>;
   abstract findById(id: string): Promise<Post | null>;
+  abstract update(updatePostData: UpdatePostData): Promise<Post>;
+  abstract delete(deletePostData: DeletePostData): Promise<void>;
   abstract findMany(options: FindPostsOptions): Promise<FindPostsResult>;
 }

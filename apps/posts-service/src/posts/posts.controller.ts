@@ -3,6 +3,8 @@ import { MessagePattern } from "@nestjs/microservices";
 import { CreatePostUseCase } from "src/core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "src/core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "src/core/application/posts/get-posts.use-case";
+import { UpdatePostUseCase } from "src/core/application/posts/update-post.use-case";
+import { DeletePostUseCase } from "src/core/application/posts/delete-post.use-case";
 import { POST_COMMANDS } from "@repo/contracts";
 import type {
   CreatePostRequest,
@@ -11,6 +13,10 @@ import type {
   GetPostReply,
   GetPostsRequest,
   GetPostsReply,
+  UpdatePostRequest,
+  UpdatePostReply,
+  DeletePostRequest,
+  DeletePostReply,
 } from "@repo/contracts";
 
 @Controller()
@@ -21,6 +27,8 @@ export class PostsController {
     private createPostUseCase: CreatePostUseCase,
     private getPostUseCase: GetPostUseCase,
     private getPostsUseCase: GetPostsUseCase,
+    private updatePostUseCase: UpdatePostUseCase,
+    private deletePostUseCase: DeletePostUseCase,
   ) {}
 
   @MessagePattern({ cmd: POST_COMMANDS.createPost })
@@ -82,6 +90,40 @@ export class PostsController {
       page: result.page,
       limit: result.limit,
       totalPages: result.totalPages,
+    };
+  }
+
+  @MessagePattern({ cmd: POST_COMMANDS.updatePost })
+  async handleUpdatePost(request: UpdatePostRequest): Promise<UpdatePostReply> {
+    this.logger.debug("Posts service: handling update post command", request);
+
+    const post = await this.updatePostUseCase.execute({
+      postId: request.postId,
+      authorId: request.authorId,
+      title: request.title,
+      content: request.content,
+    });
+
+    return {
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      authorId: post.authorId,
+      createdAt: post.createdAt.toISOString(),
+    };
+  }
+
+  @MessagePattern({ cmd: POST_COMMANDS.deletePost })
+  async handleDeletePost(request: DeletePostRequest): Promise<DeletePostReply> {
+    this.logger.debug("Posts service: handling delete post command", request);
+
+    await this.deletePostUseCase.execute({
+      postId: request.postId,
+      authorId: request.authorId,
+    });
+
+    return {
+      success: true,
     };
   }
 }

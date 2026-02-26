@@ -7,6 +7,8 @@ import { DatabaseModule } from "./infra/database/database.module";
 import { CreatePostUseCase } from "./core/application/posts/create-post.use-case";
 import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "./core/application/posts/get-posts.use-case";
+import { UpdatePostUseCase } from "./core/application/posts/update-post.use-case";
+import { DeletePostUseCase } from "./core/application/posts/delete-post.use-case";
 import {
   LogContextInterceptor,
   getCorrelationId,
@@ -37,6 +39,8 @@ import {
     CreatePostUseCase,
     GetPostUseCase,
     GetPostsUseCase,
+    UpdatePostUseCase,
+    DeletePostUseCase,
     {
       provide: APP_INTERCEPTOR,
       useClass: LogContextInterceptor,

@@ -8,6 +8,9 @@ describe("CreatePostUseCase", () => {
     postRepository = {
       create: jest.fn(),
       findById: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     };
   });
 
