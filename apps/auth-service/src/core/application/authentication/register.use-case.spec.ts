@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import { RegisterUseCase } from './register.use-case';
 import { UserRepository } from 'src/core/domain/user/user.repository';
+import { USER_EVENTS } from '@repo/events';
+import { RabbitMqEventPublisher } from 'src/infra/events/rabbitmq-event.publisher';
 
 jest.mock('bcrypt', () => ({
   __esModule: true,
@@ -11,6 +13,7 @@ jest.mock('bcrypt', () => ({
 
 describe('RegisterUseCase', () => {
   let userRepository: jest.Mocked<UserRepository>;
+  let eventPublisher: jest.Mocked<Pick<RabbitMqEventPublisher, 'publish'>>;
 
   beforeEach(() => {
     userRepository = {
@@ -18,24 +21,31 @@ describe('RegisterUseCase', () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
     };
+    eventPublisher = {
+      publish: jest.fn().mockResolvedValue(undefined),
+    };
     jest.clearAllMocks();
   });
 
-  it('should hash the password and create a user', async () => {
+  it('should hash the password and create a user, then emit registration event', async () => {
     const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
     bcryptMock.hash.mockResolvedValue('hashed-password');
 
+    const createdAtDate = new Date('2024-01-01T00:00:00Z');
     userRepository.findByEmail.mockResolvedValue(null);
     userRepository.create.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
-      createdAt: new Date('2024-01-01T00:00:00Z'),
+      createdAt: createdAtDate,
       updatedAt: null,
     });
 
-    const useCase = new RegisterUseCase(userRepository);
+    const useCase = new RegisterUseCase(
+      userRepository,
+      eventPublisher as RabbitMqEventPublisher,
+    );
 
     const result = await useCase.execute({
       name: 'John Doe',
@@ -50,6 +60,15 @@ describe('RegisterUseCase', () => {
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
     });
+    expect(eventPublisher.publish).toHaveBeenCalledWith(
+      USER_EVENTS.REGISTERED,
+      {
+        userId: 'user-1',
+        name: 'John Doe',
+        email: 'john@doe.com',
+        createdAt: createdAtDate.toISOString(),
+      },
+    );
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',
@@ -67,7 +86,10 @@ describe('RegisterUseCase', () => {
       updatedAt: null,
     });
 
-    const useCase = new RegisterUseCase(userRepository);
+    const useCase = new RegisterUseCase(
+      userRepository,
+      eventPublisher as RabbitMqEventPublisher,
+    );
 
     await expect(
       useCase.execute({
@@ -78,6 +100,7 @@ describe('RegisterUseCase', () => {
     ).rejects.toThrow('Email already registered');
 
     expect(userRepository.create).not.toHaveBeenCalled();
+    expect(eventPublisher.publish).not.toHaveBeenCalled();
   });
 
   it('should propagate repository errors during creation', async () => {
@@ -87,7 +110,10 @@ describe('RegisterUseCase', () => {
     userRepository.findByEmail.mockResolvedValue(null);
     userRepository.create.mockRejectedValue(new Error('db failure'));
 
-    const useCase = new RegisterUseCase(userRepository);
+    const useCase = new RegisterUseCase(
+      userRepository,
+      eventPublisher as RabbitMqEventPublisher,
+    );
 
     await expect(
       useCase.execute({
@@ -96,5 +122,7 @@ describe('RegisterUseCase', () => {
         password: 'plain-password',
       }),
     ).rejects.toThrow('db failure');
+
+    expect(eventPublisher.publish).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,6 @@
 # Social Media Monorepo
 
-Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, an auth service, and a shared contracts package that defines message commands and DTOs.
+Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, auth and posts services, an event handler service, and shared packages.
 
 ## Stack
 
@@ -8,6 +8,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - pnpm workspaces
 - Turborepo
 - NestJS microservices (TCP transport)
+- Node.js EventEmitter for event-driven architecture
 - Docker Compose (infra only in dev)
 
 ## Apps
@@ -15,10 +16,12 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `api-gateway`: HTTP entrypoint for clients
 - `auth-service`: Auth microservice listening on TCP
 - `posts-service`: Posts microservice listening on TCP
+- `event-handler-service`: Background worker that processes domain events
 
 ## Packages
 
-- `@repo/contracts`: Shared message contracts and commands
+- `@repo/contracts`: Shared RPC message contracts and commands
+- `@repo/events`: Shared event types and event names
 - `@repo/eslint-config`: Shared ESLint configuration
 - `@repo/exception-filters`: Shared NestJS exception filters
 - `@repo/log-context`: Correlation id, user id, and request duration context
@@ -28,19 +31,47 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 
 We run infrastructure in Docker and keep services local for hot reload.
 
-- PostgreSQL: `localhost:5432`
-- Loki: `localhost:3100`
-- Grafana: `localhost:3001` (admin/admin)
+- PostgreSQL: `localhost:5432` (for future use)
+- Loki: `localhost:3100` (log aggregation)
+- Grafana: `localhost:3001` (visualization, admin/admin)
+- RabbitMQ: `localhost:5672` (message broker)
 
-Start infra only:
+Start infra:
 
 ```sh
 docker compose -f docker-compose.infra.yml up -d
 ```
 
-## Contracts
+RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/guest)
 
-The API gateway and microservices share message contracts through `@repo/contracts`.
+## Event-Driven Architecture
+
+Services emit domain events that are processed by handlers:
+
+1. **Event Emitters**: Services create events when domain events occur (e.g., `user.registered`)
+2. **Event Handlers**: Background workers listen to events and perform side effects
+3. **Decoupling**: Services don't know about or depend on event handlers
+
+### Example: User Registration Flow
+
+```
+User Registration Request
+↓
+AuthController → RegisterUseCase
+↓
+UserRepository.create()
+↓
+RegisterUseCase emits USER_EVENTS.REGISTERED
+↓
+EventEmitter broadcasts to all listeners
+↓
+UserRegistrationHandler processes the event
+(sends welcome email, creates user profile, etc.)
+```
+
+## RPC Contracts
+
+The API gateway and microservices communicate via TCP using NestJS microservices pattern.
 
 Example usage:
 
@@ -50,6 +81,10 @@ import type { RegisterRequest, RegisterReply } from "@repo/contracts";
 
 this.authClient.send<RegisterReply>({ cmd: AUTH_COMMANDS.register }, payload);
 ```
+
+## Exception Handling
+
+Microservices serialize NestJS exceptions over TCP and the API gateway maps them back to HTTP responses (e.g., duplicate email returns 409 Conflict).
 
 ## Getting Started
 
@@ -79,7 +114,7 @@ Run all services in dev mode:
 pnpm dev
 ```
 
-Hybrid workflow (recommended for dev):
+Recommended hybrid workflow (infrastructure in Docker, services local):
 
 ```sh
 docker compose -f docker-compose.infra.yml up -d
@@ -92,49 +127,47 @@ Run a single app:
 pnpm --filter api-gateway dev
 pnpm --filter auth-service dev
 pnpm --filter posts-service dev
-
-## Error Handling
-
-Microservices serialize NestJS exceptions over TCP and the API gateway maps them
-back to HTTP responses (for example, duplicate email returns 409 Conflict).
+pnpm --filter event-handler-service dev
 ```
 
 ## Useful Scripts
 
-- `pnpm dev`: Run all apps in watch mode (Turbo)
-- `pnpm build`: Build all apps and packages
-- `pnpm lint`: Lint all apps and packages
+- `pnpm dev`: Run all services in watch mode (Turbo)
+- `pnpm build`: Build all services and packages
+- `pnpm test`: Run all tests
+- `pnpm lint`: Lint all code
 - `pnpm check-types`: Type-check all packages
 
 ## Docker (Production Builds)
 
-Each service has a production Dockerfile that builds to `dist/` and runs the
-compiled output (no hot reload). These are intended for production or staging.
+Each service has a production Dockerfile for deployment:
 
 - [apps/api-gateway/Dockerfile](apps/api-gateway/Dockerfile)
 - [apps/auth-service/Dockerfile](apps/auth-service/Dockerfile)
 - [apps/posts-service/Dockerfile](apps/posts-service/Dockerfile)
+- [apps/event-handler-service/Dockerfile](apps/event-handler-service/Dockerfile)
 
 ## Environment Variables
 
-- Per-service examples live in `apps/*/.env.example`
-- A root reference file is available at [.env.example](.env.example)
+- Per-service examples in `apps/*/.env.example`
+- Root reference at [.env.example](.env.example)
 
 ## TODO
 
-- [ ] Production docker-compose
-- [ ] Errors (Sentry)
+- [ ] Production docker-compose (all services)
+- [ ] RabbitMQ message broker integration
+- [ ] Error tracking (Sentry)
 - [ ] Observability platform (Datadog)
-- [ ] Tracing (OpenTelemetry)
+- [ ] Distributed tracing (OpenTelemetry)
 - [ ] Kubernetes deployment
 - [ ] API documentation (Swagger)
-- [ ] Testing (Jest)
-- [ ] Code coverage
+- [ ] Code coverage reports
 - [ ] Caching (Redis)
-- [ ] Rate limiting (Redis)
-- [ ] Database integration (PostgreSQL)
-- [ ] Message broker integration (RabbitMQ, Kafka)
+- [ ] Rate limiting
+- [ ] PostgreSQL integration
+- [ ] Email service integration
+- [ ] Search service (Elasticsearch)
 
 ## Notes
 
-- The contracts package is compiled to `dist/` and exported from there.
+- All packages are compiled to `dist/` and exported via their main field

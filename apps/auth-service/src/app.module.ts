@@ -8,6 +8,7 @@ import { DatabaseModule } from './infra/database/database.module';
 import { RegisterUseCase } from './core/application/authentication/register.use-case';
 import { LoginUseCase } from './core/application/authentication/login.use-case';
 import { GetProfileUseCase } from './core/application/authentication/get-profile.use-case';
+import { RabbitMqEventPublisher } from './infra/events/rabbitmq-event.publisher';
 import {
   LogContextInterceptor,
   getCorrelationId,
@@ -48,6 +49,7 @@ import {
     RegisterUseCase,
     LoginUseCase,
     GetProfileUseCase,
+    RabbitMqEventPublisher,
     {
       provide: APP_INTERCEPTOR,
       useClass: LogContextInterceptor,
