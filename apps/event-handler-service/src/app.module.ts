@@ -9,8 +9,10 @@ import {
   getUserId,
 } from "@repo/log-context";
 import { EventHandlersModule } from "./events/event-handlers.module";
+import { HealthController } from "./health.controller";
 
 @Module({
+  controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,

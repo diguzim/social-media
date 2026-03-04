@@ -7,6 +7,7 @@ import {
 import { connect, type Channel, type ChannelModel } from "amqplib";
 import { EVENT_BUS, USER_EVENTS, type UserRegisteredEvent } from "@repo/events";
 import { UserRegistrationHandler } from "./user-registration.handler";
+import { RabbitMqHealthService } from "./rabbitmq-health.service";
 
 @Injectable()
 export class RabbitMqUserRegisteredConsumer
@@ -26,6 +27,7 @@ export class RabbitMqUserRegisteredConsumer
 
   constructor(
     private readonly userRegistrationHandler: UserRegistrationHandler,
+    private readonly rabbitMqHealthService: RabbitMqHealthService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -64,10 +66,19 @@ export class RabbitMqUserRegisteredConsumer
         }
       });
 
+      this.rabbitMqHealthService.markConnected({
+        exchange: this.exchange,
+        queue: this.queueName,
+        url: this.rabbitMqUrl,
+      });
+
       this.logger.log(
         `Consuming '${USER_EVENTS.REGISTERED}' from queue '${this.queueName}'`,
       );
     } catch (error) {
+      this.rabbitMqHealthService.markDisconnected(
+        error instanceof Error ? error.message : String(error),
+      );
       this.logger.error(
         `RabbitMQ consumer startup failed: ${error instanceof Error ? error.message : String(error)}`,
       );
@@ -75,6 +86,7 @@ export class RabbitMqUserRegisteredConsumer
   }
 
   async onModuleDestroy(): Promise<void> {
+    this.rabbitMqHealthService.markDisconnected("consumer stopped");
     await this.channel?.close();
     await this.connection?.close();
   }
