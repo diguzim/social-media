@@ -45,29 +45,52 @@ docker compose -f docker-compose.infra.yml up -d
 
 RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/guest)
 
+## Frontend Authentication Flow
+
+1. **Register** (`/register`) - User creates account with name, email, and password
+   - POST `/users` → auth-service validates and creates user
+   - RabbitMQ publishes `user.registered` event
+   - UserRegistrationHandler processes the event (logs for now)
+   - User redirected to login page
+
+2. **Login** (`/login`) - User authenticates with email and password
+   - POST `/users/login` → auth-service validates credentials
+   - JWT token generated and stored in localStorage
+   - User redirected to welcome page
+
+3. **Welcome** (`/welcome`) - Protected page showing user profile
+   - GET `/users/me` (requires JWT Bearer token)
+   - User profile (id, name, email) cached in localStorage
+   - Shows "Welcome {name}!" with user details
+   - Logout clears tokens and redirects to home
+
 ## Event-Driven Architecture
 
-Services emit domain events that are processed by handlers:
+Services emit domain events that are processed by handlers via RabbitMQ:
 
 1. **Event Emitters**: Services create events when domain events occur (e.g., `user.registered`)
-2. **Event Handlers**: Background workers listen to events and perform side effects
-3. **Decoupling**: Services don't know about or depend on event handlers
+2. **Event Handlers**: Background workers (event-handler-service) listen on RabbitMQ and perform side effects
+3. **Message Broker**: RabbitMQ manages event distribution with topic exchanges
+4. **Decoupling**: Services don't know about or depend on event handlers
 
 ### Example: User Registration Flow
 
 ```
 User Registration Request
 ↓
-AuthController → RegisterUseCase
+API Gateway → Auth Service (TCP)
 ↓
-UserRepository.create()
+RegisterUseCase → UserRepository.create()
 ↓
-RegisterUseCase emits USER_EVENTS.REGISTERED
+RegisterUseCase emits USER_EVENTS.REGISTERED to RabbitMQ
 ↓
-EventEmitter broadcasts to all listeners
+RabbitMQ publishes to "social-media.events" exchange
+(routing key: user.registered)
+↓
+event-handler-service consumes from queue
 ↓
 UserRegistrationHandler processes the event
-(sends welcome email, creates user profile, etc.)
+(currently logs, ready for: welcome email, profile creation, etc.)
 ```
 
 ## RPC Contracts
@@ -156,8 +179,16 @@ Each service has a production Dockerfile for deployment:
 
 ## TODO
 
+- [x] RabbitMQ message broker integration
+- [x] Event-driven architecture with user registration events
+- [x] JWT-based authentication (register, login, profile)
+- [x] Frontend UI (React Vite SPA with routing)
+- [ ] Protected routes (frontend and backend)
+- [ ] Email service integration (welcome emails)
+- [ ] PostgreSQL integration (currently in-memory storage)
+- [ ] Posts listing page with pagination
+- [ ] Post creation UI
 - [ ] Production docker-compose (all services)
-- [ ] RabbitMQ message broker integration
 - [ ] Error tracking (Sentry)
 - [ ] Observability platform (Datadog)
 - [ ] Distributed tracing (OpenTelemetry)
@@ -166,8 +197,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] Code coverage reports
 - [ ] Caching (Redis)
 - [ ] Rate limiting
-- [ ] PostgreSQL integration
-- [ ] Email service integration
 - [ ] Search service (Elasticsearch)
 
 ## Notes

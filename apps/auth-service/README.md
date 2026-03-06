@@ -1,98 +1,164 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Auth Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Microservice for user authentication, JWT token generation, and user profile management. Communicates with API Gateway via TCP.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Purpose
 
-## Description
+- Handle user registration with password hashing (bcrypt)
+- Validate login credentials and issue JWT tokens
+- Retrieve user profile information
+- Publish user registration events to RabbitMQ for event-driven workflows
+- Store user data (in-memory for development)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Architecture
 
-## Project setup
-
-```bash
-$ pnpm install
+```
+API Gateway (HTTP)
+  ↓ TCP Request
+Auth Service (Port 4001)
+  ├─→ UserRepository (in-memory storage)
+  ├─→ RabbitMQ Event Publisher (user.registered events)
+  └─→ JwtService (token generation)
 ```
 
-## Compile and run the project
+## Commands
 
-```bash
-# development
-$ pnpm run start
+The service handles RPC messages from the API Gateway:
 
-# watch mode
-$ pnpm run start:dev
+- `AUTH_COMMANDS.register` - User registration
+  - Input: `{ name, email, password }`
+  - Output: `{ id, email }`
+  - Side effect: Publishes `user.registered` event to RabbitMQ
 
-# production mode
-$ pnpm run start:prod
+- `AUTH_COMMANDS.login` - User authentication
+  - Input: `{ email, password }`
+  - Output: `{ id, email, accessToken }`
+  - Process: Validates credentials, generates JWT token
+
+- `AUTH_COMMANDS.getProfile` - Retrieve user profile
+  - Input: `{ userId }`
+  - Output: `{ id, name, email }`
+  - Requires: User must exist
+
+## Use Cases
+
+### RegisterUseCase
+
+1. Check if email already exists (returns ConflictException if true)
+2. Hash password using bcrypt
+3. Create user in UserRepository
+4. Publish `USER_EVENTS.REGISTERED` event to RabbitMQ
+5. Return user id and email
+
+### LoginUseCase
+
+1. Find user by email
+2. Compare provided password with stored hash
+3. Generate JWT token with `{ sub: userId, email }`
+4. Return user id, email, and access token
+
+### GetProfileUseCase
+
+1. Find user by userId
+2. Return id, name, and email
+3. Throw NotFoundException if user not found
+
+## Event Publishing
+
+On successful registration, an event is published to RabbitMQ:
+
+```
+User Registration Event
+├─ Exchange: "social-media.events" (topic type)
+├─ Routing Key: "user.registered"
+├─ Event Payload: { userId, name, email, createdAt }
+└─ Consumer: event-handler-service processes the event
 ```
 
-## Run tests
+## Configuration
 
-```bash
-# unit tests
-$ pnpm run test
+Environment variables (see `.env.example`):
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```env
+PORT=4001
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=1h
+RABBITMQ_URL=amqp://guest:guest@localhost:5672
+RABBITMQ_EXCHANGE=social-media.events
 ```
 
-## Deployment
+## Storage
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Currently uses **in-memory storage** for development:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Seeded with 0 users on startup
+- Data persists only during service runtime
+- Ready for PostgreSQL integration
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+## Testing
+
+Run the test suite:
+
+```sh
+pnpm --filter auth-service test
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Tests cover:
 
-## Resources
+- RegisterUseCase (happy path, email already exists, password hashing)
+- LoginUseCase (valid credentials, user not found, wrong password, JWT signing)
+- GetProfileUseCase (user found, user not found)
+- User entity creation and validation
 
-Check out a few resources that may come in handy when working with NestJS:
+## Running
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Development:
 
-## Support
+```sh
+pnpm --filter auth-service dev
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+From root:
 
-## Stay in touch
+```sh
+pnpm dev
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Then test with curl:
 
-## License
+```sh
+# Register
+curl -X POST http://localhost:4000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com","password":"secret"}'
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Login
+curl -X POST http://localhost:4000/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"secret"}'
+
+# Get profile (with token from login)
+curl -X GET http://localhost:4000/users/me \
+  -H "Authorization: Bearer {accessToken}"
+```
+
+## Tech Stack
+
+- **NestJS** - Framework
+- **@nestjs/jwt** - JWT token handling
+- **@nestjs/passport** - Authentication strategy support
+- **bcrypt** - Password hashing
+- **amqplib** - RabbitMQ client
+- **Jest** - Testing framework
+- **Pino** - Structured logging
+
+## Error Handling
+
+The service throws NestJS exceptions that are serialized over TCP:
+
+- `ConflictException` - Email already registered (409)
+- `UnauthorizedException` - Invalid credentials (401)
+- `NotFoundException` - User not found (404)
+- `BadRequestException` - Invalid input (400)
+
+These are caught by the API Gateway's exception filter and converted to HTTP responses.
