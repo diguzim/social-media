@@ -284,7 +284,7 @@ importers:
         specifier: ^20.0.0
         version: 20.19.37
       cypress:
-        specifier: ^13.6.2
+        specifier: ^13.17.0
         version: 13.17.0
       typescript:
         specifier: ^5.7.0
@@ -7182,7 +7182,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 20.19.37
+      '@types/node': 22.19.7
     optional: true
 
   '@typescript-eslint/eslint-plugin@8.50.0(@typescript-eslint/parser@8.50.0(eslint@9.39.1)(typescript@5.9.2))(eslint@9.39.1)(typescript@5.9.2)':
@@ -8026,7 +8026,7 @@ snapshots:
       process: 0.11.10
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
-      semver: 7.7.3
+      semver: 7.7.4
       supports-color: 8.1.1
       tmp: 0.2.5
       tree-kill: 1.2.2

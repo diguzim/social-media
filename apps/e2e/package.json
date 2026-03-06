@@ -7,12 +7,13 @@
     "test": "cypress run",
     "test:debug": "cypress run --headed --browser chrome",
     "test:electron": "cypress run --headed --browser electron",
+    "test:watch": "cypress run --headed --browser electron --no-exit",
     "open": "cypress open",
     "open:electron": "cypress open --browser electron",
     "ci": "cypress run --headless"
   },
   "devDependencies": {
-    "cypress": "^13.6.2",
+    "cypress": "^13.17.0",
     "@cypress/schematic": "^2.5.1",
     "@types/node": "^20.0.0",
     "typescript": "^5.7.0"
