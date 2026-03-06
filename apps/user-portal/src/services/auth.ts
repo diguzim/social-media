@@ -23,6 +23,12 @@ export interface LoginResponse {
   email: string;
 }
 
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export async function registerUser(data: RegisterRequest): Promise<RegisterResponse> {
   const response = await fetch(`${API_BASE_URL}/users`, {
     method: 'POST',
@@ -57,4 +63,41 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
   const result = await response.json();
   localStorage.setItem('token', result.accessToken);
   return result;
+}
+
+export async function getProfile(): Promise<UserProfile> {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch profile');
+  }
+
+  const profile = await response.json();
+  storeUserProfile(profile);
+  return profile;
+}
+
+export function storeUserProfile(profile: UserProfile): void {
+  localStorage.setItem('user', JSON.stringify(profile));
+}
+
+export function getUserProfile(): UserProfile | null {
+  const userStr = localStorage.getItem('user');
+  if (!userStr) return null;
+  try {
+    return JSON.parse(userStr);
+  } catch {
+    return null;
+  }
 }
