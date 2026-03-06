@@ -27,8 +27,8 @@ export function Register() {
 
     try {
       const result = await registerUser(formData);
-      alert(`Welcome ${result.name}! Registration successful.`);
-      navigate('/');
+      alert(`Welcome ${result.name}! Registration successful. Please log in.`);
+      navigate('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -105,6 +105,12 @@ export function Register() {
       </form>
 
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
+        <p>
+          Already have an account?{' '}
+          <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
+            Login
+          </a>
+        </p>
         <a href="/" style={{ color: '#007bff', textDecoration: 'none' }}>
           Back to Home
         </a>
