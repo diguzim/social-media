@@ -36,6 +36,6 @@ COPY apps/event-handler-service/src ./src
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prefer-offline --prod
 
-EXPOSE 5000
+EXPOSE 4003
 
 CMD ["node", "dist/main.js"]

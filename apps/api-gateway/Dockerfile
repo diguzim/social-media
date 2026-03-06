@@ -60,7 +60,7 @@ COPY --from=builder /app/apps/api-gateway/dist ./apps/api-gateway/dist
 WORKDIR /app/apps/api-gateway
 
 # Expose the HTTP port
-EXPOSE 3000
+EXPOSE 4000
 
 # Run the service
 CMD ["node", "dist/main.js"]

@@ -5,7 +5,7 @@ Microservice for managing posts (CRUD operations).
 ## Tech Stack
 
 - NestJS
-- TCP Transport (Port 4001)
+- TCP Transport (Port 4002)
 - In-memory storage
 
 ## Features

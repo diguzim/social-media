@@ -60,7 +60,7 @@ COPY --from=builder /app/apps/auth-service/dist ./apps/auth-service/dist
 WORKDIR /app/apps/auth-service
 
 # Expose the microservice port
-EXPOSE 4000
+EXPOSE 4001
 
 # Run the service
 CMD ["node", "dist/main.js"]

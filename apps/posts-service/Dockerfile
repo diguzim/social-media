@@ -60,7 +60,7 @@ COPY --from=builder /app/apps/posts-service/dist ./apps/posts-service/dist
 WORKDIR /app/apps/posts-service
 
 # Expose the microservice port
-EXPOSE 4001
+EXPOSE 4002
 
 # Run the service
 CMD ["node", "dist/main.js"]

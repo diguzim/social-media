@@ -9,7 +9,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: parseInt(process.env.PORT || '4000', 10),
+        port: parseInt(process.env.PORT || '4001', 10),
       },
     },
   );

@@ -13,10 +13,11 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 
 ## Apps
 
-- `api-gateway`: HTTP entrypoint for clients
-- `auth-service`: Auth microservice listening on TCP
-- `posts-service`: Posts microservice listening on TCP
-- `event-handler-service`: Background worker that processes domain events
+- `api-gateway`: HTTP entrypoint for clients (port 4000)
+- `auth-service`: Auth microservice listening on TCP (port 4001)
+- `posts-service`: Posts microservice listening on TCP (port 4002)
+- `event-handler-service`: Background worker that processes domain events (port 4003)
+- `user-portal`: React + Vite frontend for user management (port 3000)
 
 ## Packages
 
@@ -128,6 +129,7 @@ pnpm --filter api-gateway dev
 pnpm --filter auth-service dev
 pnpm --filter posts-service dev
 pnpm --filter event-handler-service dev
+pnpm --filter user-portal dev
 ```
 
 ## Useful Scripts
