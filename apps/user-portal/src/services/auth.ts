@@ -61,12 +61,13 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
   }
 
   const result = await response.json();
+  localStorage.setItem('jwtToken', result.accessToken);
   localStorage.setItem('token', result.accessToken);
   return result;
 }
 
 export async function getProfile(): Promise<UserProfile> {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('jwtToken') ?? localStorage.getItem('token');
   if (!token) {
     throw new Error('No authentication token found');
   }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, LoginRequest } from '../services/auth';
+import { loginUser, getProfile, getUserProfile, LoginRequest } from '../services/auth';
 
 export function Login() {
   const navigate = useNavigate();
@@ -25,7 +25,20 @@ export function Login() {
     setLoading(true);
 
     try {
-      const result = await loginUser(formData);
+      await loginUser(formData);
+
+      // Ensure user profile is loaded and stored in localStorage
+      try {
+        await getProfile();
+      } catch {
+        const cachedUser = getUserProfile();
+        if (!cachedUser) {
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('token');
+          throw new Error('Failed to load user profile after login');
+        }
+      }
+
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

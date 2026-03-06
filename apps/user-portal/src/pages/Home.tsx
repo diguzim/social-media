@@ -10,13 +10,6 @@ export function Home() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
     const fetchProfile = async () => {
       try {
         const profile = await getProfile();
@@ -27,8 +20,6 @@ export function Home() {
         if (cachedUser) {
           setUser(cachedUser);
           setError('');
-        } else {
-          setTimeout(() => navigate('/login', { replace: true }), 2000);
         }
       } finally {
         setLoading(false);
@@ -36,9 +27,10 @@ export function Home() {
     };
 
     fetchProfile();
-  }, [navigate]);
+  }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login', { replace: true });
