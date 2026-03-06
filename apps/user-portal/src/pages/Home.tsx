@@ -15,7 +15,7 @@ export function Home() {
             borderRadius: '4px',
           }}
         >
-          Create Account
+          Register
         </a>
       </div>
     </div>

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "types": ["cypress", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "cypress/*"]
+    }
+  },
+  "include": ["cypress/**/*"],
+  "exclude": ["node_modules"]
+}
