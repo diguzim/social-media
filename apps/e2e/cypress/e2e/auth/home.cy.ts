@@ -1,4 +1,4 @@
-describe("Welcome Page Flow", () => {
+describe("Home Page Flow", () => {
   const runId = `${Date.now()}-${Cypress._.random(1000, 9999)}`;
   const testUser = {
     name: `Welcome Test User ${runId}`,
@@ -20,20 +20,23 @@ describe("Welcome Page Flow", () => {
     cy.visitLogin();
     cy.loginUser(testUser.email, testUser.password);
 
-    // Wait for redirect to welcome page
-    cy.url().should("include", "/welcome");
+    // Wait for redirect to home page
+    cy.url().should("include", "/");
   });
 
   it("should display welcome page with loading state initially", () => {
-    cy.visitWelcome();
+    cy.visitHome();
+
+    // Should show loading or page title
+    cy.contains("h1").should("include.text", "Welcome");
   });
 
   it("should fetch and display user profile on welcome page", () => {
-    // Should be on welcome page after login
-    cy.url().should("include", "/welcome");
+    // Should be on home page after login
+    cy.url().should("include", "/");
 
     // Should display welcome message with user name
-    cy.contains("h1", "Welcome").should("be.visible");
+    cy.contains("h1").should("include.text", "Welcome");
 
     // Should display user details
     cy.get("body").should("contain", testUser.email);
@@ -41,7 +44,7 @@ describe("Welcome Page Flow", () => {
 
   it("should display user information in profile section", () => {
     // Wait for profile fetch
-    cy.url().should("include", "/welcome");
+    cy.url().should("include", "/");
 
     // Should show email (from the fetched profile)
     cy.get("p").should("include.text", testUser.email);
@@ -58,9 +61,8 @@ describe("Welcome Page Flow", () => {
     // Click logout button
     cy.contains("button", "Logout").click();
 
-    // Should be redirected to home page
-    cy.url().should("include", "/");
-    cy.contains("h1", "User Portal").should("be.visible");
+    // Should be redirected to login page
+    cy.url().should("include", "/login");
 
     // Token should be cleared from localStorage
     cy.window().then((win) => {
@@ -75,13 +77,10 @@ describe("Welcome Page Flow", () => {
       win.localStorage.clear();
     });
 
-    // Reload page so Welcome component checks for token on mount
+    // Reload page so Home component checks for token on mount
     cy.reload();
 
-    // Should try to navigate to welcome
-    cy.visit("/welcome");
-
-    // Should redirect to login (Welcome component checks token in useEffect)
+    // Should redirect to login (Home component checks token in useEffect)
     cy.url({ timeout: 5000 }).should("include", "/login");
   });
 });

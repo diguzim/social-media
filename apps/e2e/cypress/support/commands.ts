@@ -22,11 +22,6 @@ declare namespace Cypress {
     visitLogin(): Chainable<Window>;
 
     /**
-     * Navigate to welcome page and verify it's loaded
-     */
-    visitWelcome(): Chainable<Window>;
-
-    /**
      * Register a new user via the form
      * @param user - Object with name, email, password
      */
@@ -89,7 +84,7 @@ function fillEnabledInput(
  */
 Cypress.Commands.add("visitHome", () => {
   cy.visit("/");
-  cy.contains("h1", "Home").should("be.visible");
+  cy.contains("h1").should("include.text", "Welcome");
 });
 
 /**
@@ -106,14 +101,6 @@ Cypress.Commands.add("visitRegister", () => {
 Cypress.Commands.add("visitLogin", () => {
   cy.visit("/login");
   cy.contains("h1", "Login").should("be.visible");
-});
-
-/**
- * Navigate to welcome page
- */
-Cypress.Commands.add("visitWelcome", () => {
-  cy.visit("/welcome");
-  cy.contains("h1", "Welcome").should("be.visible");
 });
 
 /**

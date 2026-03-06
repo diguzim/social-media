@@ -26,7 +26,7 @@ export function Login() {
 
     try {
       const result = await loginUser(formData);
-      navigate('/welcome');
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
