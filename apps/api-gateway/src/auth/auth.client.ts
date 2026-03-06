@@ -8,7 +8,8 @@ export const authClientProvider = {
     ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        port: 4000,
+        host: process.env.AUTH_SERVICE_HOST || 'localhost',
+        port: parseInt(process.env.AUTH_SERVICE_PORT || '4001', 10),
       },
     }),
 };

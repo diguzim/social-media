@@ -8,7 +8,8 @@ export const postsClientProvider = {
     ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        port: 4001,
+        host: process.env.POSTS_SERVICE_HOST || 'localhost',
+        port: parseInt(process.env.POSTS_SERVICE_PORT || '4002', 10),
       },
     }),
 };
