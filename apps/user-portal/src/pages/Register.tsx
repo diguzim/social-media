@@ -27,7 +27,6 @@ export function Register() {
 
     try {
       const result = await registerUser(formData);
-      alert(`Welcome ${result.name}! Registration successful. Please log in.`);
       navigate('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');

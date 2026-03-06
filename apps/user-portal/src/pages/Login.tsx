@@ -26,7 +26,6 @@ export function Login() {
 
     try {
       const result = await loginUser(formData);
-      alert(`Welcome back, ${result.email}!`);
       navigate('/welcome');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
