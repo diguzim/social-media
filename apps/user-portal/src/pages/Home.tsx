@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProfile, getUserProfile } from '../services/auth';
 import type { UserProfile } from '../services/auth';
+import { Feed } from '../components/feed/Feed';
 
 export function Home() {
   const navigate = useNavigate();
@@ -61,13 +62,12 @@ export function Home() {
   }
 
   return (
-    <div
-      data-testid="home-page"
-      style={{ padding: '40px', maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}
-    >
+    <div data-testid="home-page" style={{ padding: '40px', maxWidth: '900px', margin: '0 auto' }}>
       {user && (
         <>
-          <h1 data-testid="home-welcome-title">Welcome {user.name}!</h1>
+          <h1 data-testid="home-welcome-title" style={{ textAlign: 'center' }}>
+            Welcome {user.name}!
+          </h1>
           <div
             data-testid="home-profile-card"
             style={{
@@ -75,6 +75,7 @@ export function Home() {
               padding: '20px',
               backgroundColor: '#f5f5f5',
               borderRadius: '8px',
+              textAlign: 'center',
             }}
           >
             <p>
@@ -89,6 +90,10 @@ export function Home() {
           </div>
         </>
       )}
+
+      <div style={{ marginTop: '28px' }}>
+        <Feed />
+      </div>
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
         <button

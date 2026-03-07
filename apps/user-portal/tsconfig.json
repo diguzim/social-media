@@ -8,6 +8,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
+    "types": ["vite/client", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"]
