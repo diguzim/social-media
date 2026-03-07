@@ -16,6 +16,11 @@
     "cypress": "^13.17.0",
     "@cypress/schematic": "^2.5.1",
     "@types/node": "^20.0.0",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "vite": "^5.0.8",
     "typescript": "^5.7.0"
   }
 }

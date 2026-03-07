@@ -37,9 +37,18 @@ export default defineConfig({
     },
   },
   component: {
+    specPattern: "cypress/component/**/*.cy.{ts,tsx}",
+    supportFile: "cypress/support/component.ts",
     devServer: {
       framework: "react",
       bundler: "vite",
+      viteConfig: {
+        server: {
+          fs: {
+            allow: [".."],
+          },
+        },
+      },
     },
   },
 });
