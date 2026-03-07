@@ -36,14 +36,18 @@ export function Register() {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
+    <div
+      data-testid="register-page"
+      style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}
+    >
+      <h1 data-testid="register-page-title">Register</h1>
+      <form data-testid="register-form" onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="name" style={{ display: 'block', marginBottom: '5px' }}>
             Name
           </label>
           <input
+            data-testid="register-name-input"
             type="text"
             id="name"
             name="name"
@@ -59,6 +63,7 @@ export function Register() {
             Email
           </label>
           <input
+            data-testid="register-email-input"
             type="email"
             id="email"
             name="email"
@@ -74,6 +79,7 @@ export function Register() {
             Password
           </label>
           <input
+            data-testid="register-password-input"
             type="password"
             id="password"
             name="password"
@@ -84,9 +90,14 @@ export function Register() {
           />
         </div>
 
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
+        {error && (
+          <div data-testid="register-error-message" style={{ color: 'red', marginBottom: '15px' }}>
+            {error}
+          </div>
+        )}
 
         <button
+          data-testid="register-submit-button"
           type="submit"
           disabled={loading}
           style={{
@@ -106,11 +117,19 @@ export function Register() {
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
         <p>
           Already have an account?{' '}
-          <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
+          <a
+            data-testid="register-login-link"
+            href="/login"
+            style={{ color: '#007bff', textDecoration: 'none' }}
+          >
             Login
           </a>
         </p>
-        <a href="/" style={{ color: '#007bff', textDecoration: 'none' }}>
+        <a
+          data-testid="register-back-home-link"
+          href="/"
+          style={{ color: '#007bff', textDecoration: 'none' }}
+        >
           Back to Home
         </a>
       </div>

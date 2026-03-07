@@ -47,9 +47,9 @@ export function Login() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
+    <div data-testid="login-page" style={{ padding: '40px', maxWidth: '400px', margin: '0 auto' }}>
+      <h1 data-testid="login-page-title">Login</h1>
+      <form data-testid="login-form" onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
           <label
             htmlFor="email"
@@ -58,6 +58,7 @@ export function Login() {
             Email:
           </label>
           <input
+            data-testid="login-email-input"
             id="email"
             type="email"
             name="email"
@@ -82,6 +83,7 @@ export function Login() {
             Password:
           </label>
           <input
+            data-testid="login-password-input"
             id="password"
             type="password"
             name="password"
@@ -98,9 +100,14 @@ export function Login() {
           />
         </div>
 
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
+        {error && (
+          <div data-testid="login-error-message" style={{ color: 'red', marginBottom: '15px' }}>
+            {error}
+          </div>
+        )}
 
         <button
+          data-testid="login-submit-button"
           type="submit"
           disabled={loading}
           style={{
@@ -120,7 +127,11 @@ export function Login() {
 
       <p style={{ marginTop: '20px', textAlign: 'center' }}>
         Don't have an account?{' '}
-        <a href="/register" style={{ color: '#007bff', textDecoration: 'none' }}>
+        <a
+          data-testid="login-create-account-link"
+          href="/register"
+          style={{ color: '#007bff', textDecoration: 'none' }}
+        >
           Create one
         </a>
       </p>

@@ -55,14 +55,15 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
 
 2. **Login** (`/login`) - User authenticates with email and password
    - POST `/users/login` → auth-service validates credentials
-   - JWT token generated and stored in localStorage
-   - User redirected to welcome page
+   - JWT token generated and stored in localStorage (`jwtToken`)
+   - User profile fetched via GET `/users/me` and cached as `user`
+   - User redirected to home page
 
-3. **Welcome** (`/welcome`) - Protected page showing user profile
-   - GET `/users/me` (requires JWT Bearer token)
-   - User profile (id, name, email) cached in localStorage
-   - Shows "Welcome {name}!" with user details
-   - Logout clears tokens and redirects to home
+3. **Protected Pages** (`/`, `/profile`) - Authenticated user area
+   - Route guard requires both `jwtToken` and `user` in localStorage
+   - Home (`/`) shows "Welcome {name}!" and user summary
+   - Profile (`/profile`) shows dedicated profile details
+   - Logout clears auth data and redirects to `/login`
 
 ## Event-Driven Architecture
 

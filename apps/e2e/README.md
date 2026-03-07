@@ -115,6 +115,8 @@ Optimized for CI/CD environments (headless, optimized output).
 
 ### Using the E2E Runner Script
 
+      home.cy.ts          # Home page and profile view
+
 A convenience script `run-e2e.sh` is available to handle startup:
 
 ```sh
@@ -124,11 +126,30 @@ chmod +x run-e2e.sh
 # Run with Cypress UI
 ./run-e2e.sh open
 
+
+- `cy.getByTestId(testId)` - Query elements using `data-testid`
 # Run with visible browser
 ./run-e2e.sh debug
 
-# Run headless
 ./run-e2e.sh
+```
+
+## Selector Strategy (`data-testid`)
+
+All E2E selectors should use `data-testid` attributes for stability.
+
+- ✅ Prefer: `cy.getByTestId("login-submit-button")`
+- ❌ Avoid for interaction: `cy.contains("button", "Login")`
+
+Use text assertions only when text itself is the behavior under test.
+
+Example:
+
+```typescript
+cy.getByTestId("login-email-input").type("user@example.com");
+cy.getByTestId("login-password-input").type("Secret123!");
+cy.getByTestId("login-submit-button").click();
+cy.getByTestId("home-welcome-title").should("contain.text", "Welcome");
 ```
 
 This script:
@@ -173,7 +194,7 @@ Currently covers:
 
 - **Register**: Navigation, form submission, validation, redirect
 - **Login**: Valid/invalid credentials, redirect, token storage
-- **Welcome**: Profile fetch, data display, logout, navigation
+- **Home**: Profile fetch, data display, logout, navigation
 
 ## Best Practices
 

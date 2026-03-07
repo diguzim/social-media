@@ -7,6 +7,12 @@ const INPUT_RETRY_DELAY_MS = 150;
 declare namespace Cypress {
   interface Chainable {
     /**
+     * Query element(s) by data-testid attribute
+     * @param testId - data-testid value
+     */
+    getByTestId(testId: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
      * Navigate to home page and verify it's loaded
      */
     visitHome(): Chainable<Window>;
@@ -80,6 +86,13 @@ function fillEnabledInput(
 }
 
 /**
+ * Query element by data-testid
+ */
+Cypress.Commands.add("getByTestId", (testId: string) => {
+  return cy.get(`[data-testid="${testId}"]`);
+});
+
+/**
  * Navigate to home page
  */
 Cypress.Commands.add("visitHome", () => {
@@ -92,7 +105,7 @@ Cypress.Commands.add("visitHome", () => {
  */
 Cypress.Commands.add("visitRegister", () => {
   cy.visit("/register");
-  cy.contains("h1", "Register").should("be.visible");
+  cy.getByTestId("register-page-title").should("be.visible");
 });
 
 /**
@@ -100,7 +113,7 @@ Cypress.Commands.add("visitRegister", () => {
  */
 Cypress.Commands.add("visitLogin", () => {
   cy.visit("/login");
-  cy.contains("h1", "Login").should("be.visible");
+  cy.getByTestId("login-page-title").should("be.visible");
 });
 
 /**
@@ -109,11 +122,19 @@ Cypress.Commands.add("visitLogin", () => {
 Cypress.Commands.add(
   "registerUser",
   (user: { name: string; email: string; password: string }) => {
-    fillEnabledInput('input[name="name"]', user.name, "name");
-    fillEnabledInput('input[name="email"]', user.email, "email");
-    fillEnabledInput('input[name="password"]', user.password, "password");
+    fillEnabledInput('[data-testid="register-name-input"]', user.name, "name");
+    fillEnabledInput(
+      '[data-testid="register-email-input"]',
+      user.email,
+      "email",
+    );
+    fillEnabledInput(
+      '[data-testid="register-password-input"]',
+      user.password,
+      "password",
+    );
 
-    cy.contains("button", "Register")
+    cy.getByTestId("register-submit-button")
       .should("be.visible")
       .and("not.be.disabled")
       .click();
@@ -124,10 +145,14 @@ Cypress.Commands.add(
  * Fill and submit login form
  */
 Cypress.Commands.add("loginUser", (email: string, password: string) => {
-  fillEnabledInput('input[name="email"]', email, "email");
-  fillEnabledInput('input[name="password"]', password, "password");
+  fillEnabledInput('[data-testid="login-email-input"]', email, "email");
+  fillEnabledInput(
+    '[data-testid="login-password-input"]',
+    password,
+    "password",
+  );
 
-  cy.contains("button", "Login")
+  cy.getByTestId("login-submit-button")
     .should("be.visible")
     .and("not.be.disabled")
     .click();
@@ -141,10 +166,6 @@ Cypress.Commands.add(
   (user: { name: string; email: string; password: string }) => {
     cy.visitRegister();
     cy.registerUser(user);
-    // After registration, should be redirected to login and show alert
-    cy.on("window:alert", (str) => {
-      expect(str).to.include("Registration successful");
-    });
     cy.visitLogin();
     cy.loginUser(user.email, user.password);
   },

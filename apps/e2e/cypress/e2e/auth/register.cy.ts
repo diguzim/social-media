@@ -5,14 +5,14 @@ describe("User Registration Flow", () => {
 
   it("should navigate from login to register page via link click", () => {
     // Verify login page is loaded
-    cy.contains("h1", "Login").should("be.visible");
+    cy.getByTestId("login-page-title").should("be.visible");
 
     // Click registration link
-    cy.contains("a", "Create one").should("be.visible").click();
+    cy.getByTestId("login-create-account-link").should("be.visible").click();
 
     // Should be on register page
     cy.url().should("include", "/register");
-    cy.contains("h1", "Register").should("be.visible");
+    cy.getByTestId("register-page-title").should("be.visible");
   });
 
   it("should successfully register a new user", () => {
@@ -27,18 +27,22 @@ describe("User Registration Flow", () => {
     };
 
     // Fill registration form
-    cy.get('input[name="name"]').should("be.visible").type(testUser.name);
-    cy.get('input[name="email"]').should("be.visible").type(testUser.email);
-    cy.get('input[name="password"]')
+    cy.getByTestId("register-name-input")
+      .should("be.visible")
+      .type(testUser.name);
+    cy.getByTestId("register-email-input")
+      .should("be.visible")
+      .type(testUser.email);
+    cy.getByTestId("register-password-input")
       .should("be.visible")
       .type(testUser.password);
 
     // Submit form
-    cy.contains("button", "Register").should("be.visible").click();
+    cy.getByTestId("register-submit-button").should("be.visible").click();
 
     // Should be redirected to login page
     cy.url().should("include", "/login");
-    cy.contains("h1", "Login").should("be.visible");
+    cy.getByTestId("login-page-title").should("be.visible");
   });
 
   it("should show error message for empty form submission", () => {
@@ -46,7 +50,7 @@ describe("User Registration Flow", () => {
     cy.visit("/register");
 
     // Try to submit empty form
-    cy.contains("button", "Register").click();
+    cy.getByTestId("register-submit-button").click();
 
     // Form should still be on register page (HTML5 validation prevents submit)
     cy.url().should("include", "/register");
@@ -66,7 +70,7 @@ describe("User Registration Flow", () => {
 
     // Verify redirected to login
     cy.url().should("include", "/login");
-    cy.contains("h1", "Login").should("be.visible");
-    cy.contains("a", "Create one").should("be.visible");
+    cy.getByTestId("login-page-title").should("be.visible");
+    cy.getByTestId("login-create-account-link").should("be.visible");
   });
 });

@@ -13,10 +13,10 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 ## Routes
 
-- `/` - Home page with navigation links
+- `/` - Protected home page showing user data
 - `/register` - User registration form
 - `/login` - User login form
-- `/welcome` - Protected welcome page showing user profile (after successful login)
+- `/profile` - Protected profile page
 
 ## Authentication Flow
 
@@ -26,20 +26,36 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 2. **Login** - User authenticates
    - Form submits to `POST /users/login` (api-gateway)
-   - JWT token stored in localStorage
-   - Redirects to Welcome page
 
-3. **Welcome** - Protected profile page
-   - Fetches `GET /users/me` with Bearer token
-   - Stores user profile in localStorage
-   - Displays user details
-   - Logout button clears tokens and returns to home
+- JWT token stored in localStorage (`jwtToken`)
+- User profile fetched from `GET /users/me` and cached in localStorage (`user`)
+- Redirects to Home page
+
+3. **Protected Area** (`/`, `/profile`)
+
+- Protected by route guard (requires `jwtToken` + `user` in localStorage)
+- Home shows welcome + user info
+- Profile shows dedicated profile view
+- Logout clears auth data and redirects to login
 
 ## Data Storage
 
-- **JWT Token** - localStorage key `token` (from login response)
+- **JWT Token** - localStorage key `jwtToken` (from login response)
 - **User Profile** - localStorage key `user` (from /users/me response)
   - Structure: `{ id, name, email }`
+
+## Test Selectors (`data-testid`)
+
+UI elements used in E2E/Playwright flows expose `data-testid` attributes.
+
+Examples:
+
+- Login: `login-email-input`, `login-password-input`, `login-submit-button`
+- Register: `register-name-input`, `register-email-input`, `register-submit-button`
+- Home: `home-welcome-title`, `home-profile-card`, `home-logout-button`
+- Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
+
+These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
 
 ## API Integration
 
@@ -76,8 +92,8 @@ pnpm build
 ```
 src/
   app/            - Application root and routing
-  pages/          - Page components (Home, Register, Login, Welcome)
-  components/     - Reusable UI components (placeholder)
+  pages/          - Page components (Home, Register, Login, Profile)
+  components/     - Reusable UI components (e.g., Navbar, AuthenticatedLayout)
   services/       - API clients (auth.ts with register, login, getProfile)
   hooks/          - Custom React hooks (placeholder)
 ```

@@ -28,7 +28,10 @@ describe("Home Page Flow", () => {
     cy.visitHome();
 
     // Page may show loading first, then welcome heading after profile is loaded
-    cy.contains("h1", `Welcome ${testUser.name}!`).should("be.visible");
+    cy.getByTestId("home-welcome-title").should(
+      "contain.text",
+      `Welcome ${testUser.name}!`,
+    );
   });
 
   it("should fetch and display user profile on welcome page", () => {
@@ -36,10 +39,13 @@ describe("Home Page Flow", () => {
     cy.url().should("include", "/");
 
     // Should display welcome message with user name
-    cy.contains("h1", `Welcome ${testUser.name}!`).should("be.visible");
+    cy.getByTestId("home-welcome-title").should(
+      "contain.text",
+      `Welcome ${testUser.name}!`,
+    );
 
     // Should display user details
-    cy.get("body").should("contain", testUser.email);
+    cy.getByTestId("home-user-email").should("contain.text", testUser.email);
   });
 
   it("should display user information in profile section", () => {
@@ -47,19 +53,19 @@ describe("Home Page Flow", () => {
     cy.url().should("include", "/");
 
     // Should show email (from the fetched profile)
-    cy.get("p").should("include.text", testUser.email);
-
-    // Should show at least the name label or content
-    cy.contains("strong", "Email:").should("be.visible");
+    cy.getByTestId("home-profile-card").should("be.visible");
+    cy.getByTestId("home-user-email").should("contain.text", testUser.email);
   });
 
   it("should have Logout button on welcome page", () => {
-    cy.contains("button", "Logout").should("be.visible");
+    cy.getByTestId("home-logout-button").should("be.visible");
+    cy.getByTestId("navbar-menu-button").should("be.visible");
   });
 
   it("should logout and clear tokens when logout button is clicked", () => {
-    // Click logout button
-    cy.contains("button", "Logout").click();
+    // Click logout button from navbar dropdown
+    cy.getByTestId("navbar-menu-button").click();
+    cy.getByTestId("navbar-logout-button").click();
 
     // Should be redirected to login page
     cy.url().should("include", "/login");

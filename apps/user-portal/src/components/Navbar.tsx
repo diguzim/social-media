@@ -13,6 +13,7 @@ export function Navbar() {
 
   return (
     <nav
+      data-testid="navbar"
       style={{
         backgroundColor: '#007bff',
         color: 'white',
@@ -24,6 +25,7 @@ export function Navbar() {
       }}
     >
       <Link
+        data-testid="navbar-home-link"
         to="/"
         style={{
           color: 'white',
@@ -35,10 +37,13 @@ export function Navbar() {
         Home
       </Link>
 
-      <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Social Media</h1>
+      <h1 data-testid="navbar-title" style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>
+        Social Media
+      </h1>
 
-      <div style={{ position: 'relative' }}>
+      <div data-testid="navbar-menu-container" style={{ position: 'relative' }}>
         <button
+          data-testid="navbar-menu-button"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           style={{
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -56,6 +61,7 @@ export function Navbar() {
 
         {isDropdownOpen && (
           <div
+            data-testid="navbar-menu-dropdown"
             style={{
               position: 'absolute',
               right: 0,
@@ -69,6 +75,7 @@ export function Navbar() {
             }}
           >
             <Link
+              data-testid="navbar-profile-link"
               to="/profile"
               onClick={() => setIsDropdownOpen(false)}
               style={{
@@ -84,6 +91,7 @@ export function Navbar() {
               Profile
             </Link>
             <button
+              data-testid="navbar-logout-button"
               onClick={() => {
                 setIsDropdownOpen(false);
                 handleLogout();

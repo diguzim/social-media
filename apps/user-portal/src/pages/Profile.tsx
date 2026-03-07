@@ -29,25 +29,37 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-        <p>Loading your profile...</p>
+      <div
+        data-testid="profile-loading-state"
+        style={{ padding: '40px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}
+      >
+        <p data-testid="profile-loading-text">Loading your profile...</p>
       </div>
     );
   }
 
   if (error && !user) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-        <p style={{ color: 'red' }}>{error}</p>
+      <div
+        data-testid="profile-error-state"
+        style={{ padding: '40px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}
+      >
+        <p data-testid="profile-error-message" style={{ color: 'red' }}>
+          {error}
+        </p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>Profile</h1>
+    <div
+      data-testid="profile-page"
+      style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}
+    >
+      <h1 data-testid="profile-page-title">Profile</h1>
       {user && (
         <div
+          data-testid="profile-user-card"
           style={{
             marginTop: '20px',
             padding: '24px',
@@ -60,21 +72,27 @@ export function Profile() {
             <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>
               User ID:
             </label>
-            <p style={{ margin: 0, color: '#666' }}>{user.id}</p>
+            <p data-testid="profile-user-id" style={{ margin: 0, color: '#666' }}>
+              {user.id}
+            </p>
           </div>
 
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>
               Name:
             </label>
-            <p style={{ margin: 0, color: '#333' }}>{user.name}</p>
+            <p data-testid="profile-user-name" style={{ margin: 0, color: '#333' }}>
+              {user.name}
+            </p>
           </div>
 
           <div>
             <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '4px' }}>
               Email:
             </label>
-            <p style={{ margin: 0, color: '#333' }}>{user.email}</p>
+            <p data-testid="profile-user-email" style={{ margin: 0, color: '#333' }}>
+              {user.email}
+            </p>
           </div>
         </div>
       )}

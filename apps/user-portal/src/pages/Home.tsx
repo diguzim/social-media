@@ -37,27 +37,39 @@ export function Home() {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
-        <p>Loading your profile...</p>
+      <div
+        data-testid="home-loading-state"
+        style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}
+      >
+        <p data-testid="home-loading-text">Loading your profile...</p>
       </div>
     );
   }
 
   if (error && !user) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
-        <p style={{ color: 'red' }}>{error}</p>
+      <div
+        data-testid="home-error-state"
+        style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}
+      >
+        <p data-testid="home-error-message" style={{ color: 'red' }}>
+          {error}
+        </p>
         <p>Redirecting to login...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '40px', maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
+    <div
+      data-testid="home-page"
+      style={{ padding: '40px', maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}
+    >
       {user && (
         <>
-          <h1>Welcome {user.name}!</h1>
+          <h1 data-testid="home-welcome-title">Welcome {user.name}!</h1>
           <div
+            data-testid="home-profile-card"
             style={{
               marginTop: '20px',
               padding: '20px',
@@ -68,7 +80,7 @@ export function Home() {
             <p>
               <strong>ID:</strong> {user.id}
             </p>
-            <p>
+            <p data-testid="home-user-email">
               <strong>Email:</strong> {user.email}
             </p>
             <p>
@@ -80,6 +92,7 @@ export function Home() {
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
         <button
+          data-testid="home-logout-button"
           onClick={handleLogout}
           style={{
             padding: '10px 15px',
