@@ -19,6 +19,12 @@ describe("User Login Flow", () => {
 
     // Should redirect to login
     cy.url().should("include", "/login");
+
+    // Alias common login page elements (guaranteed to exist)
+    cy.getByTestId("login-email-input").as("loginEmailInput");
+    cy.getByTestId("login-password-input").as("loginPasswordInput");
+    cy.getByTestId("login-submit-button").as("loginSubmitButton");
+    cy.getByTestId("login-create-account-link").as("loginCreateAccountLink");
   });
 
   it("should successfully login with valid credentials", () => {
@@ -26,15 +32,13 @@ describe("User Login Flow", () => {
       const testUser = (win as any).testUser;
 
       // Fill login form
-      cy.getByTestId("login-email-input")
-        .should("be.visible")
-        .type(testUser.email);
-      cy.getByTestId("login-password-input")
+      cy.get("@loginEmailInput").should("be.visible").type(testUser.email);
+      cy.get("@loginPasswordInput")
         .should("be.visible")
         .type(testUser.password);
 
       // Submit form
-      cy.getByTestId("login-submit-button").should("be.visible").click();
+      cy.get("@loginSubmitButton").should("be.visible").click();
 
       // Should be redirected to home page
       cy.getByTestId("home-welcome-title").should(
@@ -47,18 +51,21 @@ describe("User Login Flow", () => {
   it("should show error for invalid email", () => {
     cy.visitLogin();
 
+    // Alias elements for this test
+    cy.getByTestId("login-email-input").as("loginEmailInput");
+    cy.getByTestId("login-password-input").as("loginPasswordInput");
+    cy.getByTestId("login-submit-button").as("loginSubmitButton");
+
     // Enter invalid credentials
-    cy.getByTestId("login-email-input").type("nonexistent@example.com");
-    cy.getByTestId("login-password-input").type("WrongPassword123!");
+    cy.get("@loginEmailInput").type("nonexistent@example.com");
+    cy.get("@loginPasswordInput").type("WrongPassword123!");
 
     // Submit form
-    cy.getByTestId("login-submit-button").click();
+    cy.get("@loginSubmitButton").click();
 
-    // Should show error message
-    cy.getByTestId("login-error-message").should(
-      "include.text",
-      "Invalid credentials",
-    );
+    // Should show error message (alias it after it appears)
+    cy.getByTestId("login-error-message").as("loginErrorMessage");
+    cy.get("@loginErrorMessage").should("include.text", "Invalid credentials");
   });
 
   it("should show error for wrong password", () => {
@@ -67,15 +74,21 @@ describe("User Login Flow", () => {
 
       cy.visitLogin();
 
+      // Alias elements for this test
+      cy.getByTestId("login-email-input").as("loginEmailInput");
+      cy.getByTestId("login-password-input").as("loginPasswordInput");
+      cy.getByTestId("login-submit-button").as("loginSubmitButton");
+
       // Correct email, wrong password
-      cy.getByTestId("login-email-input").type(testUser.email);
-      cy.getByTestId("login-password-input").type("WrongPassword123!");
+      cy.get("@loginEmailInput").type(testUser.email);
+      cy.get("@loginPasswordInput").type("WrongPassword123!");
 
       // Submit form
-      cy.getByTestId("login-submit-button").click();
+      cy.get("@loginSubmitButton").click();
 
-      // Should show error message
-      cy.getByTestId("login-error-message").should(
+      // Should show error message (alias it after it appears)
+      cy.getByTestId("login-error-message").as("loginErrorMessage");
+      cy.get("@loginErrorMessage").should(
         "include.text",
         "Invalid credentials",
       );
@@ -85,8 +98,11 @@ describe("User Login Flow", () => {
   it("should have link to register page", () => {
     cy.visitLogin();
 
+    // Alias element for this test
+    cy.getByTestId("login-create-account-link").as("loginCreateAccountLink");
+
     // Should have a link to registration
-    cy.getByTestId("login-create-account-link").should("be.visible").click();
+    cy.get("@loginCreateAccountLink").should("be.visible").click();
 
     // Should navigate to register page
     cy.url().should("include", "/register");
@@ -97,16 +113,14 @@ describe("User Login Flow", () => {
     cy.visitLogin();
 
     // Button should be disabled when form is empty
-    cy.getByTestId("login-submit-button")
-      .should("be.visible")
-      .and("be.disabled");
+    cy.get("@loginSubmitButton").should("be.visible").and("be.disabled");
 
     // Fill only email - button should still be disabled
-    cy.getByTestId("login-email-input").type("test@example.com");
-    cy.getByTestId("login-submit-button").should("be.disabled");
+    cy.get("@loginEmailInput").type("test@example.com");
+    cy.get("@loginSubmitButton").should("be.disabled");
 
     // Fill password - button should now be enabled
-    cy.getByTestId("login-password-input").type("password123");
-    cy.getByTestId("login-submit-button").should("not.be.disabled");
+    cy.get("@loginPasswordInput").type("password123");
+    cy.get("@loginSubmitButton").should("not.be.disabled");
   });
 });
