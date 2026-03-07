@@ -84,7 +84,7 @@ function fillEnabledInput(
  */
 Cypress.Commands.add("visitHome", () => {
   cy.visit("/");
-  cy.contains("h1").should("include.text", "Welcome");
+  cy.url().should("include", "/");
 });
 
 /**

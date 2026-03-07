@@ -34,7 +34,6 @@ export function Login() {
         const cachedUser = getUserProfile();
         if (!cachedUser) {
           localStorage.removeItem('jwtToken');
-          localStorage.removeItem('token');
           throw new Error('Failed to load user profile after login');
         }
       }

@@ -31,7 +31,6 @@ export function Home() {
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login', { replace: true });
   };

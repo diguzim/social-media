@@ -6,6 +6,13 @@ import { Profile } from '../pages/Profile';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
 import { isAuthenticated } from '../utils';
 
+function ProtectedRoutes() {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <AuthenticatedLayout />;
+}
+
 export function App() {
   return (
     <BrowserRouter>
@@ -15,9 +22,7 @@ export function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Protected routes with navbar */}
-        <Route
-          element={isAuthenticated() ? <AuthenticatedLayout /> : <Navigate to="/login" replace />}
-        >
+        <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

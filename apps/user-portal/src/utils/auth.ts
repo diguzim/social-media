@@ -6,7 +6,7 @@
  * Check if user is authenticated by verifying token and user in localStorage
  */
 export function isAuthenticated(): boolean {
-  const token = localStorage.getItem('jwtToken') ?? localStorage.getItem('token');
+  const token = localStorage.getItem('jwtToken');
   const user = localStorage.getItem('user');
   return !!(token && user);
 }
@@ -15,7 +15,7 @@ export function isAuthenticated(): boolean {
  * Get token from localStorage
  */
 export function getToken(): string | null {
-  return localStorage.getItem('jwtToken') ?? localStorage.getItem('token');
+  return localStorage.getItem('jwtToken');
 }
 
 /**
@@ -30,6 +30,5 @@ export function getUser(): string | null {
  */
 export function clearAuth(): void {
   localStorage.removeItem('jwtToken');
-  localStorage.removeItem('token');
   localStorage.removeItem('user');
 }

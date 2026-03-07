@@ -38,8 +38,7 @@ describe("User Login Flow", () => {
       cy.contains("button", "Login").should("be.visible").click();
 
       // Should be redirected to home page
-      cy.url().should("include", "/");
-      cy.contains("h1").should("include.text", "Welcome");
+      cy.contains("h1", `Welcome ${testUser.name}!`).should("be.visible");
     });
   });
 

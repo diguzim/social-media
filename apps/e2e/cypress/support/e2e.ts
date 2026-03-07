@@ -25,10 +25,10 @@ afterEach(() => {
   // Clear localStorage after each test for test isolation
   cy.window().then((win) => {
     // Save token if test expects to persist (optional)
-    const token = win.localStorage.getItem("token");
+    const token = win.localStorage.getItem("jwtToken");
     win.localStorage.clear();
     if (token) {
-      win.localStorage.setItem("token", token);
+      win.localStorage.setItem("jwtToken", token);
     }
   });
 });

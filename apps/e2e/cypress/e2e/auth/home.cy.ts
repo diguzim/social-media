@@ -1,8 +1,8 @@
 describe("Home Page Flow", () => {
   const runId = `${Date.now()}-${Cypress._.random(1000, 9999)}`;
   const testUser = {
-    name: `Welcome Test User ${runId}`,
-    email: `welcome+${runId}@example.com`,
+    name: `Test User ${runId}`,
+    email: `testuser+${runId}@example.com`,
     password: "WelcomePass123!",
   };
 
@@ -27,8 +27,8 @@ describe("Home Page Flow", () => {
   it("should display welcome page with loading state initially", () => {
     cy.visitHome();
 
-    // Should show loading or page title
-    cy.contains("h1").should("include.text", "Welcome");
+    // Page may show loading first, then welcome heading after profile is loaded
+    cy.contains("h1", `Welcome ${testUser.name}!`).should("be.visible");
   });
 
   it("should fetch and display user profile on welcome page", () => {
@@ -36,7 +36,7 @@ describe("Home Page Flow", () => {
     cy.url().should("include", "/");
 
     // Should display welcome message with user name
-    cy.contains("h1").should("include.text", "Welcome");
+    cy.contains("h1", `Welcome ${testUser.name}!`).should("be.visible");
 
     // Should display user details
     cy.get("body").should("contain", testUser.email);
@@ -66,7 +66,7 @@ describe("Home Page Flow", () => {
 
     // Token should be cleared from localStorage
     cy.window().then((win) => {
-      expect(win.localStorage.getItem("token")).to.be.null;
+      expect(win.localStorage.getItem("jwtToken")).to.be.null;
       expect(win.localStorage.getItem("user")).to.be.null;
     });
   });

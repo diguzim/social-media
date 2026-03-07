@@ -1,14 +1,14 @@
 describe("User Registration Flow", () => {
   beforeEach(() => {
-    cy.visit("/");
+    cy.visitLogin();
   });
 
-  it("should navigate from home to register page via button click", () => {
-    // Verify home page is loaded
-    cy.contains("h1", "User Portal").should("be.visible");
+  it("should navigate from login to register page via link click", () => {
+    // Verify login page is loaded
+    cy.contains("h1", "Login").should("be.visible");
 
-    // Click "Register" button
-    cy.contains("a", "Register").should("be.visible").click();
+    // Click registration link
+    cy.contains("a", "Create one").should("be.visible").click();
 
     // Should be on register page
     cy.url().should("include", "/register");
@@ -32,11 +32,6 @@ describe("User Registration Flow", () => {
     cy.get('input[name="password"]')
       .should("be.visible")
       .type(testUser.password);
-
-    // Handle alert
-    cy.on("window:alert", (str) => {
-      expect(str).to.include("Registration successful");
-    });
 
     // Submit form
     cy.contains("button", "Register").should("be.visible").click();
@@ -68,11 +63,6 @@ describe("User Registration Flow", () => {
     };
 
     cy.registerUser(testUser);
-
-    // Expect alert
-    cy.on("window:alert", (str) => {
-      expect(str).to.include("Registration successful");
-    });
 
     // Verify redirected to login
     cy.url().should("include", "/login");
