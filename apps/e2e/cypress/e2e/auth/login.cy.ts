@@ -92,4 +92,21 @@ describe("User Login Flow", () => {
     cy.url().should("include", "/register");
     cy.getByTestId("register-page-title").should("be.visible");
   });
+
+  it("should have disabled submit button until all fields are filled", () => {
+    cy.visitLogin();
+
+    // Button should be disabled when form is empty
+    cy.getByTestId("login-submit-button")
+      .should("be.visible")
+      .and("be.disabled");
+
+    // Fill only email - button should still be disabled
+    cy.getByTestId("login-email-input").type("test@example.com");
+    cy.getByTestId("login-submit-button").should("be.disabled");
+
+    // Fill password - button should now be enabled
+    cy.getByTestId("login-password-input").type("password123");
+    cy.getByTestId("login-submit-button").should("not.be.disabled");
+  });
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, getProfile, getUserProfile, LoginRequest } from '../services/auth';
 
@@ -18,6 +18,9 @@ export function Login() {
       [name]: value,
     }));
   };
+
+  // Simple validation: all fields must have values
+  const isFormValid = formData.email.trim() !== '' && formData.password.trim() !== '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,16 +112,16 @@ export function Login() {
         <button
           data-testid="login-submit-button"
           type="submit"
-          disabled={loading}
+          disabled={!isFormValid || loading}
           style={{
             width: '100%',
             padding: '10px',
-            backgroundColor: '#007bff',
+            backgroundColor: !isFormValid || loading ? '#ccc' : '#007bff',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.6 : 1,
+            cursor: !isFormValid || loading ? 'not-allowed' : 'pointer',
+            opacity: !isFormValid || loading ? 0.6 : 1,
           }}
         >
           {loading ? 'Logging in...' : 'Login'}
