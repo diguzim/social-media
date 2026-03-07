@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "post-1",
+      "title": "First post",
+      "content": "This is the first post in feed",
+      "authorId": "user-1",
+      "createdAt": "2026-03-07T10:00:00.000Z"
+    },
+    {
+      "id": "post-2",
+      "title": "Second post",
+      "content": "Another post from the community",
+      "authorId": "user-2",
+      "createdAt": "2026-03-07T11:00:00.000Z"
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 1
+}

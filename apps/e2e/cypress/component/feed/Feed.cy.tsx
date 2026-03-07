@@ -2,34 +2,11 @@ import { createElement } from "react";
 import { Feed } from "../../../../user-portal/src/components/feed/Feed";
 
 describe("Feed component", () => {
-  const successResponse = {
-    data: [
-      {
-        id: "post-1",
-        title: "First post",
-        content: "This is the first post in feed",
-        authorId: "user-1",
-        createdAt: "2026-03-07T10:00:00.000Z",
-      },
-      {
-        id: "post-2",
-        title: "Second post",
-        content: "Another post from the community",
-        authorId: "user-2",
-        createdAt: "2026-03-07T11:00:00.000Z",
-      },
-    ],
-    total: 2,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-  };
-
   it("shows loading state while fetching posts", () => {
     cy.intercept("GET", "http://localhost:4000/posts*", {
       statusCode: 200,
       delay: 1000,
-      body: successResponse,
+      fixture: "feed.fixture.json",
     }).as("getPosts");
 
     cy.mount(createElement(Feed));
@@ -77,7 +54,7 @@ describe("Feed component", () => {
   it("shows success state and requests posts with expected query params", () => {
     cy.intercept("GET", "http://localhost:4000/posts*", {
       statusCode: 200,
-      body: successResponse,
+      fixture: "feed.fixture.json",
     }).as("getPosts");
 
     cy.mount(createElement(Feed));
