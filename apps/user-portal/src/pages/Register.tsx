@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, type RegisterRequest } from '../services/auth';
 
@@ -20,13 +20,17 @@ export function Register() {
     }));
   };
 
+  // Simple validation: all fields must have values
+  const isFormValid =
+    formData.name.trim() !== '' && formData.email.trim() !== '' && formData.password.trim() !== '';
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const result = await registerUser(formData);
+      await registerUser(formData);
       navigate('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
@@ -99,15 +103,16 @@ export function Register() {
         <button
           data-testid="register-submit-button"
           type="submit"
-          disabled={loading}
+          disabled={!isFormValid || loading}
           style={{
             width: '100%',
             padding: '10px',
-            backgroundColor: loading ? '#ccc' : '#007bff',
+            backgroundColor: !isFormValid || loading ? '#ccc' : '#007bff',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
+            cursor: !isFormValid || loading ? 'not-allowed' : 'pointer',
+            opacity: !isFormValid || loading ? 0.6 : 1,
           }}
         >
           {loading ? 'Registering...' : 'Register'}

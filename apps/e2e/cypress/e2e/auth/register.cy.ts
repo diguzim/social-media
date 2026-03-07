@@ -45,15 +45,26 @@ describe("User Registration Flow", () => {
     cy.getByTestId("login-page-title").should("be.visible");
   });
 
-  it("should show error message for empty form submission", () => {
+  it("should have disabled submit button until all fields are filled", () => {
     // Navigate to register page
     cy.visit("/register");
 
-    // Try to submit empty form
-    cy.getByTestId("register-submit-button").click();
+    // Button should be disabled when form is empty
+    cy.getByTestId("register-submit-button")
+      .should("be.visible")
+      .and("be.disabled");
 
-    // Form should still be on register page (HTML5 validation prevents submit)
-    cy.url().should("include", "/register");
+    // Fill only name - button should still be disabled
+    cy.getByTestId("register-name-input").type("Test User");
+    cy.getByTestId("register-submit-button").should("be.disabled");
+
+    // Fill email - button should still be disabled
+    cy.getByTestId("register-email-input").type("test@example.com");
+    cy.getByTestId("register-submit-button").should("be.disabled");
+
+    // Fill password - button should now be enabled
+    cy.getByTestId("register-password-input").type("password123");
+    cy.getByTestId("register-submit-button").should("not.be.disabled");
   });
 
   it("should fill, submit, and verify user is on login page after registration", () => {
