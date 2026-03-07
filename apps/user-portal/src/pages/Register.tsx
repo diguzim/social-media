@@ -40,14 +40,13 @@ export function Register() {
   };
 
   return (
-    <div
-      data-testid="register-page"
-      style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}
-    >
-      <h1 data-testid="register-page-title">Register</h1>
+    <div data-testid="register-page" className="auth-container">
+      <h1 data-testid="register-page-title" className="section-title text-center">
+        Register
+      </h1>
       <form data-testid="register-form" onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="name" style={{ display: 'block', marginBottom: '5px' }}>
+        <div className="form-field">
+          <label htmlFor="name" className="label-base">
             Name
           </label>
           <input
@@ -58,12 +57,12 @@ export function Register() {
             value={formData.name}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px' }}
+            className="input-base"
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>
+        <div className="form-field">
+          <label htmlFor="email" className="label-base">
             Email
           </label>
           <input
@@ -74,12 +73,12 @@ export function Register() {
             value={formData.email}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px' }}
+            className="input-base"
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>
+        <div className="form-field">
+          <label htmlFor="password" className="label-base">
             Password
           </label>
           <input
@@ -90,12 +89,12 @@ export function Register() {
             value={formData.password}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px' }}
+            className="input-base"
           />
         </div>
 
         {error && (
-          <div data-testid="register-error-message" style={{ color: 'red', marginBottom: '15px' }}>
+          <div data-testid="register-error-message" className="status-error">
             {error}
           </div>
         )}
@@ -104,37 +103,20 @@ export function Register() {
           data-testid="register-submit-button"
           type="submit"
           disabled={!isFormValid || loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: !isFormValid || loading ? '#ccc' : '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: !isFormValid || loading ? 'not-allowed' : 'pointer',
-            opacity: !isFormValid || loading ? 0.6 : 1,
-          }}
+          className="btn-primary w-full"
         >
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
-      <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <p>
+      <div className="mt-4 text-center text-sm text-slate-600">
+        <p className="mb-3">
           Already have an account?{' '}
-          <a
-            data-testid="register-login-link"
-            href="/login"
-            style={{ color: '#007bff', textDecoration: 'none' }}
-          >
+          <a data-testid="register-login-link" href="/login" className="link-primary">
             Login
           </a>
         </p>
-        <a
-          data-testid="register-back-home-link"
-          href="/"
-          style={{ color: '#007bff', textDecoration: 'none' }}
-        >
+        <a data-testid="register-back-home-link" href="/" className="link-primary">
           Back to Home
         </a>
       </div>

@@ -50,14 +50,13 @@ export function Login() {
   };
 
   return (
-    <div data-testid="login-page" style={{ padding: '40px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1 data-testid="login-page-title">Login</h1>
+    <div data-testid="login-page" className="auth-container">
+      <h1 data-testid="login-page-title" className="section-title text-center">
+        Login
+      </h1>
       <form data-testid="login-form" onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label
-            htmlFor="email"
-            style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}
-          >
+        <div className="form-field">
+          <label htmlFor="email" className="label-base">
             Email:
           </label>
           <input
@@ -68,21 +67,12 @@ export function Login() {
             value={formData.email}
             onChange={handleChange}
             required
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-            }}
+            className="input-base"
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label
-            htmlFor="password"
-            style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}
-          >
+        <div className="form-field">
+          <label htmlFor="password" className="label-base">
             Password:
           </label>
           <input
@@ -93,18 +83,12 @@ export function Login() {
             value={formData.password}
             onChange={handleChange}
             required
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-            }}
+            className="input-base"
           />
         </div>
 
         {error && (
-          <div data-testid="login-error-message" style={{ color: 'red', marginBottom: '15px' }}>
+          <div data-testid="login-error-message" className="status-error">
             {error}
           </div>
         )}
@@ -113,28 +97,15 @@ export function Login() {
           data-testid="login-submit-button"
           type="submit"
           disabled={!isFormValid || loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: !isFormValid || loading ? '#ccc' : '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: !isFormValid || loading ? 'not-allowed' : 'pointer',
-            opacity: !isFormValid || loading ? 0.6 : 1,
-          }}
+          className="btn-primary w-full"
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
-      <p style={{ marginTop: '20px', textAlign: 'center' }}>
+      <p className="mt-5 text-center text-sm text-slate-600">
         Don't have an account?{' '}
-        <a
-          data-testid="login-create-account-link"
-          href="/register"
-          style={{ color: '#007bff', textDecoration: 'none' }}
-        >
+        <a data-testid="login-create-account-link" href="/register" className="link-primary">
           Create one
         </a>
       </p>

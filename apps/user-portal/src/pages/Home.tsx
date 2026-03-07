@@ -38,10 +38,7 @@ export function Home() {
 
   if (loading) {
     return (
-      <div
-        data-testid="home-loading-state"
-        style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}
-      >
+      <div data-testid="home-loading-state" className="page-container max-w-md text-center">
         <p data-testid="home-loading-text">Loading your profile...</p>
       </div>
     );
@@ -49,65 +46,45 @@ export function Home() {
 
   if (error && !user) {
     return (
-      <div
-        data-testid="home-error-state"
-        style={{ padding: '40px', textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}
-      >
-        <p data-testid="home-error-message" style={{ color: 'red' }}>
+      <div data-testid="home-error-state" className="page-container max-w-md text-center">
+        <p data-testid="home-error-message" className="status-error">
           {error}
         </p>
-        <p>Redirecting to login...</p>
+        <p className="text-sm text-slate-600">Redirecting to login...</p>
       </div>
     );
   }
 
   return (
-    <div data-testid="home-page" style={{ padding: '40px', maxWidth: '900px', margin: '0 auto' }}>
+    <div data-testid="home-page" className="page-container max-w-5xl">
       {user && (
         <>
-          <h1 data-testid="home-welcome-title" style={{ textAlign: 'center' }}>
+          <h1
+            data-testid="home-welcome-title"
+            className="text-center text-3xl font-bold text-slate-900"
+          >
             Welcome {user.name}!
           </h1>
-          <div
-            data-testid="home-profile-card"
-            style={{
-              marginTop: '20px',
-              padding: '20px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '8px',
-              textAlign: 'center',
-            }}
-          >
-            <p>
+          <div data-testid="home-profile-card" className="card mt-5 px-6 py-5 text-center">
+            <p className="mb-2 text-slate-700">
               <strong>ID:</strong> {user.id}
             </p>
-            <p data-testid="home-user-email">
+            <p data-testid="home-user-email" className="mb-2 text-slate-700">
               <strong>Email:</strong> {user.email}
             </p>
-            <p>
+            <p className="text-slate-700">
               <strong>Name:</strong> {user.name}
             </p>
           </div>
         </>
       )}
 
-      <div style={{ marginTop: '28px' }}>
+      <div className="mt-7">
         <Feed />
       </div>
 
-      <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <button
-          data-testid="home-logout-button"
-          onClick={handleLogout}
-          style={{
-            padding: '10px 15px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        >
+      <div className="mt-5 flex justify-center gap-3">
+        <button data-testid="home-logout-button" onClick={handleLogout} className="btn-danger">
           Logout
         </button>
       </div>

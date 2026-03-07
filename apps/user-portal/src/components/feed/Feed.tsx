@@ -30,8 +30,8 @@ export function Feed() {
   if (loading) {
     return (
       <section data-testid="feed-loading-state">
-        <h2 style={{ marginBottom: '12px' }}>Feed</h2>
-        <p>Loading posts...</p>
+        <h2 className="mb-3 text-2xl font-semibold text-slate-900">Feed</h2>
+        <p className="text-slate-600">Loading posts...</p>
       </section>
     );
   }
@@ -39,8 +39,8 @@ export function Feed() {
   if (error) {
     return (
       <section data-testid="feed-error-state">
-        <h2 style={{ marginBottom: '12px' }}>Feed</h2>
-        <p style={{ color: '#dc2626' }}>{error}</p>
+        <h2 className="mb-3 text-2xl font-semibold text-slate-900">Feed</h2>
+        <p className="text-danger-600">{error}</p>
       </section>
     );
   }
@@ -48,16 +48,16 @@ export function Feed() {
   if (posts.length === 0) {
     return (
       <section data-testid="feed-empty-state">
-        <h2 style={{ marginBottom: '12px' }}>Feed</h2>
-        <p>No posts yet.</p>
+        <h2 className="mb-3 text-2xl font-semibold text-slate-900">Feed</h2>
+        <p className="text-slate-600">No posts yet.</p>
       </section>
     );
   }
 
   return (
     <section data-testid="feed-section">
-      <h2 style={{ marginBottom: '12px' }}>Feed</h2>
-      <div style={{ display: 'grid', gap: '12px' }}>
+      <h2 className="mb-3 text-2xl font-semibold text-slate-900">Feed</h2>
+      <div className="grid gap-3">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
