@@ -57,6 +57,11 @@ describe("Home Page Flow", () => {
     cy.getByTestId("home-user-email").should("contain.text", testUser.email);
   });
 
+  it("should display feed section on welcome page", () => {
+    // Should show feed section below profile
+    cy.getByTestId("feed-section").should("be.visible");
+  });
+
   it("should have Logout button on welcome page", () => {
     cy.getByTestId("home-logout-button").should("be.visible");
     cy.getByTestId("navbar-menu-button").should("be.visible");
