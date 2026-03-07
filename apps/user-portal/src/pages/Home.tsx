@@ -82,12 +82,6 @@ export function Home() {
       <div className="mt-7">
         <Feed />
       </div>
-
-      <div className="mt-5 flex justify-center gap-3">
-        <button data-testid="home-logout-button" onClick={handleLogout} className="btn-danger">
-          Logout
-        </button>
-      </div>
     </div>
   );
 }
