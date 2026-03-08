@@ -13,11 +13,14 @@ End-to-end tests for the social media platform using Cypress. Tests the complete
 
 ```
 cypress/
+  component/
+    feed/
+      Feed.cy.tsx        # Feed component tests (network mocked)
   e2e/
     auth/
       register.cy.ts      # User registration flow
       login.cy.ts         # User login flow
-      welcome.cy.ts       # Welcome page and profile view
+      home.cy.ts          # Home page and profile/feed view
   support/
     commands.ts           # Custom Cypress commands
     e2e.ts               # Global hooks and setup
@@ -31,7 +34,6 @@ The `cypress/support/commands.ts` file provides helper commands:
 - `cy.visitHome()` - Navigate to home page and verify
 - `cy.visitRegister()` - Navigate to register page
 - `cy.visitLogin()` - Navigate to login page
-- `cy.visitWelcome()` - Navigate to welcome page
 - `cy.registerUser(user)` - Fill and submit registration form
 - `cy.loginUser(email, password)` - Fill and submit login form
 - `cy.registerAndLogin(user)` - Register and login in one command
@@ -164,8 +166,16 @@ This script:
 Each test:
 
 - Clears localStorage before running (clean state)
-- Creates a unique test user (using timestamps to avoid conflicts)
+- Creates a unique test user via faker-based factories (`buildTestUser`)
 - Performs actual API calls to the backend
+
+## Test Data Generation
+
+E2E specs use synthetic test data generation via `@faker-js/faker`.
+
+- Helper file: [cypress/support/test-data.ts](cypress/support/test-data.ts)
+- Primary factory: `buildTestUser()`
+- Purpose: generate random, realistic names/emails and avoid collisions in repeated runs
 
 ## Writing New Tests
 
@@ -199,7 +209,7 @@ Currently covers:
 ## Best Practices
 
 1. **Use custom commands** - Keep tests DRY with `cy.registerUser()` etc
-2. **Unique test data** - Use timestamps for emails to avoid collisions
+2. **Unique test data** - Use faker-generated names/emails via `buildTestUser()`
 3. **Wait for elements** - Cypress waits by default, but be explicit on slow operations
 4. **Avoid hard sleeps** - Use `cy.contains()`, `cy.get()` which retry
 5. **Test user journeys** - Don't test implementation, test user behavior

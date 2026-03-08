@@ -1,3 +1,5 @@
+import { buildTestUser } from "../../support/test-data";
+
 describe("User Registration Flow", () => {
   beforeEach(() => {
     cy.visitLogin();
@@ -24,11 +26,7 @@ describe("User Registration Flow", () => {
     cy.visit("/register");
 
     // Test data
-    const testUser = {
-      name: `Test User ${Date.now()}`,
-      email: `test+${Date.now()}@example.com`,
-      password: "TestPassword123!",
-    };
+    const testUser = buildTestUser({ password: "TestPassword123!" });
 
     // Alias register page elements
     cy.getByTestId("register-name-input").as("registerNameInput");
@@ -67,11 +65,11 @@ describe("User Registration Flow", () => {
       .and("be.disabled");
 
     // Fill only name - button should still be disabled
-    cy.get("@registerNameInput").type("Test User");
+    cy.get("@registerNameInput").type(buildTestUser().name);
     cy.get("@registerSubmitButton").should("be.disabled");
 
     // Fill email - button should still be disabled
-    cy.get("@registerEmailInput").type("test@example.com");
+    cy.get("@registerEmailInput").type(buildTestUser().email);
     cy.get("@registerSubmitButton").should("be.disabled");
 
     // Fill password - button should now be enabled
@@ -83,11 +81,7 @@ describe("User Registration Flow", () => {
     // Use the custom command to register a user
     cy.visitRegister();
 
-    const testUser = {
-      name: `User ${Date.now()}`,
-      email: `user+${Date.now()}@example.com`,
-      password: "SecurePass123!",
-    };
+    const testUser = buildTestUser({ password: "SecurePass123!" });
 
     cy.registerUser(testUser);
 

@@ -280,6 +280,9 @@ importers:
       '@cypress/schematic':
         specifier: ^2.5.1
         version: 2.5.2(@angular/cli@21.2.1(@types/node@20.19.37)(chokidar@4.0.3))(@angular/core@21.2.1(rxjs@7.8.2))
+      '@faker-js/faker':
+        specifier: ^9.8.0
+        version: 9.9.0
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37
@@ -1253,6 +1256,10 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@faker-js/faker@9.9.0':
+    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@gar/promise-retry@1.0.2':
     resolution: {integrity: sha512-Lm/ZLhDZcBECta3TmCQSngiQykFdfw+QtI1/GYMsZd4l3nG+P8WLB16XuS7WaBGLQ+9E+cOcWQsth9cayuGt8g==}
@@ -6675,6 +6682,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@faker-js/faker@9.9.0': {}
 
   '@gar/promise-retry@1.0.2':
     dependencies:

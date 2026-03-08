@@ -1,10 +1,7 @@
+import { buildTestUser } from "../../support/test-data";
+
 describe("Home Page Flow", () => {
-  const runId = `${Date.now()}-${Cypress._.random(1000, 9999)}`;
-  const testUser = {
-    name: `Test User ${runId}`,
-    email: `testuser+${runId}@example.com`,
-    password: "WelcomePass123!",
-  };
+  const testUser = buildTestUser({ password: "WelcomePass123!" });
 
   before(() => {
     // Register once per spec execution

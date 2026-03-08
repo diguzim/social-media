@@ -8,6 +8,7 @@ HTTP entrypoint for the social media platform. Routes HTTP requests from clients
 - CORS enabled for cross-origin requests from React SPA
 - JWT verification for protected endpoints
 - Request routing to auth-service and posts-service microservices
+- Translation layer between `API` (public HTTP) and `RPC` (internal TCP) contracts
 - Exception serialization and HTTP response mapping
 
 ## Architecture
@@ -26,7 +27,7 @@ API Gateway (Port 4000)
 
 - `POST /users` - Register new user
   - Body: `{ name, email, password }`
-  - Returns: `{ id, email }`
+  - Returns: `{ id, name, email }`
 
 - `POST /users/login` - Login with credentials
   - Body: `{ email, password }`
@@ -46,8 +47,8 @@ API Gateway (Port 4000)
   - Guards: **JwtAuthGuard**
 
 - `GET /posts` - List all posts with pagination and filtering
-  - Query params: `?page=1&limit=10&authorId=user-1&sortBy=createdAt&sortOrder=desc`
-  - Returns: `{ data: [posts], total, page, limit }`
+  - Query params: `?page=1&limit=10&authorId=user-1&sortOrder=desc`
+  - Returns: `{ data: [posts], total, page, limit, totalPages }`
 
 - `GET /posts/:id` - Get a specific post
   - Returns: `{ id, title, content, authorId, createdAt }`
@@ -61,7 +62,7 @@ API Gateway (Port 4000)
 - `DELETE /posts/:id` - Delete a post
   - Headers: `Authorization: Bearer {token}`
   - Guards: **JwtAuthGuard** + ownership verification
-  - Returns: `{ id }`
+  - Returns: `{ success: true }`
 
 ## Configuration
 

@@ -1,14 +1,12 @@
+import { buildTestUser } from "../../support/test-data";
+
 describe("User Login Flow", () => {
   beforeEach(() => {
     // Seed a test user via registration before each test
     // In production, you might use an API call to seed data
     cy.visitRegister();
 
-    const testUser = {
-      name: "Test User",
-      email: `testuser+${Date.now()}@example.com`,
-      password: "TestPass123!",
-    };
+    const testUser = buildTestUser({ password: "TestPass123!" });
 
     // Store in window for use in test
     cy.window().then((win) => {
@@ -57,7 +55,7 @@ describe("User Login Flow", () => {
     cy.getByTestId("login-submit-button").as("loginSubmitButton");
 
     // Enter invalid credentials
-    cy.get("@loginEmailInput").type("nonexistent@example.com");
+    cy.get("@loginEmailInput").type(buildTestUser().email);
     cy.get("@loginPasswordInput").type("WrongPassword123!");
 
     // Submit form
@@ -116,7 +114,7 @@ describe("User Login Flow", () => {
     cy.get("@loginSubmitButton").should("be.visible").and("be.disabled");
 
     // Fill only email - button should still be disabled
-    cy.get("@loginEmailInput").type("test@example.com");
+    cy.get("@loginEmailInput").type(buildTestUser().email);
     cy.get("@loginSubmitButton").should("be.disabled");
 
     // Fill password - button should now be enabled

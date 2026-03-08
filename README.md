@@ -21,7 +21,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 
 ## Packages
 
-- `@repo/contracts`: Shared RPC message contracts and commands
+- `@repo/contracts`: Shared boundary contracts (`API` for frontend↔gateway and `RPC` for gateway↔microservices) and command constants
 - `@repo/events`: Shared event types and event names
 - `@repo/eslint-config`: Shared ESLint configuration
 - `@repo/exception-filters`: Shared NestJS exception filters
@@ -94,17 +94,28 @@ UserRegistrationHandler processes the event
 (currently logs, ready for: welcome email, profile creation, etc.)
 ```
 
-## RPC Contracts
+## API and RPC Contracts
 
-The API gateway and microservices communicate via TCP using NestJS microservices pattern.
+Contracts are separated by boundary in `@repo/contracts`:
+
+- `API.*` → frontend ↔ API gateway (HTTP contract)
+- `RPC.*` → API gateway ↔ microservices (TCP contract)
+
+The API gateway translates between these two boundaries.
 
 Example usage:
 
 ```ts
 import { AUTH_COMMANDS } from "@repo/contracts";
-import type { RegisterRequest, RegisterReply } from "@repo/contracts";
+import type { API, RPC } from "@repo/contracts";
 
-this.authClient.send<RegisterReply>({ cmd: AUTH_COMMANDS.register }, payload);
+const apiRequest: API.LoginRequest = { email, password };
+const rpcRequest: RPC.LoginRequest = { ...apiRequest, correlationId };
+
+this.authClient.send<RPC.LoginReply, RPC.LoginRequest>(
+  { cmd: AUTH_COMMANDS.login },
+  rpcRequest,
+);
 ```
 
 ## Exception Handling
@@ -184,7 +195,9 @@ Each service has a production Dockerfile for deployment:
 - [x] Event-driven architecture with user registration events
 - [x] JWT-based authentication (register, login, profile)
 - [x] Frontend UI (React Vite SPA with routing)
-- [ ] Protected routes (frontend and backend)
+- [x] Protected routes (frontend and backend)
+- [x] Tailwind CSS migration in user-portal
+- [x] Cypress component testing for feed states
 - [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)
 - [ ] Posts listing page with pagination

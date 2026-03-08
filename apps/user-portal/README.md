@@ -65,7 +65,10 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users (register)
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
+- GET /posts?page=1&limit=10&sortOrder=desc
 ```
+
+Request/response typing is shared from `@repo/contracts/api` to keep frontend and gateway aligned on the public HTTP boundary.
 
 ## Getting Started
 
@@ -93,8 +96,8 @@ pnpm build
 src/
   app/            - Application root and routing
   pages/          - Page components (Home, Register, Login, Profile)
-  components/     - Reusable UI components (e.g., Navbar, AuthenticatedLayout)
-  services/       - API clients (auth.ts with register, login, getProfile)
+  components/     - Reusable UI components (e.g., Navbar, Feed, PostCard)
+  services/       - API clients (auth.ts and posts.ts)
   hooks/          - Custom React hooks (placeholder)
 ```
 
@@ -113,6 +116,7 @@ src/
 - **Vite** - Build tool and dev server
 - **TypeScript 5.7** - Type safety
 - **React Router v6** - Client-side routing
+- **Tailwind CSS** - Utility-first styling
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 
@@ -125,10 +129,12 @@ The app communicates with the API Gateway which routes requests to microservices
   - `loginUser()` - POST /users/login (stores JWT in localStorage)
   - `getProfile()` - GET /users/me (stores user profile in localStorage)
   - `getUserProfile()` - Retrieve cached profile from localStorage
+- `posts.ts` provides:
+  - `getPosts()` - GET /posts with pagination/filter query params
 
 ## Notes
 
-- Minimal styling, no CSS framework
+- Styled with Tailwind utility classes and shared component classes in `src/styles.css`
 - Functional components throughout
 - localStorage handles persistence across page reloads
 - JWT token sent in Authorization header for protected endpoints
