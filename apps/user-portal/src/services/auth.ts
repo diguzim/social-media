@@ -1,33 +1,17 @@
+import type {
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  LoginResponse,
+  GetProfileResponse,
+} from '@repo/contracts/api';
+
 const API_BASE_URL = 'http://localhost:4000';
 
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-}
+// Re-export types for convenience
+export type { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse };
 
-export interface RegisterResponse {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-  id: string;
-  email: string;
-}
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-}
+export type UserProfile = GetProfileResponse;
 
 export async function registerUser(data: RegisterRequest): Promise<RegisterResponse> {
   const response = await fetch(`${API_BASE_URL}/users`, {

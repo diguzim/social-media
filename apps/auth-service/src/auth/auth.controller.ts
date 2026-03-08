@@ -3,15 +3,7 @@ import { MessagePattern } from '@nestjs/microservices';
 import { RegisterUseCase } from 'src/core/application/authentication/register.use-case';
 import { LoginUseCase } from 'src/core/application/authentication/login.use-case';
 import { GetProfileUseCase } from 'src/core/application/authentication/get-profile.use-case';
-import { AUTH_COMMANDS } from '@repo/contracts';
-import type {
-  RegisterRequest,
-  RegisterReply,
-  LoginRequest,
-  LoginReply,
-  GetProfileRequest,
-  GetProfileReply,
-} from '@repo/contracts';
+import { AUTH_COMMANDS, RPC } from '@repo/contracts';
 
 @Controller()
 export class AuthController {
@@ -24,7 +16,9 @@ export class AuthController {
   ) {}
 
   @MessagePattern({ cmd: AUTH_COMMANDS.register })
-  async handleRegister(request: RegisterRequest): Promise<RegisterReply> {
+  async handleRegister(
+    request: RPC.RegisterRequest,
+  ): Promise<RPC.RegisterReply> {
     this.logger.debug('Auth service: handling register command', request);
 
     const createdUser = await this.registerUseCase.execute({
@@ -40,7 +34,7 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: AUTH_COMMANDS.login })
-  async handleLogin(request: LoginRequest): Promise<LoginReply> {
+  async handleLogin(request: RPC.LoginRequest): Promise<RPC.LoginReply> {
     this.logger.debug('Auth service: handling login command', request);
 
     return this.loginUseCase.execute({
@@ -50,7 +44,9 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: AUTH_COMMANDS.getProfile })
-  async handleGetProfile(request: GetProfileRequest): Promise<GetProfileReply> {
+  async handleGetProfile(
+    request: RPC.GetProfileRequest,
+  ): Promise<RPC.GetProfileReply> {
     this.logger.debug('Auth service: handling getProfile command', request);
 
     return this.getProfileUseCase.execute({

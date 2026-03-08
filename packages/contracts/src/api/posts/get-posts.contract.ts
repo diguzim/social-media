@@ -3,10 +3,9 @@ export interface GetPostsRequest {
   limit?: number;
   authorId?: string;
   sortOrder?: "asc" | "desc";
-  correlationId?: string;
 }
 
-export interface GetPostsPostReply {
+export interface Post {
   id: string;
   title: string;
   content: string;
@@ -14,8 +13,8 @@ export interface GetPostsPostReply {
   createdAt: string; // ISO string
 }
 
-export interface GetPostsReply {
-  data: GetPostsPostReply[];
+export interface GetPostsResponse {
+  data: Post[];
   total: number;
   page: number;
   limit: number;

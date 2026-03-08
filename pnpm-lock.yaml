@@ -528,6 +528,9 @@ importers:
 
   apps/user-portal:
     dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       react:
         specifier: ^18.2.0
         version: 18.3.1

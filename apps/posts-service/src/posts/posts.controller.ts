@@ -6,18 +6,7 @@ import { GetPostsUseCase } from "src/core/application/posts/get-posts.use-case";
 import { UpdatePostUseCase } from "src/core/application/posts/update-post.use-case";
 import { DeletePostUseCase } from "src/core/application/posts/delete-post.use-case";
 import { POST_COMMANDS } from "@repo/contracts";
-import type {
-  CreatePostRequest,
-  CreatePostReply,
-  GetPostRequest,
-  GetPostReply,
-  GetPostsRequest,
-  GetPostsReply,
-  UpdatePostRequest,
-  UpdatePostReply,
-  DeletePostRequest,
-  DeletePostReply,
-} from "@repo/contracts";
+import type { RPC } from "@repo/contracts";
 
 @Controller()
 export class PostsController {
@@ -32,7 +21,9 @@ export class PostsController {
   ) {}
 
   @MessagePattern({ cmd: POST_COMMANDS.createPost })
-  async handleCreatePost(request: CreatePostRequest): Promise<CreatePostReply> {
+  async handleCreatePost(
+    request: RPC.CreatePostRequest,
+  ): Promise<RPC.CreatePostReply> {
     this.logger.debug("Posts service: handling create post command", request);
 
     const post = await this.createPostUseCase.execute({
@@ -51,7 +42,7 @@ export class PostsController {
   }
 
   @MessagePattern({ cmd: POST_COMMANDS.getPost })
-  async handleGetPost(request: GetPostRequest): Promise<GetPostReply> {
+  async handleGetPost(request: RPC.GetPostRequest): Promise<RPC.GetPostReply> {
     this.logger.debug("Posts service: handling get post command", request);
 
     const post = await this.getPostUseCase.execute({
@@ -68,7 +59,9 @@ export class PostsController {
   }
 
   @MessagePattern({ cmd: POST_COMMANDS.getPosts })
-  async handleGetPosts(request: GetPostsRequest): Promise<GetPostsReply> {
+  async handleGetPosts(
+    request: RPC.GetPostsRequest,
+  ): Promise<RPC.GetPostsReply> {
     this.logger.debug("Posts service: handling get posts command", request);
 
     const result = await this.getPostsUseCase.execute({
@@ -94,7 +87,9 @@ export class PostsController {
   }
 
   @MessagePattern({ cmd: POST_COMMANDS.updatePost })
-  async handleUpdatePost(request: UpdatePostRequest): Promise<UpdatePostReply> {
+  async handleUpdatePost(
+    request: RPC.UpdatePostRequest,
+  ): Promise<RPC.UpdatePostReply> {
     this.logger.debug("Posts service: handling update post command", request);
 
     const post = await this.updatePostUseCase.execute({
@@ -114,7 +109,9 @@ export class PostsController {
   }
 
   @MessagePattern({ cmd: POST_COMMANDS.deletePost })
-  async handleDeletePost(request: DeletePostRequest): Promise<DeletePostReply> {
+  async handleDeletePost(
+    request: RPC.DeletePostRequest,
+  ): Promise<RPC.DeletePostReply> {
     this.logger.debug("Posts service: handling delete post command", request);
 
     await this.deletePostUseCase.execute({

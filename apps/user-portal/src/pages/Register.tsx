@@ -14,7 +14,7 @@ export function Register() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: RegisterRequest) => ({
       ...prev,
       [name]: value,
     }));

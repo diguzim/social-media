@@ -1,29 +1,8 @@
+import type { GetPostsRequest, GetPostsResponse, Post } from '@repo/contracts/api';
+
 const API_BASE_URL = 'http://localhost:4000';
 
-export type SortOrder = 'asc' | 'desc';
-
-export interface GetPostsRequest {
-  page?: number;
-  limit?: number;
-  authorId?: string;
-  sortOrder?: SortOrder;
-}
-
-export interface FeedPost {
-  id: string;
-  title: string;
-  content: string;
-  authorId: string;
-  createdAt: string;
-}
-
-export interface GetPostsResponse {
-  data: FeedPost[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+export type FeedPost = Post;
 
 export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
   const query = new URLSearchParams();

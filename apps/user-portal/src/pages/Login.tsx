@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, getProfile, getUserProfile, LoginRequest } from '../services/auth';
+import { loginUser, getProfile, getUserProfile } from '../services/auth';
+import type { LoginRequest } from '../services/auth';
 
 export function Login() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export function Login() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: LoginRequest) => ({
       ...prev,
       [name]: value,
     }));
