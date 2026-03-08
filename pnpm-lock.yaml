@@ -283,6 +283,9 @@ importers:
       '@faker-js/faker':
         specifier: ^9.8.0
         version: 9.9.0
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.37

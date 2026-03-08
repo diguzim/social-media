@@ -37,6 +37,7 @@ The `cypress/support/commands.ts` file provides helper commands:
 - `cy.registerUser(user)` - Fill and submit registration form
 - `cy.loginUser(email, password)` - Fill and submit login form
 - `cy.registerAndLogin(user)` - Register and login in one command
+- `cy.authenticateViaApi(overrides?)` - Register+login via API and bootstrap localStorage for protected-route specs
 
 ## Configuration
 
@@ -168,6 +169,12 @@ Each test:
 - Clears localStorage before running (clean state)
 - Creates a unique test user via faker-based factories (`buildTestUser`)
 - Performs actual API calls to the backend
+
+### Programmatic Auth Strategy
+
+- For **protected feature specs** (e.g. home/profile/feed), tests use `cy.authenticateViaApi()` in `beforeEach`.
+- This creates a fresh fake E2E user via API, logs in via API, fetches `/users/me`, and sets `jwtToken` + `user` in localStorage before app boot.
+- For **auth flow specs** (`register.cy.ts`, `login.cy.ts`), keep using real UI interactions to validate forms and navigation behavior.
 
 ## Test Data Generation
 

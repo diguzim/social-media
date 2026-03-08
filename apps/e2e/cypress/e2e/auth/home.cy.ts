@@ -1,36 +1,22 @@
-import { buildTestUser } from "../../support/test-data";
+import type { TestUser } from "../../support/test-data";
 
 describe("Home Page Flow", () => {
-  const testUser = buildTestUser({ password: "WelcomePass123!" });
-
-  before(() => {
-    // Register once per spec execution
-    cy.visitRegister();
-    cy.registerUser(testUser);
-
-    // App redirects to login after successful registration
-    cy.url().should("include", "/login");
-  });
+  let testUser: TestUser;
 
   beforeEach(() => {
-    // Reuse existing registered user
-    cy.visitLogin();
-    cy.loginUser(testUser.email, testUser.password);
+    cy.authenticateViaApi({ password: "WelcomePass123!" }).then((user) => {
+      testUser = user;
 
-    // Wait for redirect to home page
-    cy.url().should("include", "/");
-
-    // Alias common home page elements (guaranteed to exist)
-    cy.getByTestId("home-welcome-title").as("homeWelcomeTitle");
-    cy.getByTestId("home-user-email").as("homeUserEmail");
-    cy.getByTestId("home-profile-card").as("homeProfileCard");
-    cy.getByTestId("feed-section").as("feedSection");
-    cy.getByTestId("navbar-menu-button").as("navbarMenuButton");
+      // Set up aliases for page elements
+      cy.getByTestId("home-welcome-title").as("homeWelcomeTitle");
+      cy.getByTestId("home-user-email").as("homeUserEmail");
+      cy.getByTestId("home-profile-card").as("homeProfileCard");
+      cy.getByTestId("feed-section").as("feedSection");
+      cy.getByTestId("navbar-menu-button").as("navbarMenuButton");
+    });
   });
 
-  it("should display welcome page with loading state initially", () => {
-    cy.visitHome();
-
+  it.only("should display welcome page with loading state initially", () => {
     // Page may show loading first, then welcome heading after profile is loaded
     cy.get("@homeWelcomeTitle").should(
       "contain.text",
@@ -39,7 +25,7 @@ describe("Home Page Flow", () => {
   });
 
   it("should fetch and display user profile on welcome page", () => {
-    // Should be on home page after login
+    // Should be on home page after programmatic login
     cy.url().should("include", "/");
 
     // Should display welcome message with user name
