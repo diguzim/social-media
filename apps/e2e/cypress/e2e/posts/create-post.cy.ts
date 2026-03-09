@@ -151,4 +151,61 @@ describe("Create Post Flow", () => {
     cy.get("@titleInput").should("have.value", "");
     cy.get("@contentInput").should("have.value", "");
   });
+
+  it("should display created post in both home feed and my posts", () => {
+    const postTitle = `${faker.lorem.words(3)} - Verify Post`;
+    const postContent = faker.lorem.paragraphs(1);
+
+    // Create a post on home page
+    cy.get("@titleInput").type(postTitle);
+    cy.get("@contentInput").type(postContent);
+    cy.get("@submitButton").click();
+
+    // Verify post appears in home feed
+    cy.getByTestId("create-post-success-message")
+      .should("be.visible")
+      .and("contain.text", "Post created successfully!");
+
+    cy.getByTestId("feed-section").should("contain.text", postTitle);
+
+    // Navigate to My Posts page
+    cy.getByTestId("navbar-my-posts-link").should("be.visible").click();
+
+    // Verify post appears in My Posts page
+    cy.getByTestId("my-posts-page").should("be.visible");
+    cy.getByTestId("my-posts-list")
+      .should("be.visible")
+      .and("contain.text", postTitle);
+
+    // Verify post author is current user (by checking authorId matches)
+    cy.getByTestId("my-posts-list").within(() => {
+      cy.contains(`Author: ${testUser.id}`).should("exist");
+    });
+  });
+
+  it("should only show current user's posts in my posts page", () => {
+    const userPost = {
+      title: `${faker.lorem.words(3)} - My Post`,
+      content: faker.lorem.sentences(2),
+    };
+
+    // Create post as current user
+    cy.get("@titleInput").type(userPost.title);
+    cy.get("@contentInput").type(userPost.content);
+    cy.get("@submitButton").click();
+
+    cy.getByTestId("create-post-success-message").should("be.visible");
+
+    // Navigate to my posts
+    cy.getByTestId("navbar-my-posts-link").click();
+
+    // Verify the post appears
+    cy.getByTestId("my-posts-page").should("be.visible");
+    cy.getByTestId("my-posts-list").should("contain.text", userPost.title);
+
+    // Verify the post count is at least 1
+    cy.getByTestId("my-posts-count")
+      .should("contain.text", "post")
+      .and("not.contain.text", "0 posts");
+  });
 });

@@ -231,7 +231,7 @@ Cypress.Commands.add(
                   win.localStorage.setItem("user", JSON.stringify(profile));
                 },
               })
-              .then(() => cy.wrap(testUser));
+              .then(() => cy.wrap({ ...testUser, id: profile.id }));
           });
       });
   },

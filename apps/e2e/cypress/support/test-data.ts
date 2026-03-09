@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 
 export interface TestUser {
+  id?: string;
   name: string;
   email: string;
   password: string;
