@@ -1,4 +1,10 @@
-import type { GetPostsRequest, GetPostsResponse, Post } from '@repo/contracts/api';
+import type {
+  GetPostsRequest,
+  GetPostsResponse,
+  Post,
+  CreatePostRequest,
+  CreatePostResponse,
+} from '@repo/contracts/api';
 
 const API_BASE_URL = 'http://localhost:4000';
 
@@ -22,6 +28,29 @@ export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsRe
 
   if (!response.ok) {
     throw new Error('Failed to fetch posts');
+  }
+
+  return response.json();
+}
+
+export async function createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create post');
   }
 
   return response.json();

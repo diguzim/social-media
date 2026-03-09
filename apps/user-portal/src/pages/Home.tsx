@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { getProfile, getUserProfile } from '../services/auth';
 import type { UserProfile } from '../services/auth';
 import { Feed } from '../components/feed/Feed';
+import { CreatePostForm } from '../components/post/CreatePostForm';
 
 export function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [feedKey, setFeedKey] = useState(0);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,10 +32,9 @@ export function Home() {
     fetchProfile();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('user');
-    navigate('/login', { replace: true });
+  const handlePostCreated = () => {
+    // Refresh feed by changing its key
+    setFeedKey((prev) => prev + 1);
   };
 
   if (loading) {
@@ -80,7 +81,11 @@ export function Home() {
       )}
 
       <div className="mt-7">
-        <Feed />
+        <CreatePostForm onPostCreated={handlePostCreated} />
+      </div>
+
+      <div className="mt-7">
+        <Feed key={feedKey} />
       </div>
     </div>
   );
