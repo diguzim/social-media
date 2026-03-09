@@ -16,13 +16,22 @@ export function Navbar() {
       data-testid="navbar"
       className="flex items-center justify-between bg-primary-600 px-4 py-3 text-white shadow-card sm:px-6"
     >
-      <Link
-        data-testid="navbar-home-link"
-        to="/"
-        className="text-lg font-semibold text-white no-underline transition hover:text-primary-100"
-      >
-        Home
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link
+          data-testid="navbar-home-link"
+          to="/"
+          className="text-lg font-semibold text-white no-underline transition hover:text-primary-100"
+        >
+          Home
+        </Link>
+        <Link
+          data-testid="navbar-my-posts-link"
+          to="/my-posts"
+          className="text-lg font-semibold text-white no-underline transition hover:text-primary-100"
+        >
+          My Posts
+        </Link>
+      </div>
 
       <h1 data-testid="navbar-title" className="text-xl font-bold sm:text-2xl">
         Social Media

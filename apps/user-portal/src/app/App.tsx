@@ -3,6 +3,7 @@ import { Home } from '../pages/Home';
 import { Register } from '../pages/Register';
 import { Login } from '../pages/Login';
 import { Profile } from '../pages/Profile';
+import { MyPosts } from '../pages/MyPosts';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
 import { isAuthenticated } from '../utils';
 
@@ -25,6 +26,7 @@ export function App() {
         <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/my-posts" element={<MyPosts />} />
         </Route>
       </Routes>
     </BrowserRouter>
