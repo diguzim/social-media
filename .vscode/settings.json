@@ -3,5 +3,12 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+
+  // GitHub Copilot: pick up .github/copilot-instructions.md automatically
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+
+  // Scope Copilot completions to workspace context
+  "github.copilot.chat.codesearch.enabled": true,
+  "chat.mcp.access": "all"
 }

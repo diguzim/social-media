@@ -1,0 +1,14 @@
+{
+  // Model Context Protocol server configuration for this workspace.
+  // These servers give GitHub Copilot additional tools and context.
+  // Each team member needs the referenced tools installed locally.
+  // See: https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+  "servers": {
+    // GitKraken: git operations, PR management, issue tracking, commit composer
+    // Requires: GitKraken desktop app installed + signed in
+    "gitkraken": {
+      "command": "npx",
+      "args": ["-y", "@gitkraken/mcp-server"]
+    }
+  }
+}
