@@ -184,7 +184,8 @@ Cypress.Commands.add("registerAndLogin", (user: RegisterRequest) => {
  */
 Cypress.Commands.add(
   "authenticateViaApi",
-  (overrides: Partial<TestUser> = {}) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ((overrides: Partial<TestUser> = {}) => {
     const testUser = buildTestUser(overrides);
     const apiBaseUrl =
       (Cypress.env("API_BASE_URL") as string | undefined) ??
@@ -234,5 +235,5 @@ Cypress.Commands.add(
               .then(() => cy.wrap({ ...testUser, id: profile.id }));
           });
       });
-  },
+  }) as any,
 );

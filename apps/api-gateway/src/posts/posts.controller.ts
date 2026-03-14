@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { POSTS_SERVICE } from './posts.client';
+import { FeedService } from './feed.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { POST_COMMANDS } from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
@@ -26,6 +27,7 @@ export class PostsController {
 
   constructor(
     @Inject(POSTS_SERVICE) private readonly postsClient: ClientProxy,
+    private readonly feedService: FeedService,
   ) {}
 
   @Post()
@@ -59,6 +61,22 @@ export class PostsController {
       authorId: rpcReply.authorId,
       createdAt: rpcReply.createdAt,
     };
+  }
+
+  @Get('feed')
+  async getFeed(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('authorId') authorId?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+  ): Promise<API.GetFeedResponse> {
+    this.logger.debug('API Gateway: handling GET /posts/feed');
+    return this.feedService.getFeed(
+      page ? parseInt(page, 10) : undefined,
+      limit ? parseInt(limit, 10) : undefined,
+      authorId,
+      sortOrder,
+    );
   }
 
   @Get()
