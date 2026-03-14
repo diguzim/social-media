@@ -6,6 +6,7 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   const createdAt = new Date(post.createdAt).toLocaleString();
+  const authorLabel = 'author' in post ? post.author.name : post.authorId;
 
   return (
     <article data-testid={`post-card-${post.id}`} className="card p-4">
@@ -23,7 +24,7 @@ export function PostCard({ post }: PostCardProps) {
       </p>
 
       <footer className="flex flex-wrap justify-between gap-2 text-xs text-slate-500">
-        <span data-testid={`post-author-${post.id}`}>Author: {post.authorId}</span>
+        <span data-testid={`post-author-${post.id}`}>Author: {authorLabel}</span>
         <span data-testid={`post-created-at-${post.id}`}>{createdAt}</span>
       </footer>
     </article>

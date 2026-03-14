@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getPosts } from '../../services/posts';
+import { getFeed } from '../../services/posts';
 import type { FeedPost } from '../../services/posts';
 import { PostCard } from './PostCard';
 
@@ -11,7 +11,7 @@ export function Feed() {
   useEffect(() => {
     const loadFeed = async () => {
       try {
-        const response = await getPosts({
+        const response = await getFeed({
           page: 1,
           limit: 10,
           sortOrder: 'desc',
