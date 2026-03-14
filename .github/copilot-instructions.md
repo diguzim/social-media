@@ -117,6 +117,19 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Assert stable end-states, not transient loading states
 - Unit tests live alongside the code they test (`*.spec.ts`)
 
+### Documentation Maintenance
+
+- Treat documentation updates as part of every coding task, not as optional follow-up work
+- When changing behavior, architecture, contracts, setup, commands, ports, workflows, or testing strategy, update the relevant documentation in the same interaction before finishing
+- Always review whether these files should change after implementation:
+  - root `README.md`
+  - app/package-level `README.md` files affected by the change
+  - `docs/PRD.md` for feature scope or roadmap changes
+  - `docs/ADR.md` when an architectural decision is introduced or changed
+  - `.github/copilot-instructions.md` when project conventions or architecture guidance evolve
+- If no documentation change is needed, explicitly verify that the existing docs are still accurate before considering the task complete
+- Prefer small, precise documentation updates that stay aligned with the code instead of leaving stale or aspirational text
+
 ## Running the Project
 
 ```bash
