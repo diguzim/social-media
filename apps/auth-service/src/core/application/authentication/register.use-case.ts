@@ -42,7 +42,9 @@ export class RegisterUseCase {
     const user = await this.userRepository.create(createUserData);
 
     const { verificationToken, expiresAt } =
-      await this.createEmailVerificationTokenUseCase.execute({ userId: user.id });
+      await this.createEmailVerificationTokenUseCase.execute({
+        userId: user.id,
+      });
 
     await this.eventPublisher.publish(USER_EVENTS.REGISTERED, {
       userId: user.id,

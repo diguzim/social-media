@@ -1,14 +1,14 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import * as crypto from "node:crypto";
-import { UserRepository } from "src/core/domain/user/user.repository";
-import { EmailVerificationTokenRepository } from "src/core/domain/user/email-verification-token.repository";
+import { BadRequestException, Injectable } from '@nestjs/common';
+import * as crypto from 'node:crypto';
+import { UserRepository } from 'src/core/domain/user/user.repository';
+import { EmailVerificationTokenRepository } from 'src/core/domain/user/email-verification-token.repository';
 
 export interface ConfirmEmailVerificationInput {
   token: string;
 }
 
 export interface ConfirmEmailVerificationOutput {
-  status: "verified" | "already_verified";
+  status: 'verified' | 'already_verified';
   emailVerifiedAt: string;
 }
 
@@ -27,21 +27,21 @@ export class ConfirmEmailVerificationUseCase {
       await this.emailVerificationTokenRepository.findByTokenHash(tokenHash);
 
     if (!verificationToken) {
-      throw new BadRequestException("Invalid verification token");
+      throw new BadRequestException('Invalid verification token');
     }
 
     if (verificationToken.consumedAt) {
-      throw new BadRequestException("Verification token already used");
+      throw new BadRequestException('Verification token already used');
     }
 
     if (verificationToken.expiresAt.getTime() < Date.now()) {
-      throw new BadRequestException("Verification token expired");
+      throw new BadRequestException('Verification token expired');
     }
 
     const user = await this.userRepository.findById(verificationToken.userId);
 
     if (!user) {
-      throw new BadRequestException("Invalid verification token");
+      throw new BadRequestException('Invalid verification token');
     }
 
     const consumedAt = new Date();
@@ -52,7 +52,7 @@ export class ConfirmEmailVerificationUseCase {
 
     if (user.emailVerifiedAt) {
       return {
-        status: "already_verified",
+        status: 'already_verified',
         emailVerifiedAt: user.emailVerifiedAt.toISOString(),
       };
     }
@@ -63,16 +63,16 @@ export class ConfirmEmailVerificationUseCase {
     );
 
     if (!updatedUser || !updatedUser.emailVerifiedAt) {
-      throw new BadRequestException("Unable to verify email");
+      throw new BadRequestException('Unable to verify email');
     }
 
     return {
-      status: "verified",
+      status: 'verified',
       emailVerifiedAt: updatedUser.emailVerifiedAt.toISOString(),
     };
   }
 
   private hashToken(token: string): string {
-    return crypto.createHash("sha256").update(token).digest("hex");
+    return crypto.createHash('sha256').update(token).digest('hex');
   }
 }

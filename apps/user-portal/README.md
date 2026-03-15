@@ -24,7 +24,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 1. **Register** - User creates account
    - Form validates and submits to `POST /users` (api-gateway)
-  - Redirects to login page on success; verification email is sent automatically
+
+- Redirects to login page on success; verification email is sent automatically
 
 2. **Login** - User authenticates
    - Form submits to `POST /users/login` (api-gateway)

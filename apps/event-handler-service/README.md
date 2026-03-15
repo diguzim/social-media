@@ -37,12 +37,12 @@ Triggered when a user successfully registers **or** when a user requests a new v
 
 ```typescript
 {
-  userId: string;          // Unique user ID
-  name: string;            // User's full name
-  email: string;           // User's email address
-  createdAt: string;       // ISO timestamp of registration
+  userId: string; // Unique user ID
+  name: string; // User's full name
+  email: string; // User's email address
+  createdAt: string; // ISO timestamp of registration
   verificationToken: string; // Raw token to embed in the confirmation link
-  tokenExpiresAt: string;  // ISO timestamp when the token expires (24h from creation)
+  tokenExpiresAt: string; // ISO timestamp when the token expires (24h from creation)
 }
 ```
 

@@ -84,7 +84,7 @@ export async function getProfile(): Promise<UserProfile> {
 }
 
 export async function confirmEmailVerification(
-  token: string,
+  token: string
 ): Promise<ConfirmEmailVerificationResponse> {
   const response = await fetch(`${API_BASE_URL}/users/email-verification/confirm`, {
     method: 'POST',

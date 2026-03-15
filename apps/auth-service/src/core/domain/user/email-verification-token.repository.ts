@@ -1,4 +1,4 @@
-import { EmailVerificationToken } from "./email-verification-token.entity";
+import { EmailVerificationToken } from './email-verification-token.entity';
 
 export interface CreateEmailVerificationTokenData {
   userId: string;
@@ -18,5 +18,8 @@ export abstract class EmailVerificationTokenRepository {
   abstract invalidateActiveTokensByUserId(userId: string): Promise<void>;
 
   /** Mark a specific token as consumed (one-time use). */
-  abstract consume(tokenId: string, consumedAt: Date): Promise<EmailVerificationToken>;
+  abstract consume(
+    tokenId: string,
+    consumedAt: Date,
+  ): Promise<EmailVerificationToken>;
 }

@@ -28,9 +28,7 @@ export function UnverifiedEmailBanner({ onVerified: _onVerified }: UnverifiedEma
       data-testid="unverified-email-banner"
       className="w-full bg-yellow-50 border-b border-yellow-300 px-4 py-3 text-sm text-yellow-800 flex items-center justify-between gap-4"
     >
-      <span>
-        ⚠️ Please verify your email address to access all features.
-      </span>
+      <span>⚠️ Please verify your email address to access all features.</span>
 
       <div className="flex items-center gap-3 shrink-0">
         {sent ? (

@@ -7,9 +7,9 @@ export class EmailVerificationToken {
   consumedAt: Date | null;
 
   constructor(props: Partial<EmailVerificationToken>) {
-    this.id = props.id ?? "";
-    this.userId = props.userId ?? "";
-    this.tokenHash = props.tokenHash ?? "";
+    this.id = props.id ?? '';
+    this.userId = props.userId ?? '';
+    this.tokenHash = props.tokenHash ?? '';
     this.expiresAt = props.expiresAt ?? new Date();
     this.createdAt = props.createdAt ?? new Date();
     this.consumedAt = props.consumedAt ?? null;
