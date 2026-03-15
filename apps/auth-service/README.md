@@ -97,18 +97,24 @@ The service handles RPC messages from the API Gateway:
 
 1. Find user; guard: not found → 404, already verified → `{ queued: false }`
 2. Create a new verification token
-3. Re-emit `user.registered` event so event-handler sends a fresh email
+3. Emit `user.emailVerificationRequested` event so event-handler sends a fresh email
 4. Return `{ queued: true }`
 
 ## Event Publishing
 
-On successful registration or resend request, an event is published to RabbitMQ:
+On successful registration or resend request, events are published to RabbitMQ:
 
 ```
 User Registration Event
 ├─ Exchange: "social-media.events" (topic type)
 ├─ Routing Key: "user.registered"
 ├─ Event Payload: { userId, name, email, createdAt, verificationToken, tokenExpiresAt }
+└─ Consumer: event-handler-service processes the event and sends verification email
+
+Verification Email Requested Event
+├─ Exchange: "social-media.events" (topic type)
+├─ Routing Key: "user.emailVerificationRequested"
+├─ Event Payload: { userId, name, email, requestedAt, verificationToken, tokenExpiresAt }
 └─ Consumer: event-handler-service processes the event and sends verification email
 ```
 

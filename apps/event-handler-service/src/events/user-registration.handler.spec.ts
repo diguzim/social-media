@@ -32,4 +32,24 @@ describe("UserRegistrationHandler", () => {
     );
     expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
   });
+
+  it("should send verification email when handling a verification re-request", async () => {
+    const event = {
+      userId: "user-1",
+      name: "John Doe",
+      email: "john@example.com",
+      requestedAt: new Date().toISOString(),
+      verificationToken: "raw-token-xyz789",
+      tokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+    };
+
+    await handler.handleVerificationEmailRequested(event);
+
+    expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
+      event.email,
+      event.name,
+      event.verificationToken,
+    );
+    expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+  });
 });

@@ -5,7 +5,12 @@ import {
   OnModuleInit,
 } from "@nestjs/common";
 import { connect, type Channel, type ChannelModel } from "amqplib";
-import { EVENT_BUS, USER_EVENTS, type UserRegisteredEvent } from "@repo/events";
+import {
+  EVENT_BUS,
+  USER_EVENTS,
+  type UserRegisteredEvent,
+  type VerificationEmailRequestedEvent,
+} from "@repo/events";
 import { UserRegistrationHandler } from "./user-registration.handler";
 import { RabbitMqHealthService } from "./rabbitmq-health.service";
 
@@ -45,6 +50,11 @@ export class RabbitMqUserRegisteredConsumer
         this.exchange,
         USER_EVENTS.REGISTERED,
       );
+      await channel.bindQueue(
+        this.queueName,
+        this.exchange,
+        USER_EVENTS.EMAIL_VERIFICATION_REQUESTED,
+      );
 
       await channel.consume(this.queueName, async (msg) => {
         if (!msg) {
@@ -52,11 +62,21 @@ export class RabbitMqUserRegisteredConsumer
         }
 
         try {
-          const event = JSON.parse(
-            msg.content.toString("utf-8"),
-          ) as UserRegisteredEvent;
+          const routingKey = msg.fields.routingKey;
+          const parsedEvent = JSON.parse(msg.content.toString("utf-8"));
 
-          await this.userRegistrationHandler.handleUserRegistered(event);
+          if (routingKey === USER_EVENTS.REGISTERED) {
+            await this.userRegistrationHandler.handleUserRegistered(
+              parsedEvent as UserRegisteredEvent,
+            );
+          } else if (routingKey === USER_EVENTS.EMAIL_VERIFICATION_REQUESTED) {
+            await this.userRegistrationHandler.handleVerificationEmailRequested(
+              parsedEvent as VerificationEmailRequestedEvent,
+            );
+          } else {
+            throw new Error(`Unsupported routing key: ${routingKey}`);
+          }
+
           channel.ack(msg);
         } catch (error) {
           this.logger.error(
@@ -73,7 +93,7 @@ export class RabbitMqUserRegisteredConsumer
       });
 
       this.logger.log(
-        `Consuming '${USER_EVENTS.REGISTERED}' from queue '${this.queueName}'`,
+        `Consuming '${USER_EVENTS.REGISTERED}' and '${USER_EVENTS.EMAIL_VERIFICATION_REQUESTED}' from queue '${this.queueName}'`,
       );
     } catch (error) {
       this.rabbitMqHealthService.markDisconnected(

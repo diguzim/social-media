@@ -4,7 +4,7 @@ Background worker service that listens to domain events via RabbitMQ and perform
 
 ## Purpose
 
-- Listen to domain events published by other services (e.g., `user.registered`)
+- Listen to domain events published by other services (e.g., `user.registered`, `user.emailVerificationRequested`)
 - Execute event handlers that perform business logic and side effects
 - Process messages asynchronously to avoid blocking upstream services
 - Keep business logic independent from event-driven workflows
@@ -14,7 +14,7 @@ Background worker service that listens to domain events via RabbitMQ and perform
 
 ```
 Auth Service
-  ↓ publishes user.registered event
+  ↓ publishes user.registered / user.emailVerificationRequested events
 RabbitMQ Topic Exchange (social-media.events)
   ↓ routes to queue by key
 event-handler-service
@@ -31,7 +31,7 @@ event-handler-service
 **Queue**: `social-media.user-registered`\
 **Routing Key**: `user.registered`
 
-Triggered when a user successfully registers **or** when a user requests a new verification email. Sends the email verification link to the new user.
+Triggered when a user successfully registers. Sends the initial verification email.
 
 **Event Payload**:
 
@@ -48,6 +48,27 @@ Triggered when a user successfully registers **or** when a user requests a new v
 
 The verification link sent in the email points to `http://localhost:3000/verify-email?token={verificationToken}`.
 
+### VerificationEmailRequestedHandler (same consumer)
+
+**Event**: `user.emailVerificationRequested`\
+**Queue**: `social-media.user-registered`\
+**Routing Key**: `user.emailVerificationRequested`
+
+Triggered when a user requests a verification email resend.
+
+**Event Payload**:
+
+```typescript
+{
+  userId: string;
+  name: string;
+  email: string;
+  requestedAt: string; // ISO timestamp of resend request
+  verificationToken: string;
+  tokenExpiresAt: string;
+}
+```
+
 ## RabbitMQ Configuration
 
 ### Message Exchange
@@ -62,7 +83,7 @@ The verification link sent in the email points to `http://localhost:3000/verify-
   - Exclusive: No (not bound to a connection)
   - Auto-delete: No
 
-- **Binding**: Queue binds to exchange with routing key `user.registered`
+- **Binding**: Queue binds to exchange with routing keys `user.registered` and `user.emailVerificationRequested`
 
 ### Connection
 

@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { USER_EVENTS, type UserRegisteredEvent } from '@repo/events';
+import {
+  USER_EVENTS,
+  type VerificationEmailRequestedEvent,
+} from '@repo/events';
 import { UserRepository } from 'src/core/domain/user/user.repository';
 import { RabbitMqEventPublisher } from 'src/infra/events/rabbitmq-event.publisher';
 import { CreateEmailVerificationTokenUseCase } from 'src/core/application/email-verification/create-email-verification-token.use-case';
@@ -14,11 +17,8 @@ export interface RequestEmailVerificationOutput {
 
 /**
  * Requests a new verification email for a user.
- * Creates a fresh token and re-emits user.registered so the
+ * Creates a fresh token and emits user.emailVerificationRequested so the
  * event-handler-service can pick it up and (re-)send the email.
- *
- * TODO: Replace the re-emitted user.registered with a dedicated
- *       user.emailVerificationRequested event once a resend flow is needed.
  */
 @Injectable()
 export class RequestEmailVerificationUseCase {
@@ -44,19 +44,19 @@ export class RequestEmailVerificationUseCase {
     const { verificationToken, expiresAt } =
       await this.createTokenUseCase.execute({ userId: user.id });
 
-    const event: UserRegisteredEvent & {
-      verificationToken: string;
-      tokenExpiresAt: string;
-    } = {
+    const event: VerificationEmailRequestedEvent = {
       userId: user.id,
       name: user.name,
       email: user.email,
-      createdAt: user.createdAt.toISOString(),
+      requestedAt: new Date().toISOString(),
       verificationToken,
       tokenExpiresAt: expiresAt.toISOString(),
     };
 
-    await this.eventPublisher.publish(USER_EVENTS.REGISTERED, event);
+    await this.eventPublisher.publish(
+      USER_EVENTS.EMAIL_VERIFICATION_REQUESTED,
+      event,
+    );
 
     return { queued: true };
   }

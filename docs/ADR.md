@@ -145,4 +145,4 @@ Use **Option 3: token store with timestamp**.
 ✅ Idempotent confirmation is safe for retries  
 ✅ `emailVerifiedAt` provides an audit timestamp, not just a flag  
 ⚠️ Each resend creates a new token row — old tokens remain in the store until expiry  
-⚠️ Currently uses the `user.registered` event as the resend trigger; a dedicated event should replace this as the system grows
+⚠️ Dedicated resend event (`user.emailVerificationRequested`) adds one more routing key/handler path to maintain
