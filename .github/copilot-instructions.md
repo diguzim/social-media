@@ -116,6 +116,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - All fake test data must include a `Fake E2E` prefix in names
 - Assert stable end-states, not transient loading states
 - Unit tests live alongside the code they test (`*.spec.ts`)
+- If tests or new behavior depend on baseline users/posts, update in-memory repository seed data in the same task (and keep test assertions aligned with the new seeded values)
 
 ### Documentation Maintenance
 
