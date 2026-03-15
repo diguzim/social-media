@@ -24,6 +24,16 @@ export type {
 
 export type UserProfile = GetProfileResponse;
 
+const EMAIL_CONFIRM_INFLIGHT = new Map<string, Promise<ConfirmEmailVerificationResponse>>();
+const EMAIL_CONFIRM_RECENT = new Map<
+  string,
+  {
+    value: ConfirmEmailVerificationResponse;
+    expiresAt: number;
+  }
+>();
+const EMAIL_CONFIRM_RECENT_TTL_MS = 30_000;
+
 export async function registerUser(data: RegisterRequest): Promise<RegisterResponse> {
   const response = await fetch(`${API_BASE_URL}/users`, {
     method: 'POST',
@@ -86,18 +96,44 @@ export async function getProfile(): Promise<UserProfile> {
 export async function confirmEmailVerification(
   token: string
 ): Promise<ConfirmEmailVerificationResponse> {
-  const response = await fetch(`${API_BASE_URL}/users/email-verification/confirm`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token } satisfies ConfirmEmailVerificationRequest),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Email verification failed');
+  const now = Date.now();
+  const cached = EMAIL_CONFIRM_RECENT.get(token);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
   }
 
-  return response.json();
+  const inFlight = EMAIL_CONFIRM_INFLIGHT.get(token);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = (async () => {
+    const response = await fetch(`${API_BASE_URL}/users/email-verification/confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token } satisfies ConfirmEmailVerificationRequest),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Email verification failed');
+    }
+
+    const result = (await response.json()) as ConfirmEmailVerificationResponse;
+    EMAIL_CONFIRM_RECENT.set(token, {
+      value: result,
+      expiresAt: Date.now() + EMAIL_CONFIRM_RECENT_TTL_MS,
+    });
+    return result;
+  })();
+
+  EMAIL_CONFIRM_INFLIGHT.set(token, request);
+
+  try {
+    return await request;
+  } finally {
+    EMAIL_CONFIRM_INFLIGHT.delete(token);
+  }
 }
 
 export async function requestEmailVerification(): Promise<RequestEmailVerificationResponse> {

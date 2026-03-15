@@ -21,6 +21,7 @@ cypress/
       register.cy.ts      # User registration flow
       login.cy.ts         # User login flow
       home.cy.ts          # Home page and profile/feed view
+      verify-email.cy.ts  # Email verification page flow
   support/
     commands.ts           # Custom Cypress commands
     e2e.ts               # Global hooks and setup
@@ -212,6 +213,7 @@ Currently covers:
 - **Register**: Navigation, form submission, validation, redirect
 - **Login**: Valid/invalid credentials, redirect, token storage
 - **Home**: Profile fetch, data display, logout, navigation
+- **Verify Email**: Token confirmation call, single-request guard, missing-token error state
 
 ## Best Practices
 
