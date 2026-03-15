@@ -4,12 +4,23 @@ import type {
   LoginRequest,
   LoginResponse,
   GetProfileResponse,
+  ConfirmEmailVerificationRequest,
+  ConfirmEmailVerificationResponse,
+  RequestEmailVerificationResponse,
 } from '@repo/contracts/api';
 
 const API_BASE_URL = 'http://localhost:4000';
 
 // Re-export types for convenience
-export type { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse };
+export type {
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  LoginResponse,
+  ConfirmEmailVerificationRequest,
+  ConfirmEmailVerificationResponse,
+  RequestEmailVerificationResponse,
+};
 
 export type UserProfile = GetProfileResponse;
 
@@ -72,6 +83,45 @@ export async function getProfile(): Promise<UserProfile> {
   return profile;
 }
 
+export async function confirmEmailVerification(
+  token: string,
+): Promise<ConfirmEmailVerificationResponse> {
+  const response = await fetch(`${API_BASE_URL}/users/email-verification/confirm`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token } satisfies ConfirmEmailVerificationRequest),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Email verification failed');
+  }
+
+  return response.json();
+}
+
+export async function requestEmailVerification(): Promise<RequestEmailVerificationResponse> {
+  const jwtToken = localStorage.getItem('jwtToken');
+  if (!jwtToken) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/email-verification/request`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${jwtToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to send verification email');
+  }
+
+  return response.json();
+}
+
 export function storeUserProfile(profile: UserProfile): void {
   localStorage.setItem('user', JSON.stringify(profile));
 }
@@ -80,7 +130,7 @@ export function getUserProfile(): UserProfile | null {
   const userStr = localStorage.getItem('user');
   if (!userStr) return null;
   try {
-    return JSON.parse(userStr);
+    return JSON.parse(userStr) as UserProfile;
   } catch {
     return null;
   }

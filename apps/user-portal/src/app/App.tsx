@@ -4,6 +4,7 @@ import { Register } from '../pages/Register';
 import { Login } from '../pages/Login';
 import { Profile } from '../pages/Profile';
 import { MyPosts } from '../pages/MyPosts';
+import { VerifyEmail } from '../pages/VerifyEmail';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
 import { isAuthenticated } from '../utils';
 
@@ -21,6 +22,7 @@ export function App() {
         {/* Public routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected routes with navbar */}
         <Route element={<ProtectedRoutes />}>

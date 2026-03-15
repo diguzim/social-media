@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { USER_EVENTS, type UserRegisteredEvent } from '@repo/events';
 import { RabbitMqEventPublisher } from 'src/infra/events/rabbitmq-event.publisher';
+import { CreateEmailVerificationTokenUseCase } from '../email-verification/create-email-verification-token.use-case';
 
 export interface RegisterInput {
   name: string;
@@ -21,6 +22,7 @@ export class RegisterUseCase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly eventPublisher: RabbitMqEventPublisher,
+    private readonly createEmailVerificationTokenUseCase: CreateEmailVerificationTokenUseCase,
   ) {}
 
   async execute(input: RegisterInput): Promise<RegisterOutput> {
@@ -39,11 +41,16 @@ export class RegisterUseCase {
 
     const user = await this.userRepository.create(createUserData);
 
+    const { verificationToken, expiresAt } =
+      await this.createEmailVerificationTokenUseCase.execute({ userId: user.id });
+
     await this.eventPublisher.publish(USER_EVENTS.REGISTERED, {
       userId: user.id,
       name: user.name,
       email: user.email,
       createdAt: user.createdAt.toISOString(),
+      verificationToken,
+      tokenExpiresAt: expiresAt.toISOString(),
     } as UserRegisteredEvent);
 
     return {

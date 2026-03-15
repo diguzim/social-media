@@ -66,11 +66,26 @@ export function Profile() {
             </p>
           </div>
 
-          <div>
+          <div className="mb-4">
             <label className="mb-1 block text-sm font-semibold text-slate-700">Email:</label>
             <p data-testid="profile-user-email" className="text-slate-700">
               {user.email}
             </p>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-700">
+              Email verification:
+            </label>
+            {user.emailVerifiedAt ? (
+              <p data-testid="profile-email-verified" className="text-green-600">
+                ✓ Verified on {new Date(user.emailVerifiedAt).toLocaleDateString()}
+              </p>
+            ) : (
+              <p data-testid="profile-email-unverified" className="text-yellow-600">
+                ⚠ Not yet verified
+              </p>
+            )}
           </div>
         </div>
       )}

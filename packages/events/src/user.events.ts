@@ -12,4 +12,8 @@ export interface UserRegisteredEvent {
   name: string;
   email: string;
   createdAt: string; // ISO string
+  /** Raw verification token to embed in the confirmation link. */
+  verificationToken: string;
+  /** ISO string expiry of the token. */
+  tokenExpiresAt: string;
 }

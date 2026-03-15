@@ -9,6 +9,7 @@ export interface GetProfileOutput {
   id: string;
   name: string;
   email: string;
+  emailVerifiedAt: string | null;
 }
 
 @Injectable()
@@ -26,6 +27,7 @@ export class GetProfileUseCase {
       id: user.id,
       name: user.name,
       email: user.email,
+      emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
     };
   }
 }

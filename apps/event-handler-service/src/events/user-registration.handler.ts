@@ -13,7 +13,11 @@ export class UserRegistrationHandler {
       `Processing user registration event for user ${event.userId}: ${event.email}`,
     );
 
-    await this.emailService.sendVerificationEmail(event.email, event.name);
+    await this.emailService.sendVerificationEmail(
+      event.email,
+      event.name,
+      event.verificationToken,
+    );
 
     this.logger.log(
       `User ${event.name} (${event.email}) successfully registered at ${event.createdAt}`,

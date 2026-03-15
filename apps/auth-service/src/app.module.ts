@@ -9,6 +9,9 @@ import { RegisterUseCase } from './core/application/authentication/register.use-
 import { LoginUseCase } from './core/application/authentication/login.use-case';
 import { GetProfileUseCase } from './core/application/authentication/get-profile.use-case';
 import { RabbitMqEventPublisher } from './infra/events/rabbitmq-event.publisher';
+import { CreateEmailVerificationTokenUseCase } from './core/application/email-verification/create-email-verification-token.use-case';
+import { ConfirmEmailVerificationUseCase } from './core/application/email-verification/confirm-email-verification.use-case';
+import { RequestEmailVerificationUseCase } from './core/application/email-verification/request-email-verification.use-case';
 import {
   LogContextInterceptor,
   getCorrelationId,
@@ -50,6 +53,9 @@ import {
     LoginUseCase,
     GetProfileUseCase,
     RabbitMqEventPublisher,
+    CreateEmailVerificationTokenUseCase,
+    ConfirmEmailVerificationUseCase,
+    RequestEmailVerificationUseCase,
     {
       provide: APP_INTERCEPTOR,
       useClass: LogContextInterceptor,

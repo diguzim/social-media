@@ -10,6 +10,7 @@ describe('User Entity', () => {
         passwordHash: 'hashed-password',
         createdAt: new Date('2024-01-01T00:00:00Z'),
         updatedAt: new Date('2024-01-02T00:00:00Z'),
+        emailVerifiedAt: new Date('2024-01-03T00:00:00Z'),
       };
 
       const user = new User(userProps);
@@ -21,6 +22,7 @@ describe('User Entity', () => {
       expect(user.passwordHash).toBe('hashed-password');
       expect(user.createdAt).toEqual(new Date('2024-01-01T00:00:00Z'));
       expect(user.updatedAt).toEqual(new Date('2024-01-02T00:00:00Z'));
+      expect(user.emailVerifiedAt).toEqual(new Date('2024-01-03T00:00:00Z'));
     });
 
     it('should use default values when properties are undefined', () => {
@@ -35,6 +37,7 @@ describe('User Entity', () => {
       expect(user.passwordHash).toBe('');
       expect(user.createdAt).toBeInstanceOf(Date);
       expect(user.updatedAt).toBeNull();
+      expect(user.emailVerifiedAt).toBeNull();
     });
 
     it('should create with partial properties', () => {
@@ -50,6 +53,7 @@ describe('User Entity', () => {
       expect(user.email).toBe('alice@example.com');
       expect(user.passwordHash).toBe('hash123');
       expect(user.updatedAt).toBeNull();
+      expect(user.emailVerifiedAt).toBeNull();
     });
   });
 
@@ -78,6 +82,16 @@ describe('User Entity', () => {
       expect(user.createdAt).toEqual(date1);
       expect(user.updatedAt).toEqual(date2);
       expect(user.createdAt).not.toBe(user.updatedAt);
+    });
+
+    it('should allow marking email as verified', () => {
+      const user = new User({ id: 'user-1', email: 'test@test.com' });
+      expect(user.emailVerifiedAt).toBeNull();
+
+      const verifiedAt = new Date('2024-06-01T12:00:00Z');
+      user.emailVerifiedAt = verifiedAt;
+
+      expect(user.emailVerifiedAt).toEqual(verifiedAt);
     });
   });
 });

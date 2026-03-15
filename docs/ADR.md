@@ -110,3 +110,39 @@ Early E2E tests used UI forms to register/login before each test, making tests s
 ✅ Tests are isolated — each test creates a fresh user  
 ✅ Fake data is easy to identify in logs  
 ⚠️ Tests depend on API availability — services must be running before E2E suite
+
+---
+
+## ADR-005: Email Verification Token Design
+
+**Date:** 2026-03  
+**Status:** Accepted
+
+### Context
+
+Email verification requires sending a secret link to the user. Options considered:
+
+1. **Boolean flag only** — `isEmailVerified: boolean` — no proof of the action's timing
+2. **Timestamp only** — `emailVerifiedAt: Date | null` — records when, but no external audit trail
+3. **Token store with timestamp** — generate a token, persist a hash, confirm by consuming it — full auditability and token rotation
+4. **Signed JWT as token** — self-contained, no DB round-trip — but can't be invalidated before expiry
+
+### Decision
+
+Use **Option 3: token store with timestamp**.
+
+- `emailVerifiedAt: Date | null` on `User` — semantically richer than a boolean
+- A separate `EmailVerificationToken` record stores the **SHA-256 hash** of the raw token (raw token only travels via email/URL, never persisted)
+- 24h TTL, single-use (token is consumed on confirmation)
+- Confirmation is **idempotent**: already-verified users return `already_verified` without re-consuming a token
+- Auth-service generates and stores the token; the raw token is passed through `UserRegisteredEvent` so event-handler can embed it in the email link without possessing DB access
+
+### Consequences
+
+✅ Token exposure is minimised — only the SHA-256 hash is stored  
+✅ Tokens auto-expire, preventing indefinite replay  
+✅ Single-use prevents double-click / replay attacks  
+✅ Idempotent confirmation is safe for retries  
+✅ `emailVerifiedAt` provides an audit timestamp, not just a flag  
+⚠️ Each resend creates a new token row — old tokens remain in the store until expiry  
+⚠️ Currently uses the `user.registered` event as the resend trigger; a dedicated event should replace this as the system grows

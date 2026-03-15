@@ -20,6 +20,7 @@ describe('LoginUseCase', () => {
       create: jest.fn(),
       findByEmail: jest.fn(),
       findById: jest.fn(),
+      markEmailVerified: jest.fn(),
     };
 
     jwtService = {
@@ -28,8 +29,8 @@ describe('LoginUseCase', () => {
   });
 
   it('should return access token for valid credentials', async () => {
-    const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
-    bcryptMock.compare.mockResolvedValue(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
@@ -38,6 +39,7 @@ describe('LoginUseCase', () => {
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
+      emailVerifiedAt: null,
     });
 
     jwtService.signAsync.mockResolvedValue('access-token');
@@ -50,7 +52,7 @@ describe('LoginUseCase', () => {
     });
 
     expect(userRepository.findByEmail).toHaveBeenCalledWith('jane@doe.com');
-    expect(bcryptMock.compare).toHaveBeenCalledWith(
+    expect(bcrypt.compare).toHaveBeenCalledWith(
       'plain-password',
       'hashed-password',
     );
@@ -79,8 +81,8 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw UnauthorizedException when password does not match', async () => {
-    const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
-    bcryptMock.compare.mockResolvedValue(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
@@ -89,6 +91,7 @@ describe('LoginUseCase', () => {
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
+      emailVerifiedAt: null,
     });
 
     const useCase = new LoginUseCase(userRepository, jwtService);
@@ -102,8 +105,8 @@ describe('LoginUseCase', () => {
   });
 
   it('should propagate jwt signing errors', async () => {
-    const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
-    bcryptMock.compare.mockResolvedValue(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
@@ -112,6 +115,7 @@ describe('LoginUseCase', () => {
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
+      emailVerifiedAt: null,
     });
 
     jwtService.signAsync.mockRejectedValue(new Error('jwt error'));

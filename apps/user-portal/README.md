@@ -6,7 +6,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - User registration with email/password
 - JWT-based login and authentication
-- User profile page with persistent session
+- Email verification flow (verify link + resend banner)
+- User profile page with email verification status
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
 - Loading states and error handling
@@ -16,13 +17,14 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/` - Protected home page showing user data
 - `/register` - User registration form
 - `/login` - User login form
-- `/profile` - Protected profile page
+- `/profile` - Protected profile page with verification status
+- `/verify-email?token=...` - Public email confirmation page
 
 ## Authentication Flow
 
 1. **Register** - User creates account
    - Form validates and submits to `POST /users` (api-gateway)
-   - Redirects to login page on success
+  - Redirects to login page on success; verification email is sent automatically
 
 2. **Login** - User authenticates
    - Form submits to `POST /users/login` (api-gateway)
@@ -35,14 +37,21 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - Protected by route guard (requires `jwtToken` + `user` in localStorage)
 - Home shows welcome + user info
-- Profile shows dedicated profile view
+- Profile shows dedicated profile view with `emailVerifiedAt` status
 - Logout clears auth data and redirects to login
+- Unverified users see a yellow banner with a "Resend verification email" button
+
+4. **Email Verification**
+
+- Clicking the link in the verification email loads `/verify-email?token=...`
+- Page calls `POST /users/email-verification/confirm` and shows success/already-verified/error state
+- Profile page shows "Verified on {date}" or "Not yet verified"
 
 ## Data Storage
 
 - **JWT Token** - localStorage key `jwtToken` (from login response)
 - **User Profile** - localStorage key `user` (from /users/me response)
-  - Structure: `{ id, name, email }`
+  - Structure: `{ id, name, email, emailVerifiedAt }`
 
 ## Test Selectors (`data-testid`)
 
@@ -66,6 +75,8 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
 - GET /posts?page=1&limit=10&sortOrder=desc
+- POST /users/email-verification/confirm (public — confirms token from email link)
+- POST /users/email-verification/request (requires auth — resend verification email)
 ```
 
 Request/response typing is shared from `@repo/contracts/api` to keep frontend and gateway aligned on the public HTTP boundary.

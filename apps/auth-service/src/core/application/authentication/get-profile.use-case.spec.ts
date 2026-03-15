@@ -10,6 +10,7 @@ describe('GetProfileUseCase', () => {
       create: jest.fn(),
       findByEmail: jest.fn(),
       findById: jest.fn(),
+      markEmailVerified: jest.fn(),
     };
   });
 
@@ -21,6 +22,7 @@ describe('GetProfileUseCase', () => {
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
+      emailVerifiedAt: null,
     });
 
     const useCase = new GetProfileUseCase(userRepository);
@@ -32,6 +34,31 @@ describe('GetProfileUseCase', () => {
       id: 'user-1',
       name: 'John Doe',
       email: 'john@doe.com',
+      emailVerifiedAt: null,
+    });
+  });
+
+  it('should include emailVerifiedAt when user email is verified', async () => {
+    const verifiedAt = new Date('2024-06-15T10:00:00Z');
+    userRepository.findById.mockResolvedValue({
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@doe.com',
+      passwordHash: 'hashed-password',
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: null,
+      emailVerifiedAt: verifiedAt,
+    });
+
+    const useCase = new GetProfileUseCase(userRepository);
+
+    const result = await useCase.execute({ userId: 'user-1' });
+
+    expect(result).toEqual({
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@doe.com',
+      emailVerifiedAt: verifiedAt.toISOString(),
     });
   });
 

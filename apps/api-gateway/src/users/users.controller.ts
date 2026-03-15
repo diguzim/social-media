@@ -108,6 +108,64 @@ export class UsersController {
       id: rpcReply.id,
       name: rpcReply.name,
       email: rpcReply.email,
+      emailVerifiedAt: rpcReply.emailVerifiedAt,
     };
+  }
+
+  /**
+   * POST /users/email-verification/confirm
+   * Public route — called when the user clicks the confirmation link.
+   */
+  @Post('email-verification/confirm')
+  async confirmEmailVerification(
+    @Body() body: API.ConfirmEmailVerificationRequest,
+  ): Promise<API.ConfirmEmailVerificationResponse> {
+    this.logger.debug('API Gateway: confirming email verification');
+
+    const rpcRequest: RPC.ConfirmEmailVerificationRequest = {
+      token: body.token,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.authClient.send<
+        RPC.ConfirmEmailVerificationReply,
+        RPC.ConfirmEmailVerificationRequest
+      >({ cmd: AUTH_COMMANDS.confirmEmailVerification }, rpcRequest),
+    );
+
+    return {
+      status: rpcReply.status,
+      emailVerifiedAt: rpcReply.emailVerifiedAt,
+    };
+  }
+
+  /**
+   * POST /users/email-verification/request
+   * Protected route — authenticated user can request a new verification email.
+   */
+  @Post('email-verification/request')
+  @UseGuards(JwtAuthGuard)
+  async requestEmailVerification(
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.RequestEmailVerificationResponse> {
+    this.logger.debug(
+      'API Gateway: requesting email verification resend',
+      req.user,
+    );
+
+    const rpcRequest: RPC.RequestEmailVerificationRequest = {
+      userId: req.user.userId,
+      correlationId: getCorrelationId(),
+    };
+
+    await firstValueFrom(
+      this.authClient.send<
+        RPC.RequestEmailVerificationReply,
+        RPC.RequestEmailVerificationRequest
+      >({ cmd: AUTH_COMMANDS.requestEmailVerification }, rpcRequest),
+    );
+
+    return { message: 'Verification email sent. Please check your inbox.' };
   }
 }

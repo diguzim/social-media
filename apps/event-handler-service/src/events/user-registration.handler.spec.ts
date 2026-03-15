@@ -19,6 +19,8 @@ describe("UserRegistrationHandler", () => {
       name: "John Doe",
       email: "john@example.com",
       createdAt: new Date().toISOString(),
+      verificationToken: "raw-token-abc123",
+      tokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
     };
 
     await handler.handleUserRegistered(event);
@@ -26,6 +28,7 @@ describe("UserRegistrationHandler", () => {
     expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
       event.email,
       event.name,
+      event.verificationToken,
     );
     expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
   });

@@ -31,25 +31,22 @@ event-handler-service
 **Queue**: `social-media.user-registered`\
 **Routing Key**: `user.registered`
 
-Triggered when a user successfully registers. Currently logs the event. Ready to implement:
-
-- Send welcome email to new user
-- Create user profile record
-- Add to mailing list
-- Update search index
-- Trigger analytics events
-- Create onboarding tasks
+Triggered when a user successfully registers **or** when a user requests a new verification email. Sends the email verification link to the new user.
 
 **Event Payload**:
 
 ```typescript
 {
-  userId: string; // Unique user ID
-  name: string; // User's full name
-  email: string; // User's email address
-  createdAt: string; // ISO timestamp of registration
+  userId: string;          // Unique user ID
+  name: string;            // User's full name
+  email: string;           // User's email address
+  createdAt: string;       // ISO timestamp of registration
+  verificationToken: string; // Raw token to embed in the confirmation link
+  tokenExpiresAt: string;  // ISO timestamp when the token expires (24h from creation)
 }
 ```
+
+The verification link sent in the email points to `http://localhost:3000/verify-email?token={verificationToken}`.
 
 ## RabbitMQ Configuration
 

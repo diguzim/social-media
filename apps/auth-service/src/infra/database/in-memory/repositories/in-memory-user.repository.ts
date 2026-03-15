@@ -37,6 +37,17 @@ export class InMemoryUserRepository implements UserRepository {
     return user ?? null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async markEmailVerified(userId: string, verifiedAt: Date): Promise<User> {
+    const user = this.users.find((item) => item.id === userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    user.emailVerifiedAt = verifiedAt;
+    user.updatedAt = verifiedAt;
+    return user;
+  }
+
   private seedUsers(): User[] {
     const salt = 10;
     // Hash "password" for all users
@@ -49,6 +60,8 @@ export class InMemoryUserRepository implements UserRepository {
         email: 'alice@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-01'),
+        // Seed users are pre-verified so E2E tests work without a verification step
+        emailVerifiedAt: new Date('2025-01-01'),
       },
       {
         id: '2',
@@ -56,6 +69,7 @@ export class InMemoryUserRepository implements UserRepository {
         email: 'bob@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-02'),
+        emailVerifiedAt: new Date('2025-01-02'),
       },
       {
         id: '3',
@@ -63,6 +77,7 @@ export class InMemoryUserRepository implements UserRepository {
         email: 'charlie@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-03'),
+        emailVerifiedAt: new Date('2025-01-03'),
       },
       {
         id: '4',
@@ -70,6 +85,7 @@ export class InMemoryUserRepository implements UserRepository {
         email: 'diana@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-04'),
+        emailVerifiedAt: new Date('2025-01-04'),
       },
       {
         id: '5',
@@ -77,6 +93,7 @@ export class InMemoryUserRepository implements UserRepository {
         email: 'eve@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-05'),
+        emailVerifiedAt: new Date('2025-01-05'),
       },
     ];
 

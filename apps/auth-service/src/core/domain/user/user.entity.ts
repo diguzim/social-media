@@ -5,6 +5,8 @@ export class User {
   passwordHash: string;
   createdAt: Date;
   updatedAt: Date | null;
+  /** Set once the user clicks the confirmation link. Null means unverified. */
+  emailVerifiedAt: Date | null;
 
   constructor(props: Partial<User>) {
     this.id = props.id ?? '';
@@ -13,5 +15,6 @@ export class User {
     this.passwordHash = props.passwordHash ?? '';
     this.createdAt = props.createdAt ?? new Date();
     this.updatedAt = props.updatedAt ?? null;
+    this.emailVerifiedAt = props.emailVerifiedAt ?? null;
   }
 }

@@ -7,4 +7,5 @@ export interface GetProfileReply {
   id: string;
   name: string;
   email: string;
+  emailVerifiedAt: string | null;
 }

@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import * as crypto from "node:crypto";
 
 @Injectable()
 export class EmailService {
@@ -11,17 +10,22 @@ export class EmailService {
   /**
    * Sends a verification email to a newly registered user.
    *
+   * The token is generated and stored by auth-service before this is called.
+   * The raw token received here is embedded in the link but never persisted again.
+   *
    * TODO: Replace the fake log delivery with a real email provider
-   *       (e.g. Resend, SendGrid, Nodemailer) and persist the token
-   *       so the /auth/verify-email route can validate it later.
+   *       (e.g. Resend, SendGrid, Nodemailer).
    */
-  async sendVerificationEmail(to: string, name: string): Promise<void> {
-    const token = crypto.randomBytes(32).toString("hex");
+  async sendVerificationEmail(
+    to: string,
+    name: string,
+    verificationToken: string,
+  ): Promise<void> {
     const appUrl = this.configService.get<string>(
       "APP_URL",
       "http://localhost:3000",
     );
-    const confirmationLink = `${appUrl}/auth/verify-email?token=${token}`;
+    const confirmationLink = `${appUrl}/verify-email?token=${verificationToken}`;
 
     // FAKE DELIVERY — log the link so it is visible during development
     this.logger.log(

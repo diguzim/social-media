@@ -3,6 +3,7 @@ import { RegisterUseCase } from './register.use-case';
 import { UserRepository } from 'src/core/domain/user/user.repository';
 import { USER_EVENTS } from '@repo/events';
 import { RabbitMqEventPublisher } from 'src/infra/events/rabbitmq-event.publisher';
+import { CreateEmailVerificationTokenUseCase } from '../email-verification/create-email-verification-token.use-case';
 
 jest.mock('bcrypt', () => ({
   __esModule: true,
@@ -14,22 +15,32 @@ jest.mock('bcrypt', () => ({
 describe('RegisterUseCase', () => {
   let userRepository: jest.Mocked<UserRepository>;
   let eventPublisher: jest.Mocked<Pick<RabbitMqEventPublisher, 'publish'>>;
+  let createEmailVerificationTokenUseCase: jest.Mocked<CreateEmailVerificationTokenUseCase>;
+
+  const tokenExpiresAt = new Date('2024-01-02T00:00:00Z');
 
   beforeEach(() => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
       findById: jest.fn(),
+      markEmailVerified: jest.fn(),
     };
     eventPublisher = {
       publish: jest.fn().mockResolvedValue(undefined),
     };
+    createEmailVerificationTokenUseCase = {
+      execute: jest.fn().mockResolvedValue({
+        verificationToken: 'raw-token',
+        expiresAt: tokenExpiresAt,
+      }),
+    } as unknown as jest.Mocked<CreateEmailVerificationTokenUseCase>;
     jest.clearAllMocks();
   });
 
   it('should hash the password and create a user, then emit registration event', async () => {
-    const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
-    bcryptMock.hash.mockResolvedValue('hashed-password');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     const createdAtDate = new Date('2024-01-01T00:00:00Z');
     userRepository.findByEmail.mockResolvedValue(null);
@@ -40,11 +51,17 @@ describe('RegisterUseCase', () => {
       passwordHash: 'hashed-password',
       createdAt: createdAtDate,
       updatedAt: null,
+      emailVerifiedAt: null,
+    });
+    createEmailVerificationTokenUseCase.execute.mockResolvedValue({
+      verificationToken: 'raw-token',
+      expiresAt: tokenExpiresAt,
     });
 
     const useCase = new RegisterUseCase(
       userRepository,
-      eventPublisher as RabbitMqEventPublisher,
+      eventPublisher as unknown as RabbitMqEventPublisher,
+      createEmailVerificationTokenUseCase,
     );
 
     const result = await useCase.execute({
@@ -54,11 +71,14 @@ describe('RegisterUseCase', () => {
     });
 
     expect(userRepository.findByEmail).toHaveBeenCalledWith('john@doe.com');
-    expect(bcryptMock.hash).toHaveBeenCalledWith('plain-password', 10);
+    expect(bcrypt.hash).toHaveBeenCalledWith('plain-password', 10);
     expect(userRepository.create).toHaveBeenCalledWith({
       name: 'John Doe',
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
+    });
+    expect(createEmailVerificationTokenUseCase.execute).toHaveBeenCalledWith({
+      userId: 'user-1',
     });
     expect(eventPublisher.publish).toHaveBeenCalledWith(
       USER_EVENTS.REGISTERED,
@@ -67,6 +87,8 @@ describe('RegisterUseCase', () => {
         name: 'John Doe',
         email: 'john@doe.com',
         createdAt: createdAtDate.toISOString(),
+        verificationToken: 'raw-token',
+        tokenExpiresAt: tokenExpiresAt.toISOString(),
       },
     );
     expect(result).toEqual({
@@ -84,11 +106,13 @@ describe('RegisterUseCase', () => {
       passwordHash: 'existing-hash',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
+      emailVerifiedAt: null,
     });
 
     const useCase = new RegisterUseCase(
       userRepository,
-      eventPublisher as RabbitMqEventPublisher,
+      eventPublisher as unknown as RabbitMqEventPublisher,
+      createEmailVerificationTokenUseCase,
     );
 
     await expect(
@@ -104,15 +128,16 @@ describe('RegisterUseCase', () => {
   });
 
   it('should propagate repository errors during creation', async () => {
-    const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
-    bcryptMock.hash.mockResolvedValue('hashed-password');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     userRepository.findByEmail.mockResolvedValue(null);
     userRepository.create.mockRejectedValue(new Error('db failure'));
 
     const useCase = new RegisterUseCase(
       userRepository,
-      eventPublisher as RabbitMqEventPublisher,
+      eventPublisher as unknown as RabbitMqEventPublisher,
+      createEmailVerificationTokenUseCase,
     );
 
     await expect(
