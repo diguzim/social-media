@@ -191,13 +191,6 @@ Each service has a production Dockerfile for deployment:
 
 ## TODO
 
-- [x] RabbitMQ message broker integration
-- [x] Event-driven architecture with user registration events
-- [x] JWT-based authentication (register, login, profile)
-- [x] Frontend UI (React Vite SPA with routing)
-- [x] Protected routes (frontend and backend)
-- [x] Tailwind CSS migration in user-portal
-- [x] Cypress component testing for feed states
 - [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)
 - [ ] Posts listing page with pagination
@@ -212,6 +205,7 @@ Each service has a production Dockerfile for deployment:
 - [ ] Caching (Redis)
 - [ ] Rate limiting
 - [ ] Search service (Elasticsearch)
+- [ ] 404 page and error handling in frontend
 
 ## Notes
 
