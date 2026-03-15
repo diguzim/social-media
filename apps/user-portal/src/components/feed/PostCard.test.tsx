@@ -33,7 +33,7 @@ describe('PostCard', () => {
           author: { id: 'user-2', name: 'Alice' },
           createdAt: '2026-03-07T10:00:00.000Z',
         }}
-      />,
+      />
     );
 
     expect(screen.getByTestId('post-author-post-2')).toHaveTextContent('Author: Alice');

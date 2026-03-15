@@ -1,15 +1,19 @@
 import { UserRegistrationHandler } from "./user-registration.handler";
+import { EmailService } from "../email/email.service";
 
 describe("UserRegistrationHandler", () => {
   let handler: UserRegistrationHandler;
+  let emailService: jest.Mocked<EmailService>;
 
   beforeEach(() => {
-    handler = new UserRegistrationHandler();
+    emailService = {
+      sendVerificationEmail: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<EmailService>;
+
+    handler = new UserRegistrationHandler(emailService);
   });
 
-  it("should handle user registered event", async () => {
-    const logSpy = jest.spyOn(handler["logger"], "log");
-
+  it("should send verification email when handling user registration", async () => {
     const event = {
       userId: "user-1",
       name: "John Doe",
@@ -19,12 +23,10 @@ describe("UserRegistrationHandler", () => {
 
     await handler.handleUserRegistered(event);
 
-    expect(logSpy).toHaveBeenCalledTimes(2);
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Processing user registration event"),
+    expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
+      event.email,
+      event.name,
     );
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining("successfully registered"),
-    );
+    expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
   });
 });
