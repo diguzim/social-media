@@ -11,6 +11,7 @@ Goal:
 Prepare one commit for review, but do NOT create the commit yet.
 
 Task:
+
 1. Inspect git status/diff.
 2. Select only one logical commit group based on user context.
 3. Stage only the files for that group.
@@ -22,6 +23,7 @@ Task:
 7. Explicitly stop before committing.
 
 Important constraints:
+
 - Never commit in this prompt.
 - If a file looks mixed, call it out and avoid partial staging unless clearly safe.
 
