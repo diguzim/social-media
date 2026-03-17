@@ -108,6 +108,22 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Always use `data-testid` attributes on interactive elements and key containers
 - JWT token stored in `localStorage` under key `jwtToken`
 - User profile cached in `localStorage` under key `user`
+- Prefer a **persistent shell** (layout + navbar) while route content updates; avoid full-page blocking loaders when partial UI can render
+- Build pages as **UI islands** (independent sections) so already loaded sections remain visible while slower sections show local fallback UI
+- Standardize loading into 4 scenarios: `initial-route-load`, `section-load`, `background-refresh`, `interaction-pending`
+- Prefer **section-level `Suspense` boundaries** for slower islands; do not wrap the entire app in one coarse fallback
+- Use **`useTransition` / `startTransition`** for non-urgent updates (filters, pagination, tab/route-like updates) so stale content can stay visible
+- Use **`useDeferredValue`** for input-driven filtering/search to keep typing responsive
+- Add **Error Boundaries per island** so one failed section does not collapse the entire page
+- Use reusable loading primitives (e.g., section skeletons/placeholders) that support variable layout needs (`height`, `width`, `variant`, `lines`, `minHeight`)
+- Prevent layout shift during loading (reserve space with skeleton containers/min heights)
+- For form actions (login/register/create post), keep forms visible while pending: disable submit, show inline pending feedback, and prevent duplicate submissions
+- Prefer request deduplication + abort stale requests + stale-while-revalidate behavior for smoother progressive rendering
+- Default shared loading primitives should live under `src/components/loading/` (for example: `LoadingBlock`, `SectionSkeleton`, `PendingButton`, `InlineStatus`)
+- Prefer introducing loading primitives before refactoring pages so page migrations reuse the same visual language
+- Recommended first rollout order: `Home` page → `Profile` page → `MyPosts` page → shared form pending states
+- For the `Home` page, prefer these initial islands: profile summary, create-post form, feed list
+- On `Home`, avoid blocking the entire page on profile fetch when cached user data exists; render cached/stable content first and refresh in the background where possible
 
 ### Testing
 
@@ -117,6 +133,8 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Assert stable end-states, not transient loading states
 - Unit tests live alongside the code they test (`*.spec.ts`)
 - If tests or new behavior depend on baseline users/posts, update in-memory repository seed data in the same task (and keep test assertions aligned with the new seeded values)
+- For progressive loading UX, assert that already-loaded regions remain visible while only pending islands show fallback UI
+- For interaction-pending UX, test disabled submit controls, duplicate-submit prevention, and visible pending indicators
 
 ### Documentation Maintenance
 
