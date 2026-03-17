@@ -5,6 +5,7 @@ import { Login } from '../pages/Login';
 import { Profile } from '../pages/Profile';
 import { MyPosts } from '../pages/MyPosts';
 import { VerifyEmail } from '../pages/VerifyEmail';
+import { NotFound } from '../pages/NotFound';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
 import { isAuthenticated } from '../utils';
 
@@ -30,6 +31,9 @@ export function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/my-posts" element={<MyPosts />} />
         </Route>
+
+        {/* Catch-all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

@@ -19,6 +19,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/login` - User login form
 - `/profile` - Protected profile page with verification status
 - `/verify-email?token=...` - Public email confirmation page
+- `*` - 404 Not Found page (any unmatched route)
 
 ## Authentication Flow
 
