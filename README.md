@@ -205,7 +205,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] Caching (Redis)
 - [ ] Rate limiting
 - [ ] Search service (Elasticsearch)
-- [ ] 404 page and error handling in frontend
 
 ## Notes
 
