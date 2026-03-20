@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { createPost } from '../../services/posts';
+import { PendingButton } from '../loading/PendingButton';
 
 interface CreatePostFormProps {
   onPostCreated?: () => void;
@@ -12,8 +13,13 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
     setError('');
     setSuccess('');
 
@@ -90,14 +96,14 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
           </p>
         )}
 
-        <button
+        <PendingButton
           type="submit"
           data-testid="create-post-submit-button"
-          disabled={isSubmitting}
+          isPending={isSubmitting}
+          idleText="Create Post"
+          pendingText="Creating..."
           className="btn btn-primary w-full"
-        >
-          {isSubmitting ? 'Creating...' : 'Create Post'}
-        </button>
+        />
       </form>
     </section>
   );

@@ -10,6 +10,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - User profile page with email verification status
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
+- Progressive loading UX with persistent shell + Home page islands
 - Loading states and error handling
 
 ## Routes
@@ -110,6 +111,8 @@ src/
   app/            - Application root and routing
   pages/          - Page components (Home, Register, Login, Profile)
   components/     - Reusable UI components (e.g., Navbar, Feed, PostCard)
+  components/loading/ - Shared loading primitives (skeletons, pending buttons, inline status)
+  components/home/ - Home page island components
   services/       - API clients (auth.ts and posts.ts)
   hooks/          - Custom React hooks (placeholder)
 ```
@@ -152,3 +155,5 @@ The app communicates with the API Gateway which routes requests to microservices
 - localStorage handles persistence across page reloads
 - JWT token sent in Authorization header for protected endpoints
 - Error states display user-friendly error messages
+- Home uses cached-first rendering for profile data and refreshes in the background when possible
+- Feed refreshes preserve already rendered posts and show local refresh feedback instead of blanking the page

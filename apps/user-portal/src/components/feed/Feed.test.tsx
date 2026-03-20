@@ -9,6 +9,18 @@ vi.mock('../../services/posts', () => ({
 
 const mockedGetFeed = vi.mocked(getFeed);
 
+function createDeferredPromise<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe('Feed', () => {
   it('requests posts with expected query params and renders feed', async () => {
     mockedGetFeed.mockResolvedValueOnce({
@@ -67,5 +79,72 @@ describe('Feed', () => {
 
     expect(await screen.findByTestId('feed-error-state')).toBeInTheDocument();
     expect(screen.getByText('Failed to fetch feed')).toBeInTheDocument();
+  });
+
+  it('keeps current posts visible while a background refresh is pending', async () => {
+    const deferredRefresh = createDeferredPromise<{
+      data: Array<{
+        id: string;
+        title: string;
+        content: string;
+        authorId: string;
+        author: { id: string; name: string };
+        createdAt: string;
+      }>;
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>();
+
+    mockedGetFeed
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 'p1',
+            title: 'First load',
+            content: 'Content A',
+            authorId: 'u1',
+            author: { id: 'u1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      })
+      .mockReturnValueOnce(deferredRefresh.promise);
+
+    const { rerender } = render(<Feed refreshKey={0} />);
+
+    expect(await screen.findByTestId('feed-section')).toBeInTheDocument();
+    expect(screen.getByTestId('post-title-p1')).toHaveTextContent('First load');
+
+    rerender(<Feed refreshKey={1} />);
+
+    expect(screen.getByTestId('post-title-p1')).toBeInTheDocument();
+    expect(screen.getByTestId('feed-refreshing-status')).toHaveTextContent('Refreshing feed...');
+
+    deferredRefresh.resolve({
+      data: [
+        {
+          id: 'p2',
+          title: 'Refreshed post',
+          content: 'Content B',
+          authorId: 'u2',
+          author: { id: 'u2', name: 'Bob' },
+          createdAt: '2026-03-08T12:00:00.000Z',
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('post-title-p2')).toHaveTextContent('Refreshed post');
+    });
   });
 });

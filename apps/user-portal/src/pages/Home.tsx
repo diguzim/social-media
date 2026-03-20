@@ -1,91 +1,81 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { getProfile, getUserProfile } from '../services/auth';
 import type { UserProfile } from '../services/auth';
-import { Feed } from '../components/feed/Feed';
-import { CreatePostForm } from '../components/post/CreatePostForm';
+import { HomeCreatePostSection } from '../components/home/HomeCreatePostSection';
+import { HomeFeedSection } from '../components/home/HomeFeedSection';
+import { HomeProfileSummary } from '../components/home/HomeProfileSummary';
 
 export function Home() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const initialCachedUserRef = useRef<UserProfile | null>(getUserProfile());
+  const [user, setUser] = useState<UserProfile | null>(initialCachedUserRef.current);
+  const [profileError, setProfileError] = useState('');
+  const [isProfileLoading, setIsProfileLoading] = useState(initialCachedUserRef.current === null);
+  const [isProfileRefreshing, setIsProfileRefreshing] = useState(
+    initialCachedUserRef.current !== null
+  );
   const [feedKey, setFeedKey] = useState(0);
+  const [, startFeedRefreshTransition] = useTransition();
 
   useEffect(() => {
+    let isActive = true;
+
     const fetchProfile = async () => {
       try {
         const profile = await getProfile();
+        if (!isActive) {
+          return;
+        }
+
         setUser(profile);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load profile');
-        const cachedUser = getUserProfile();
-        if (cachedUser) {
-          setUser(cachedUser);
-          setError('');
+        if (!isActive) {
+          return;
+        }
+
+        const message = err instanceof Error ? err.message : 'Failed to load profile';
+        setProfileError(message);
+
+        if (!initialCachedUserRef.current) {
+          setUser(null);
         }
       } finally {
-        setLoading(false);
+        if (!isActive) {
+          return;
+        }
+
+        setIsProfileLoading(false);
+        setIsProfileRefreshing(false);
       }
     };
 
     fetchProfile();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   const handlePostCreated = () => {
-    // Refresh feed by changing its key
-    setFeedKey((prev) => prev + 1);
+    startFeedRefreshTransition(() => {
+      setFeedKey((prev) => prev + 1);
+    });
   };
-
-  if (loading) {
-    return (
-      <div data-testid="home-loading-state" className="page-container max-w-md text-center">
-        <p data-testid="home-loading-text">Loading your profile...</p>
-      </div>
-    );
-  }
-
-  if (error && !user) {
-    return (
-      <div data-testid="home-error-state" className="page-container max-w-md text-center">
-        <p data-testid="home-error-message" className="status-error">
-          {error}
-        </p>
-        <p className="text-sm text-slate-600">Redirecting to login...</p>
-      </div>
-    );
-  }
 
   return (
     <div data-testid="home-page" className="page-container max-w-5xl">
-      {user && (
-        <>
-          <h1
-            data-testid="home-welcome-title"
-            className="text-center text-3xl font-bold text-slate-900"
-          >
-            Welcome {user.name}!
-          </h1>
-          <div data-testid="home-profile-card" className="card mt-5 px-6 py-5 text-center">
-            <p className="mb-2 text-slate-700">
-              <strong>ID:</strong> {user.id}
-            </p>
-            <p data-testid="home-user-email" className="mb-2 text-slate-700">
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p className="text-slate-700">
-              <strong>Name:</strong> {user.name}
-            </p>
-          </div>
-        </>
-      )}
+      <HomeProfileSummary
+        user={user}
+        isLoading={isProfileLoading}
+        isRefreshing={isProfileRefreshing}
+        error={profileError}
+      />
 
       <div className="mt-7">
-        <CreatePostForm onPostCreated={handlePostCreated} />
+        <HomeCreatePostSection onPostCreated={handlePostCreated} />
       </div>
 
       <div className="mt-7">
-        <Feed key={feedKey} />
+        <HomeFeedSection refreshKey={feedKey} />
       </div>
     </div>
   );

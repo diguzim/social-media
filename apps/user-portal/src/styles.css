@@ -56,4 +56,8 @@
 	.status-error {
 		@apply mb-4 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-700;
 	}
+
+	.status-success {
+		@apply mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700;
+	}
 }
