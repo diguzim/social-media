@@ -121,10 +121,34 @@ src/
 
 - `pnpm dev` - Start development server (port 3000)
 - `pnpm build` - Type-check and build production bundle
+- `pnpm storybook` - Start Storybook for visual UI validation (port 6006)
+- `pnpm build-storybook` - Build static Storybook docs
 - `pnpm preview` - Preview production build
 - `pnpm lint` - Run ESLint with auto-fix
 - `pnpm format` - Format code with Prettier
 - `pnpm type-check` - Run TypeScript type checker
+
+## Storybook
+
+Storybook is colocated in `apps/user-portal` so portal UI can be validated in isolation while the design system evolves.
+
+- Config: `.storybook/main.ts` and `.storybook/preview.ts`
+- Initial stories cover loading primitives and Home loading scenarios:
+  - `src/components/loading/*.stories.tsx`
+  - `src/components/home/HomeProfileSummary.stories.tsx`
+  - `src/stories/HomeLoadingScenarios.stories.tsx`
+
+Run:
+
+```sh
+pnpm --filter user-portal storybook
+```
+
+Build static docs:
+
+```sh
+pnpm --filter user-portal build-storybook
+```
 
 ## Tech Stack
 

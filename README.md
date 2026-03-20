@@ -165,6 +165,7 @@ pnpm --filter auth-service dev
 pnpm --filter posts-service dev
 pnpm --filter event-handler-service dev
 pnpm --filter user-portal dev
+pnpm --filter user-portal storybook
 ```
 
 ## Useful Scripts

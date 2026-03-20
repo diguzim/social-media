@@ -105,6 +105,9 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 
 - Components in `src/components/`, pages in `src/pages/`
 - Services (API calls) in `src/services/`
+- Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
+- For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
+- For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending
 - Always use `data-testid` attributes on interactive elements and key containers
 - JWT token stored in `localStorage` under key `jwtToken`
 - User profile cached in `localStorage` under key `user`
@@ -146,6 +149,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
   - `docs/PRD.md` for feature scope or roadmap changes
   - `docs/ADR.md` when an architectural decision is introduced or changed
   - `.github/copilot-instructions.md` when project conventions or architecture guidance evolve
+  - Storybook stories in `apps/user-portal/src/**/*.stories.tsx` when frontend component behavior/states change
 - If no documentation change is needed, explicitly verify that the existing docs are still accurate before considering the task complete
 - Prefer small, precise documentation updates that stay aligned with the code instead of leaving stale or aspirational text
 

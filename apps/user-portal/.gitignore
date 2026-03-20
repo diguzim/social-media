@@ -1,6 +1,7 @@
 *.local
 dist
 build
+storybook-static
 node_modules
 .env
 .env.local
