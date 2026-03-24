@@ -128,6 +128,11 @@ The `user-portal` follows a contract/presenter/provider pattern for page state o
 
 Presenters are organized by approach at folder level (for example: `src/state-contracts/home/presenters/hooks/`), similar to backend infra organization patterns.
 
+Current examples in `user-portal`:
+
+- Home uses `useHomeStateContract()` with `useHomeStatePresenter`
+- Register uses `useRegisterStateContract()` with `useRegisterStatePresenter`
+
 This keeps page components focused on rendering and makes state management implementation replaceable over time.
 
 ## Exception Handling

@@ -135,7 +135,9 @@ The portal adopts a backend-inspired architecture for state orchestration:
 Current rollout:
 
 - Home page uses `StateContractsProvider` + `useHomeStateContract()`
+- Register page uses `RegisterStateContractProvider` + `useRegisterStateContract()`
 - Default presenter is `useHomeStatePresenter` under the hooks approach folder
+- Default register presenter is `useRegisterStatePresenter` under the hooks approach folder
 
 Current folder convention (by implementation approach):
 
@@ -146,11 +148,18 @@ src/state-contracts/home/
   presenters/
     hooks/
       use-home-state.presenter.ts     # hooks-based presenter
+
+src/state-contracts/register/
+  register-state.contract.ts          # contract definition
+  register-state-contract.context.tsx # provider + consumer hook
+  presenters/
+    hooks/
+      use-register-state.presenter.ts # hooks-based presenter
 ```
 
 When adding a new state strategy, create a sibling approach folder (for example `presenters/zustand/` or `presenters/redux/`) and keep pages unchanged.
 
-This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home UI islands.
+This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home or Register page composition.
 
 ## Scripts
 

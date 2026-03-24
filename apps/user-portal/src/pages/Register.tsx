@@ -1,46 +1,26 @@
-import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { registerUser, type RegisterRequest } from '../services/auth';
+import type { ChangeEvent, FormEvent } from 'react';
+import type { RegisterRequest } from '../services/auth';
+import { useRegisterStateContract } from '../state-contracts/register';
+
+const REGISTER_FIELDS = ['name', 'username', 'email', 'password'] as const;
+
+function isRegisterField(field: string): field is keyof RegisterRequest {
+  return (REGISTER_FIELDS as readonly string[]).includes(field);
+}
 
 export function Register() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState<RegisterRequest>({
-    name: '',
-    username: '',
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const { state, actions } = useRegisterStateContract();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: RegisterRequest) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (isRegisterField(name)) {
+      actions.updateField(name, value);
+    }
   };
-
-  // Simple validation: all fields must have values
-  const isFormValid =
-    formData.name.trim() !== '' &&
-    formData.username.trim() !== '' &&
-    formData.email.trim() !== '' &&
-    formData.password.trim() !== '';
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await registerUser(formData);
-      navigate('/login');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
+    await actions.submit();
   };
 
   return (
@@ -58,7 +38,7 @@ export function Register() {
             type="text"
             id="name"
             name="name"
-            value={formData.name}
+            value={state.formData.name}
             onChange={handleChange}
             required
             className="input-base"
@@ -74,7 +54,7 @@ export function Register() {
             type="text"
             id="username"
             name="username"
-            value={formData.username}
+            value={state.formData.username}
             onChange={handleChange}
             required
             className="input-base"
@@ -90,7 +70,7 @@ export function Register() {
             type="email"
             id="email"
             name="email"
-            value={formData.email}
+            value={state.formData.email}
             onChange={handleChange}
             required
             className="input-base"
@@ -106,26 +86,26 @@ export function Register() {
             type="password"
             id="password"
             name="password"
-            value={formData.password}
+            value={state.formData.password}
             onChange={handleChange}
             required
             className="input-base"
           />
         </div>
 
-        {error && (
+        {state.error && (
           <div data-testid="register-error-message" className="status-error">
-            {error}
+            {state.error}
           </div>
         )}
 
         <button
           data-testid="register-submit-button"
           type="submit"
-          disabled={!isFormValid || loading}
+          disabled={!state.isFormValid || state.isLoading}
           className="btn-primary w-full"
         >
-          {loading ? 'Registering...' : 'Register'}
+          {state.isLoading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
