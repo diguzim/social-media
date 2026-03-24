@@ -12,4 +12,4 @@ async function bootstrap() {
   app.useGlobalFilters(new RpcExceptionFilter());
   await app.listen(process.env.PORT ?? 4000);
 }
-bootstrap();
+void bootstrap();

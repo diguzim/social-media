@@ -1,12 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 import { of, throwError } from 'rxjs';
+import type { ClientProxy } from '@nestjs/microservices';
 import { FeedService } from './feed.service';
 import { POSTS_SERVICE } from './posts.client';
 import { AUTH_SERVICE } from '../auth/auth.client';
 
-const mockPostsClient = { send: jest.fn() };
-const mockAuthClient = { send: jest.fn() };
+const mockPostsClient = {
+  send: jest.fn(),
+} as ClientProxy;
+const mockAuthClient = {
+  send: jest.fn(),
+} as ClientProxy;
 
 const makePost = (id: string, authorId: string) => ({
   id,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 import { PostsController } from './posts.controller';
@@ -5,8 +6,12 @@ import { FeedService } from './feed.service';
 import { POSTS_SERVICE } from './posts.client';
 import type { API } from '@repo/contracts';
 
-const mockFeedService = { getFeed: jest.fn() };
-const mockPostsClient = { send: jest.fn() };
+const mockFeedService = {
+  getFeed: jest.fn(),
+} as FeedService;
+const mockPostsClient = {
+  send: jest.fn(),
+} as any;
 
 const makeFeedResponse = (): API.GetFeedResponse => ({
   data: [

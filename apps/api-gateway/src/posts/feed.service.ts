@@ -68,7 +68,10 @@ export class FeedService {
             ),
           );
           authorMap.set(userId, { id: profile.id, name: profile.name });
-        } catch (err) {
+        } catch (
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _err
+        ) {
           this.logger.warn(
             `FeedService: could not fetch profile for userId=${userId}, using fallback`,
           );
@@ -97,7 +100,10 @@ export class FeedService {
         ),
       );
       reactionSummaries = reactionReply.summaries;
-    } catch (err) {
+    } catch (
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _err
+    ) {
       this.logger.warn(
         'FeedService: could not fetch reaction summaries, continuing without reactions',
       );
