@@ -44,12 +44,16 @@ describe("UpdatePostUseCase", () => {
       title: "New title",
     });
 
-    expect(postRepository.findById).toHaveBeenCalledWith("post-1");
-    expect(postRepository.update).toHaveBeenCalledWith({
-      postId: "post-1",
-      title: "New title",
-      content: undefined,
-    });
+    expect(postRepository.findById.mock.calls).toEqual([["post-1"]]);
+    expect(postRepository.update.mock.calls).toEqual([
+      [
+        {
+          postId: "post-1",
+          title: "New title",
+          content: undefined,
+        },
+      ],
+    ]);
     expect(result).toEqual({
       id: "post-1",
       title: "New title",

@@ -31,8 +31,8 @@ describe("DeletePostUseCase", () => {
       authorId: "user-1",
     });
 
-    expect(postRepository.findById).toHaveBeenCalledWith("post-1");
-    expect(postRepository.delete).toHaveBeenCalledWith({ postId: "post-1" });
+    expect(postRepository.findById.mock.calls).toEqual([["post-1"]]);
+    expect(postRepository.delete.mock.calls).toEqual([[{ postId: "post-1" }]]);
   });
 
   it("should throw NotFoundException when post does not exist", async () => {

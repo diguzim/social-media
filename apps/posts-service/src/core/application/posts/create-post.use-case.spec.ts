@@ -31,11 +31,15 @@ describe("CreatePostUseCase", () => {
       authorId: "user-1",
     });
 
-    expect(postRepository.create).toHaveBeenCalledWith({
-      title: "Post title",
-      content: "Post content",
-      authorId: "user-1",
-    });
+    expect(postRepository.create.mock.calls).toEqual([
+      [
+        {
+          title: "Post title",
+          content: "Post content",
+          authorId: "user-1",
+        },
+      ],
+    ]);
     expect(result).toEqual({
       id: "post-1",
       title: "Post title",

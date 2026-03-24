@@ -90,10 +90,11 @@ describe("Post Entity", () => {
       };
 
       const post = new Post(postProps);
+      const mutablePost = post as unknown as { id: string };
 
       // Attempting to assign to a getter should throw
       expect(() => {
-        (post as any).id = "new-id";
+        mutablePost.id = "new-id";
       }).toThrow();
 
       // Value should remain unchanged

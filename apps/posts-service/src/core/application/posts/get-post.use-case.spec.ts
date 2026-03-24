@@ -28,7 +28,7 @@ describe("GetPostUseCase", () => {
 
     const result = await useCase.execute({ postId: "post-1" });
 
-    expect(postRepository.findById).toHaveBeenCalledWith("post-1");
+    expect(postRepository.findById.mock.calls).toEqual([["post-1"]]);
     expect(result).toEqual({
       id: "post-1",
       title: "Post title",
