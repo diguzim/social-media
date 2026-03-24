@@ -9,21 +9,21 @@ vi.mock('../../services/posts', () => ({
 
 const mockedCreatePost = vi.mocked(createPost);
 
-function createDeferredPromise<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
+function createDeferredPromise<T>(result: T) {
+  let resolve!: () => void;
 
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
+  const promise = new Promise<T>((res) => {
+    resolve = () => {
+      res(result);
+    };
   });
 
-  return { promise, resolve, reject };
+  return { promise, resolve };
 }
 
 describe('CreatePostForm', () => {
   it('shows pending feedback and prevents duplicate submission', async () => {
-    const deferred = createDeferredPromise<{ id: string }>();
+    const deferred = createDeferredPromise<{ id: string }>({ id: 'post-1' });
     const onPostCreated = vi.fn();
     mockedCreatePost.mockReturnValueOnce(deferred.promise as Promise<never>);
 
@@ -43,7 +43,7 @@ describe('CreatePostForm', () => {
     expect(screen.getByTestId('create-post-submit-button')).toBeDisabled();
     expect(screen.getByTestId('create-post-submit-button')).toHaveTextContent('Creating...');
 
-    deferred.resolve({ id: 'post-1' });
+    deferred.resolve();
 
     await waitFor(() => {
       expect(onPostCreated).toHaveBeenCalledTimes(1);

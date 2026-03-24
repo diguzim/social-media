@@ -9,16 +9,16 @@ vi.mock('../../services/posts', () => ({
 
 const mockedGetFeed = vi.mocked(getFeed);
 
-function createDeferredPromise<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
+function createDeferredPromise<T>(result: T) {
+  let resolve!: () => void;
 
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
+  const promise = new Promise<T>((res) => {
+    resolve = () => {
+      res(result);
+    };
   });
 
-  return { promise, resolve, reject };
+  return { promise, resolve };
 }
 
 describe('Feed', () => {
@@ -82,20 +82,24 @@ describe('Feed', () => {
   });
 
   it('keeps current posts visible while a background refresh is pending', async () => {
-    const deferredRefresh = createDeferredPromise<{
-      data: Array<{
-        id: string;
-        title: string;
-        content: string;
-        authorId: string;
-        author: { id: string; name: string };
-        createdAt: string;
-      }>;
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    }>();
+    const deferredRefreshResult = {
+      data: [
+        {
+          id: 'p2',
+          title: 'Refreshed post',
+          content: 'Content B',
+          authorId: 'u2',
+          author: { id: 'u2', name: 'Bob' },
+          createdAt: '2026-03-08T12:00:00.000Z',
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    };
+
+    const deferredRefresh = createDeferredPromise(deferredRefreshResult);
 
     mockedGetFeed
       .mockResolvedValueOnce({
@@ -126,22 +130,7 @@ describe('Feed', () => {
     expect(screen.getByTestId('post-title-p1')).toBeInTheDocument();
     expect(screen.getByTestId('feed-refreshing-status')).toHaveTextContent('Refreshing feed...');
 
-    deferredRefresh.resolve({
-      data: [
-        {
-          id: 'p2',
-          title: 'Refreshed post',
-          content: 'Content B',
-          authorId: 'u2',
-          author: { id: 'u2', name: 'Bob' },
-          createdAt: '2026-03-08T12:00:00.000Z',
-        },
-      ],
-      total: 1,
-      page: 1,
-      limit: 10,
-      totalPages: 1,
-    });
+    deferredRefresh.resolve();
 
     await waitFor(() => {
       expect(screen.getByTestId('post-title-p2')).toHaveTextContent('Refreshed post');

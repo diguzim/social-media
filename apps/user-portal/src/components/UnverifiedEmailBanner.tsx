@@ -16,6 +16,7 @@ export function UnverifiedEmailBanner({ onVerified: _onVerified }: UnverifiedEma
     try {
       await requestEmailVerification();
       setSent(true);
+      _onVerified?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send email.');
     } finally {

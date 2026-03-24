@@ -128,6 +128,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Recommended first rollout order: `Home` page → `Profile` page → `MyPosts` page → shared form pending states
 - For the `Home` page, prefer these initial islands: profile summary, create-post form, feed list
 - On `Home`, avoid blocking the entire page on profile fetch when cached user data exists; render cached/stable content first and refresh in the background where possible
+- Before finishing any frontend task in `apps/user-portal`, run `pnpm lint` in that app and resolve all lint errors; pay special attention to recurring issues: `no-unused-vars` (including callback param names in types), `no-unsafe-finally` (no `return` in `finally`), `react/no-unescaped-entities` (escape apostrophes in JSX text), and `no-undef` for React types (use explicit type imports like `ReactElement`)
 
 ### Testing
 

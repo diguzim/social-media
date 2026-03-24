@@ -5,7 +5,7 @@ import { PendingButton } from '../loading/PendingButton';
 
 interface PostCardProps {
   post: FeedPost;
-  onReactionChange?: (postId: string) => void;
+  onReactionChange?: () => void;
 }
 
 export function PostCard({ post, onReactionChange }: PostCardProps) {
@@ -32,7 +32,7 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
     try {
       await togglePostReaction(post.id);
-      onReactionChange?.(post.id);
+      onReactionChange?.();
     } catch (error) {
       // Revert optimistic update on error
       setLocalLikedByMe(wasLiked);

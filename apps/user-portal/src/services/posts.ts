@@ -1,7 +1,6 @@
 import type {
   GetPostsRequest,
   GetPostsResponse,
-  Post,
   GetFeedRequest,
   GetFeedResponse,
   FeedPost as ApiFeedPost,

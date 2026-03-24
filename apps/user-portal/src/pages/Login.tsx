@@ -105,7 +105,7 @@ export function Login() {
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-600">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <a data-testid="login-create-account-link" href="/register" className="link-primary">
           Create one
         </a>

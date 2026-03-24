@@ -66,7 +66,7 @@ export function MyPosts() {
       <div data-testid="my-posts-page" className="page-container max-w-5xl">
         <h1 className="mb-5 text-3xl font-bold text-slate-900">My Posts</h1>
         <div data-testid="my-posts-empty-state" className="card px-6 py-8 text-center">
-          <p className="text-lg text-slate-700">You haven't created any posts yet.</p>
+          <p className="text-lg text-slate-700">You haven&apos;t created any posts yet.</p>
           <p className="mt-2 text-sm text-slate-500">
             Start sharing your thoughts with the community!
           </p>

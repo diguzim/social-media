@@ -59,12 +59,10 @@ export function Feed({ refreshKey = 0 }: FeedProps) {
           setRefreshError(message);
         }
       } finally {
-        if (!isActive) {
-          return;
+        if (isActive) {
+          setLoading(false);
+          setIsRefreshing(false);
         }
-
-        setLoading(false);
-        setIsRefreshing(false);
       }
     };
 

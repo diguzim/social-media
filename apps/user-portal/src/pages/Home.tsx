@@ -39,12 +39,10 @@ export function Home() {
           setUser(null);
         }
       } finally {
-        if (!isActive) {
-          return;
+        if (isActive) {
+          setIsProfileLoading(false);
+          setIsProfileRefreshing(false);
         }
-
-        setIsProfileLoading(false);
-        setIsProfileRefreshing(false);
       }
     };
 
