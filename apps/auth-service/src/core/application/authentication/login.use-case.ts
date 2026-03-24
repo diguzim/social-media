@@ -4,6 +4,10 @@ import bcrypt from 'bcrypt';
 import { UserRepository } from 'src/core/domain/user/user.repository';
 
 export interface LoginInput {
+  /**
+   * Backward-compatible field name used by current API contract.
+   * Accepts either email or username.
+   */
   email: string;
   password: string;
 }
@@ -22,7 +26,11 @@ export class LoginUseCase {
   ) {}
 
   async execute(input: LoginInput): Promise<LoginOutput> {
-    const user = await this.userRepository.findByEmail(input.email);
+    const identifierCanonical = input.email.trim().toLowerCase();
+
+    const user = identifierCanonical.includes('@')
+      ? await this.userRepository.findByEmail(identifierCanonical)
+      : await this.userRepository.findByUsernameCanonical(identifierCanonical);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

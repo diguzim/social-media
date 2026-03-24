@@ -58,12 +58,12 @@ export function Login() {
       <form data-testid="login-form" onSubmit={handleSubmit}>
         <div className="form-field">
           <label htmlFor="email" className="label-base">
-            Email:
+            Email or Username:
           </label>
           <input
             data-testid="login-email-input"
             id="email"
-            type="email"
+            type="text"
             name="email"
             value={formData.email}
             onChange={handleChange}

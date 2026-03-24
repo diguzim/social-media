@@ -32,7 +32,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Redirects to login page on success; verification email is sent automatically
 
 2. **Login** - User authenticates
-   - Form submits to `POST /users/login` (api-gateway)
+  - Form submits to `POST /users/login` (api-gateway) using email or username plus password
 
 - JWT token stored in localStorage (`jwtToken`)
 - User profile fetched from `GET /users/me` and cached in localStorage (`user`)

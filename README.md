@@ -53,7 +53,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - UserRegistrationHandler processes the event (logs for now)
    - User redirected to login page
 
-2. **Login** (`/login`) - User authenticates with email and password
+2. **Login** (`/login`) - User authenticates with email (or username) and password
    - POST `/users/login` → auth-service validates credentials
    - JWT token generated and stored in localStorage (`jwtToken`)
    - User profile fetched via GET `/users/me` and cached as `user`

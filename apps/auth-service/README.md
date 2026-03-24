@@ -33,7 +33,7 @@ The service handles RPC messages from the API Gateway:
   - Side effect: Creates a verification token, publishes `user.registered` event to RabbitMQ
 
 - `AUTH_COMMANDS.login` - User authentication
-  - Input: `{ email, password }`
+  - Input: `{ email, password }` where `email` accepts either email or username
   - Output: `{ id, email, accessToken }`
   - Process: Validates credentials, generates JWT token
 
@@ -72,7 +72,7 @@ The service handles RPC messages from the API Gateway:
 
 ### LoginUseCase
 
-1. Find user by email
+1. Normalize login identifier and resolve user by email or canonical username
 2. Compare provided password with stored hash
 3. Generate JWT token with `{ sub: userId, email }`
 4. Return user id, email, and access token

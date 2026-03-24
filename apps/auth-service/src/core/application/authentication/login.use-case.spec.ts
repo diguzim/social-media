@@ -73,6 +73,41 @@ describe('LoginUseCase', () => {
     });
   });
 
+  it('should login with username and normalize identifier', async () => {
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+    userRepository.findByUsernameCanonical.mockResolvedValue({
+      id: 'user-1',
+      name: 'Jane Doe',
+      username: 'janedoe',
+      usernameCanonical: 'janedoe',
+      email: 'jane@doe.com',
+      passwordHash: 'hashed-password',
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: null,
+      emailVerifiedAt: null,
+    });
+
+    jwtService.signAsync.mockResolvedValue('access-token');
+
+    const useCase = new LoginUseCase(userRepository, jwtService);
+
+    const result = await useCase.execute({
+      email: '  JaneDoe  ',
+      password: 'plain-password',
+    });
+
+    expect(userRepository.findByEmail.mock.calls).toHaveLength(0);
+    expect(userRepository.findByUsernameCanonical.mock.calls).toContainEqual([
+      'janedoe',
+    ]);
+    expect(result).toEqual({
+      id: 'user-1',
+      email: 'jane@doe.com',
+      accessToken: 'access-token',
+    });
+  });
+
   it('should throw UnauthorizedException when user is not found', async () => {
     userRepository.findByEmail.mockResolvedValue(null);
 

@@ -30,7 +30,7 @@ API Gateway (Port 4000)
   - Returns: `{ id, name, username, email }`
 
 - `POST /users/login` - Login with credentials
-  - Body: `{ email, password }`
+  - Body: `{ email, password }` where `email` accepts either email or username
   - Returns: `{ id, email, accessToken }`
 
 - `GET /users/me` - Get current user profile
