@@ -7,6 +7,7 @@ import { CreateEmailVerificationTokenUseCase } from '../email-verification/creat
 
 export interface RegisterInput {
   name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -14,6 +15,7 @@ export interface RegisterInput {
 export interface RegisterOutput {
   id: string;
   name: string;
+  username: string;
   email: string;
 }
 
@@ -31,10 +33,18 @@ export class RegisterUseCase {
       throw new ConflictException('Email already registered');
     }
 
+    const existingUsername = await this.userRepository.findByUsername(
+      input.username,
+    );
+    if (existingUsername) {
+      throw new ConflictException('Username already taken');
+    }
+
     const salt = 10;
     const hashedPassword = await bcrypt.hash(input.password, salt);
     const createUserData = {
       name: input.name,
+      username: input.username,
       email: input.email,
       passwordHash: hashedPassword,
     };
@@ -58,6 +68,7 @@ export class RegisterUseCase {
     return {
       id: user.id,
       name: user.name,
+      username: user.username,
       email: user.email,
     };
   }

@@ -23,6 +23,7 @@ describe('RegisterUseCase', () => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
       findById: jest.fn(),
       markEmailVerified: jest.fn(),
     };
@@ -43,9 +44,11 @@ describe('RegisterUseCase', () => {
 
     const createdAtDate = new Date('2024-01-01T00:00:00Z');
     userRepository.findByEmail.mockResolvedValue(null);
+    userRepository.findByUsername.mockResolvedValue(null);
     userRepository.create.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
       createdAt: createdAtDate,
@@ -65,12 +68,16 @@ describe('RegisterUseCase', () => {
 
     const result = await useCase.execute({
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       password: 'plain-password',
     });
 
     expect(userRepository.findByEmail.mock.calls).toContainEqual([
       'john@doe.com',
+    ]);
+    expect(userRepository.findByUsername.mock.calls).toContainEqual([
+      'johndoe',
     ]);
     expect((bcrypt.hash as jest.Mock).mock.calls).toContainEqual([
       'plain-password',
@@ -79,6 +86,7 @@ describe('RegisterUseCase', () => {
     expect(userRepository.create.mock.calls).toContainEqual([
       {
         name: 'John Doe',
+        username: 'johndoe',
         email: 'john@doe.com',
         passwordHash: 'hashed-password',
       },
@@ -104,6 +112,7 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
     });
   });
@@ -112,6 +121,7 @@ describe('RegisterUseCase', () => {
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-existing',
       name: 'Existing User',
+      username: 'existing-user',
       email: 'john@doe.com',
       passwordHash: 'existing-hash',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -128,6 +138,7 @@ describe('RegisterUseCase', () => {
     await expect(
       useCase.execute({
         name: 'John Doe',
+        username: 'johndoe',
         email: 'john@doe.com',
         password: 'plain-password',
       }),
@@ -137,10 +148,43 @@ describe('RegisterUseCase', () => {
     expect(eventPublisher.publish.mock.calls).toHaveLength(0);
   });
 
+  it('should throw ConflictException if username already exists', async () => {
+    userRepository.findByEmail.mockResolvedValue(null);
+    userRepository.findByUsername.mockResolvedValue({
+      id: 'user-existing',
+      name: 'Existing User',
+      username: 'johndoe',
+      email: 'existing@example.com',
+      passwordHash: 'existing-hash',
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: null,
+      emailVerifiedAt: null,
+    });
+
+    const useCase = new RegisterUseCase(
+      userRepository,
+      eventPublisher as unknown as RabbitMqEventPublisher,
+      createEmailVerificationTokenUseCase,
+    );
+
+    await expect(
+      useCase.execute({
+        name: 'John Doe',
+        username: 'johndoe',
+        email: 'john@doe.com',
+        password: 'plain-password',
+      }),
+    ).rejects.toThrow('Username already taken');
+
+    expect(userRepository.create.mock.calls).toHaveLength(0);
+    expect(eventPublisher.publish.mock.calls).toHaveLength(0);
+  });
+
   it('should propagate repository errors during creation', async () => {
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     userRepository.findByEmail.mockResolvedValue(null);
+    userRepository.findByUsername.mockResolvedValue(null);
     userRepository.create.mockRejectedValue(new Error('db failure'));
 
     const useCase = new RegisterUseCase(
@@ -152,6 +196,7 @@ describe('RegisterUseCase', () => {
     await expect(
       useCase.execute({
         name: 'John Doe',
+        username: 'johndoe',
         email: 'john@doe.com',
         password: 'plain-password',
       }),

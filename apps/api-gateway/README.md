@@ -26,8 +26,8 @@ API Gateway (Port 4000)
 ### Authentication
 
 - `POST /users` - Register new user
-  - Body: `{ name, email, password }`
-  - Returns: `{ id, name, email }`
+  - Body: `{ name, username, email, password }`
+  - Returns: `{ id, name, username, email }`
 
 - `POST /users/login` - Login with credentials
   - Body: `{ email, password }`
@@ -35,7 +35,7 @@ API Gateway (Port 4000)
 
 - `GET /users/me` - Get current user profile
   - Headers: `Authorization: Bearer {token}`
-  - Returns: `{ id, name, email }`
+  - Returns: `{ id, name, username, email, emailVerifiedAt }`
   - Guards: **JwtAuthGuard** (requires valid JWT)
 
 ### Posts

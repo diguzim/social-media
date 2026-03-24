@@ -49,6 +49,7 @@ export class UsersController {
     return {
       id: rpcReply.id,
       name: user.name,
+      username: rpcReply.username,
       email: rpcReply.email,
     };
   }
@@ -107,6 +108,7 @@ export class UsersController {
     return {
       id: rpcReply.id,
       name: rpcReply.name,
+      username: rpcReply.username,
       email: rpcReply.email,
       emailVerifiedAt: rpcReply.emailVerifiedAt,
     };

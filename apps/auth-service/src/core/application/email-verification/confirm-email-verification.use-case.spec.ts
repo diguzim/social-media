@@ -13,6 +13,7 @@ describe('ConfirmEmailVerificationUseCase', () => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
       findById: jest.fn(),
       markEmailVerified: jest.fn(),
     };
@@ -46,6 +47,7 @@ describe('ConfirmEmailVerificationUseCase', () => {
     userRepository.findById.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@example.com',
       passwordHash: 'hash',
       createdAt: new Date('2026-03-10T00:00:00.000Z'),
@@ -59,6 +61,7 @@ describe('ConfirmEmailVerificationUseCase', () => {
     userRepository.markEmailVerified.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@example.com',
       passwordHash: 'hash',
       createdAt: new Date('2026-03-10T00:00:00.000Z'),
@@ -95,6 +98,7 @@ describe('ConfirmEmailVerificationUseCase', () => {
     userRepository.findById.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@example.com',
       passwordHash: 'hash',
       createdAt: new Date('2026-03-10T00:00:00.000Z'),
@@ -126,6 +130,7 @@ describe('ConfirmEmailVerificationUseCase', () => {
     userRepository.findById.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@example.com',
       passwordHash: 'hash',
       createdAt: new Date('2026-03-10T00:00:00.000Z'),

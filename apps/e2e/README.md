@@ -184,6 +184,7 @@ E2E specs use synthetic test data generation via `@faker-js/faker`.
 - Helper file: [cypress/support/test-data.ts](cypress/support/test-data.ts)
 - Primary factory: `buildTestUser()`
 - Purpose: generate random, realistic names/emails and avoid collisions in repeated runs
+- Registration payloads include `{ name, username, email, password }`
 
 ## Writing New Tests
 

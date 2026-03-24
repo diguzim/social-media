@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { ToggleReactionResponse } from '@repo/contracts/api';
 import { PostCard } from './PostCard';
 import * as postsService from '../../services/posts';
 
@@ -130,8 +131,8 @@ describe('PostCard', () => {
     });
 
     it('disables button while request is in flight', async () => {
-      let resolveRequest: () => void;
-      const requestPromise = new Promise<void>((resolve) => {
+      let resolveRequest: (value: ToggleReactionResponse) => void;
+      const requestPromise = new Promise<ToggleReactionResponse>((resolve) => {
         resolveRequest = resolve;
       });
 
@@ -163,7 +164,13 @@ describe('PostCard', () => {
       expect(likeButton).toHaveTextContent('...');
 
       // Resolve the request
-      resolveRequest!();
+      resolveRequest!({
+        reactionId: 'reaction-1',
+        targetId: 'post-6',
+        reactionType: 'like',
+        targetType: 'post',
+        isAdded: true,
+      });
 
       // Wait for request to complete
       await waitFor(() => {

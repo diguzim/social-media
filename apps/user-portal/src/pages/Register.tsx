@@ -6,6 +6,7 @@ export function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterRequest>({
     name: '',
+    username: '',
     email: '',
     password: '',
   });
@@ -22,7 +23,10 @@ export function Register() {
 
   // Simple validation: all fields must have values
   const isFormValid =
-    formData.name.trim() !== '' && formData.email.trim() !== '' && formData.password.trim() !== '';
+    formData.name.trim() !== '' &&
+    formData.username.trim() !== '' &&
+    formData.email.trim() !== '' &&
+    formData.password.trim() !== '';
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +59,22 @@ export function Register() {
             id="name"
             name="name"
             value={formData.name}
+            onChange={handleChange}
+            required
+            className="input-base"
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="username" className="label-base">
+            Username
+          </label>
+          <input
+            data-testid="register-username-input"
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             required
             className="input-base"

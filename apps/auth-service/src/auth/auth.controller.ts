@@ -29,12 +29,14 @@ export class AuthController {
 
     const createdUser = await this.registerUseCase.execute({
       name: request.name,
+      username: request.username,
       email: request.email,
       password: request.password,
     });
 
     return {
       id: createdUser.id,
+      username: createdUser.username,
       email: createdUser.email,
     };
   }
@@ -62,6 +64,7 @@ export class AuthController {
     return {
       id: result.id,
       name: result.name,
+      username: result.username,
       email: result.email,
       emailVerifiedAt: result.emailVerifiedAt,
     };

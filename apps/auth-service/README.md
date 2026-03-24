@@ -28,8 +28,8 @@ Auth Service (Port 4001)
 The service handles RPC messages from the API Gateway:
 
 - `AUTH_COMMANDS.register` - User registration
-  - Input: `{ name, email, password }`
-  - Output: `{ id, email }`
+  - Input: `{ name, username, email, password }`
+  - Output: `{ id, username, email }`
   - Side effect: Creates a verification token, publishes `user.registered` event to RabbitMQ
 
 - `AUTH_COMMANDS.login` - User authentication
@@ -39,7 +39,7 @@ The service handles RPC messages from the API Gateway:
 
 - `AUTH_COMMANDS.getProfile` - Retrieve user profile
   - Input: `{ userId }`
-  - Output: `{ id, name, email, emailVerifiedAt }`
+  - Output: `{ id, name, username, email, emailVerifiedAt }`
   - Requires: User must exist
 
 - `AUTH_COMMANDS.createEmailVerificationToken` - Create a new hashed token
@@ -61,11 +61,12 @@ The service handles RPC messages from the API Gateway:
 ### RegisterUseCase
 
 1. Check if email already exists (returns ConflictException if true)
-2. Hash password using bcrypt
-3. Create user in UserRepository
-4. Create a SHA-256-hashed verification token (24h TTL) via `CreateEmailVerificationTokenUseCase`
-5. Publish `USER_EVENTS.REGISTERED` event to RabbitMQ (includes raw token for the email link)
-6. Return user id and email
+2. Check if username already exists (returns ConflictException if true)
+3. Hash password using bcrypt
+4. Create user in UserRepository
+5. Create a SHA-256-hashed verification token (24h TTL) via `CreateEmailVerificationTokenUseCase`
+6. Publish `USER_EVENTS.REGISTERED` event to RabbitMQ (includes raw token for the email link)
+7. Return user id, username, and email
 
 ### LoginUseCase
 
@@ -77,7 +78,7 @@ The service handles RPC messages from the API Gateway:
 ### GetProfileUseCase
 
 1. Find user by userId
-2. Return id, name, email, and emailVerifiedAt (ISO string or null)
+2. Return id, name, username, email, and emailVerifiedAt (ISO string or null)
 3. Throw NotFoundException if user not found
 
 ### CreateEmailVerificationTokenUseCase
@@ -173,7 +174,7 @@ Then test with curl:
 # Register
 curl -X POST http://localhost:4000/users \
   -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","email":"john@example.com","password":"secret"}'
+  -d '{"name":"John Doe","username":"johndoe","email":"john@example.com","password":"secret"}'
 
 # Login
 curl -X POST http://localhost:4000/users/login \
@@ -208,7 +209,7 @@ curl -X POST http://localhost:4000/users/email-verification/request \
 
 The service throws NestJS exceptions that are serialized over TCP:
 
-- `ConflictException` - Email already registered (409)
+- `ConflictException` - Email already registered or username already taken (409)
 - `UnauthorizedException` - Invalid credentials (401)
 - `NotFoundException` - User not found (404)
 - `BadRequestException` - Invalid/expired/consumed token (400)

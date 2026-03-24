@@ -9,6 +9,7 @@ describe('GetProfileUseCase', () => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
       findById: jest.fn(),
       markEmailVerified: jest.fn(),
     };
@@ -18,6 +19,7 @@ describe('GetProfileUseCase', () => {
     userRepository.findById.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -33,6 +35,7 @@ describe('GetProfileUseCase', () => {
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       emailVerifiedAt: null,
     });
@@ -43,6 +46,7 @@ describe('GetProfileUseCase', () => {
     userRepository.findById.mockResolvedValue({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -57,6 +61,7 @@ describe('GetProfileUseCase', () => {
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',
+      username: 'johndoe',
       email: 'john@doe.com',
       emailVerifiedAt: verifiedAt.toISOString(),
     });

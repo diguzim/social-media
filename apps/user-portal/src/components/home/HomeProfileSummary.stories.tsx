@@ -4,6 +4,7 @@ import { HomeProfileSummary } from './HomeProfileSummary';
 const baseUser = {
   id: 'user-123',
   name: 'Alice Johnson',
+  username: 'alice',
   email: 'alice@example.com',
   emailVerifiedAt: '2026-03-20T12:00:00.000Z',
 };

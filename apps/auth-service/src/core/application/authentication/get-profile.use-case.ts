@@ -8,6 +8,7 @@ export interface GetProfileInput {
 export interface GetProfileOutput {
   id: string;
   name: string;
+  username: string;
   email: string;
   emailVerifiedAt: string | null;
 }
@@ -26,6 +27,7 @@ export class GetProfileUseCase {
     return {
       id: user.id,
       name: user.name,
+      username: user.username,
       email: user.email,
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
     };

@@ -47,7 +47,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
 
 ## Frontend Authentication Flow
 
-1. **Register** (`/register`) - User creates account with name, email, and password
+1. **Register** (`/register`) - User creates account with name, username, email, and password
    - POST `/users` → auth-service validates and creates user
    - RabbitMQ publishes `user.registered` event
    - UserRegistrationHandler processes the event (logs for now)

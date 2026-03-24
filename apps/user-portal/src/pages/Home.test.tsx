@@ -26,6 +26,7 @@ const mockedRequestEmailVerification = vi.mocked(requestEmailVerification);
 const cachedUser = {
   id: 'user-1',
   name: 'Cached User',
+  username: 'cached-user',
   email: 'cached@example.com',
   emailVerifiedAt: '2026-03-16T10:00:00.000Z',
 };

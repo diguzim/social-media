@@ -4,7 +4,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 ## Features
 
-- User registration with email/password
+- User registration with name, username, email, and password
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
 - User profile page with email verification status
@@ -56,7 +56,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - **JWT Token** - localStorage key `jwtToken` (from login response)
 - **User Profile** - localStorage key `user` (from /users/me response)
-  - Structure: `{ id, name, email, emailVerifiedAt }`
+  - Structure: `{ id, name, username, email, emailVerifiedAt }`
 
 ## Test Selectors (`data-testid`)
 
@@ -65,7 +65,7 @@ UI elements used in E2E/Playwright flows expose `data-testid` attributes.
 Examples:
 
 - Login: `login-email-input`, `login-password-input`, `login-submit-button`
-- Register: `register-name-input`, `register-email-input`, `register-submit-button`
+- Register: `register-name-input`, `register-username-input`, `register-email-input`, `register-submit-button`
 - Home: `home-welcome-title`, `home-profile-card`, `home-logout-button`
 - Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
 

@@ -6,6 +6,7 @@ describe('User Entity', () => {
       const userProps = {
         id: 'user-123',
         name: 'John Doe',
+        username: 'johndoe',
         email: 'john@doe.com',
         passwordHash: 'hashed-password',
         createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -18,6 +19,7 @@ describe('User Entity', () => {
       expect(user).toBeInstanceOf(User);
       expect(user.id).toBe('user-123');
       expect(user.name).toBe('John Doe');
+      expect(user.username).toBe('johndoe');
       expect(user.email).toBe('john@doe.com');
       expect(user.passwordHash).toBe('hashed-password');
       expect(user.createdAt).toEqual(new Date('2024-01-01T00:00:00Z'));
@@ -34,6 +36,7 @@ describe('User Entity', () => {
       expect(user.id).toBe('user-456');
       expect(user.email).toBe('jane@doe.com');
       expect(user.name).toBe('');
+      expect(user.username).toBe('');
       expect(user.passwordHash).toBe('');
       expect(user.createdAt).toBeInstanceOf(Date);
       expect(user.updatedAt).toBeNull();
@@ -44,12 +47,14 @@ describe('User Entity', () => {
       const user = new User({
         id: 'user-789',
         name: 'Alice',
+        username: 'alice',
         email: 'alice@example.com',
         passwordHash: 'hash123',
       });
 
       expect(user.id).toBe('user-789');
       expect(user.name).toBe('Alice');
+      expect(user.username).toBe('alice');
       expect(user.email).toBe('alice@example.com');
       expect(user.passwordHash).toBe('hash123');
       expect(user.updatedAt).toBeNull();
@@ -62,9 +67,11 @@ describe('User Entity', () => {
       const user = new User({ id: 'user-1', email: 'test@test.com' });
 
       user.name = 'Updated Name';
+      user.username = 'updated-name';
       user.passwordHash = 'new-hash';
 
       expect(user.name).toBe('Updated Name');
+      expect(user.username).toBe('updated-name');
       expect(user.passwordHash).toBe('new-hash');
     });
 

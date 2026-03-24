@@ -30,12 +30,16 @@ describe("User Registration Flow", () => {
 
     // Alias register page elements
     cy.getByTestId("register-name-input").as("registerNameInput");
+    cy.getByTestId("register-username-input").as("registerUsernameInput");
     cy.getByTestId("register-email-input").as("registerEmailInput");
     cy.getByTestId("register-password-input").as("registerPasswordInput");
     cy.getByTestId("register-submit-button").as("registerSubmitButton");
 
     // Fill registration form
     cy.get("@registerNameInput").should("be.visible").type(testUser.name);
+    cy.get("@registerUsernameInput")
+      .should("be.visible")
+      .type(testUser.username);
     cy.get("@registerEmailInput").should("be.visible").type(testUser.email);
     cy.get("@registerPasswordInput")
       .should("be.visible")
@@ -55,6 +59,7 @@ describe("User Registration Flow", () => {
 
     // Alias register page elements after navigating
     cy.getByTestId("register-name-input").as("registerNameInput");
+    cy.getByTestId("register-username-input").as("registerUsernameInput");
     cy.getByTestId("register-email-input").as("registerEmailInput");
     cy.getByTestId("register-password-input").as("registerPasswordInput");
     cy.getByTestId("register-submit-button").as("registerSubmitButton");
@@ -66,6 +71,10 @@ describe("User Registration Flow", () => {
 
     // Fill only name - button should still be disabled
     cy.get("@registerNameInput").type(buildTestUser().name);
+    cy.get("@registerSubmitButton").should("be.disabled");
+
+    // Fill username - button should still be disabled
+    cy.get("@registerUsernameInput").type(buildTestUser().username);
     cy.get("@registerSubmitButton").should("be.disabled");
 
     // Fill email - button should still be disabled

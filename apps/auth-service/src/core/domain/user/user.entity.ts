@@ -1,6 +1,7 @@
 export class User {
   id: string;
   name: string;
+  username: string;
   email: string;
   passwordHash: string;
   createdAt: Date;
@@ -11,6 +12,7 @@ export class User {
   constructor(props: Partial<User>) {
     this.id = props.id ?? '';
     this.name = props.name ?? '';
+    this.username = props.username ?? '';
     this.email = props.email ?? '';
     this.passwordHash = props.passwordHash ?? '';
     this.createdAt = props.createdAt ?? new Date();

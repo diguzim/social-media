@@ -133,7 +133,7 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
   });
 
   it("feed shows from user's perspective (likedByMe and count)", () => {
-    const newPostRes = cy.request({
+    cy.request({
       method: "POST",
       url: `${API_BASE_URL}/posts`,
       headers: { Authorization: `Bearer ${jwtToken1}` },
@@ -141,9 +141,7 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
         title: `Fake E2E Multi-Like Post ${faker.lorem.words(3)}`,
         content: faker.lorem.paragraph(),
       },
-    });
-
-    cy.wrap(newPostRes).then((res) => {
+    }).then((res) => {
       const newPostId = res.body.id as string;
 
       // User 1 and User 2 both like

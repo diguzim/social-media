@@ -6,6 +6,7 @@ export interface GetProfileRequest {
 export interface GetProfileReply {
   id: string;
   name: string;
+  username: string;
   email: string;
   emailVerifiedAt: string | null;
 }

@@ -8,6 +8,7 @@ function HomeScenariosCanvas() {
   const user = {
     id: 'user-1',
     name: 'Demo User',
+    username: 'demo-user',
     email: 'demo@example.com',
     emailVerifiedAt: '2026-03-20T12:00:00.000Z',
   };

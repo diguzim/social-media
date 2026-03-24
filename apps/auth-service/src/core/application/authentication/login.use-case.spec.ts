@@ -19,6 +19,7 @@ describe('LoginUseCase', () => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
       findById: jest.fn(),
       markEmailVerified: jest.fn(),
     };
@@ -34,6 +35,7 @@ describe('LoginUseCase', () => {
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
       name: 'Jane Doe',
+      username: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -89,6 +91,7 @@ describe('LoginUseCase', () => {
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
       name: 'Jane Doe',
+      username: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -112,6 +115,7 @@ describe('LoginUseCase', () => {
     userRepository.findByEmail.mockResolvedValue({
       id: 'user-1',
       name: 'Jane Doe',
+      username: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),

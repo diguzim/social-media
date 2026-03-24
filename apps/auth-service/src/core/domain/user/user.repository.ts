@@ -2,6 +2,7 @@ import { User } from './user.entity';
 
 export interface CreateUserData {
   name: string;
+  username: string;
   email: string;
   passwordHash: string;
 }
@@ -9,6 +10,7 @@ export interface CreateUserData {
 export abstract class UserRepository {
   abstract create(createUserData: CreateUserData): Promise<User>;
   abstract findByEmail(email: string): Promise<User | null>;
+  abstract findByUsername(username: string): Promise<User | null>;
   abstract findById(id: string): Promise<User | null>;
   abstract markEmailVerified(userId: string, verifiedAt: Date): Promise<User>;
 }

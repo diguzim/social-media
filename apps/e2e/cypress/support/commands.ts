@@ -44,6 +44,7 @@ declare global {
        */
       registerUser(user: {
         name: string;
+        username: string;
         email: string;
         password: string;
       }): Chainable<void>;
@@ -61,6 +62,7 @@ declare global {
        */
       registerAndLogin(user: {
         name: string;
+        username: string;
         email: string;
         password: string;
       }): Chainable<void>;
@@ -139,6 +141,11 @@ Cypress.Commands.add("visitLogin", () => {
  */
 Cypress.Commands.add("registerUser", (user: RegisterRequest) => {
   fillEnabledInput('[data-testid="register-name-input"]', user.name, "name");
+  fillEnabledInput(
+    '[data-testid="register-username-input"]',
+    user.username,
+    "username",
+  );
   fillEnabledInput('[data-testid="register-email-input"]', user.email, "email");
   fillEnabledInput(
     '[data-testid="register-password-input"]',
@@ -197,6 +204,7 @@ Cypress.Commands.add(
         url: `${apiBaseUrl}/users`,
         body: {
           name: testUser.name,
+          username: testUser.username,
           email: testUser.email,
           password: testUser.password,
         } as RegisterRequest,
