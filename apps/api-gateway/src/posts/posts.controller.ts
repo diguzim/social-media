@@ -16,7 +16,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { POSTS_SERVICE } from './posts.client';
 import { FeedService } from './feed.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { POST_COMMANDS } from '@repo/contracts';
+import { POST_COMMANDS, REACTION_COMMANDS } from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
 import type { API, RPC } from '@repo/contracts';
 import { firstValueFrom } from 'rxjs';
@@ -210,6 +210,44 @@ export class PostsController {
     // Transform RPC reply to API response
     return {
       success: rpcReply.success,
+    };
+  }
+
+  @Post(':id/reactions')
+  @UseGuards(JwtAuthGuard)
+  async toggleReaction(
+    @Param('id') id: string,
+    @Body() payload: API.ToggleReactionRequest,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.ToggleReactionResponse> {
+    this.logger.debug(
+      'API Gateway: forwarding toggle reaction to posts service',
+    );
+
+    // Transform API request to RPC request
+    const rpcRequest: RPC.ToggleReactionRequest = {
+      userId: req.user.userId,
+      targetId: id,
+      targetType: 'post',
+      reactionType: payload.reactionType,
+      correlationId: getCorrelationId(),
+    };
+
+    // Call microservice
+    const rpcReply = await firstValueFrom(
+      this.postsClient.send<RPC.ToggleReactionReply, RPC.ToggleReactionRequest>(
+        { cmd: REACTION_COMMANDS.toggleReaction },
+        rpcRequest,
+      ),
+    );
+
+    // Transform RPC reply to API response
+    return {
+      reactionId: rpcReply.reactionId,
+      targetId: rpcReply.targetId,
+      reactionType: rpcReply.reactionType,
+      targetType: rpcReply.targetType,
+      isAdded: rpcReply.isAdded,
     };
   }
 }

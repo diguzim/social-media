@@ -7,11 +7,14 @@ import type {
   FeedPost as ApiFeedPost,
   CreatePostRequest,
   CreatePostResponse,
+  ToggleReactionRequest,
+  ToggleReactionResponse,
 } from '@repo/contracts/api';
 
 const API_BASE_URL = 'http://localhost:4000';
 
-export type FeedPost = Post | ApiFeedPost;
+// FeedPost from /feed endpoint includes author and reactions
+export type FeedPost = ApiFeedPost;
 
 export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
   const query = new URLSearchParams();
@@ -77,6 +80,34 @@ export async function createPost(data: CreatePostRequest): Promise<CreatePostRes
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to create post');
+  }
+
+  return response.json();
+}
+
+export async function togglePostReaction(
+  postId: string,
+  reactionType: 'like' = 'like'
+): Promise<ToggleReactionResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/reactions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      reactionType,
+    } as ToggleReactionRequest),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to toggle reaction');
   }
 
   return response.json();

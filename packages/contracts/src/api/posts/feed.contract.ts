@@ -10,6 +10,10 @@ export interface FeedPost {
   authorId: string;
   author: FeedPostAuthor;
   createdAt: string;
+  reactions?: {
+    likeCount: number;
+    likedByMe: boolean;
+  };
 }
 
 export interface GetFeedRequest {

@@ -5,7 +5,9 @@ import { GetPostUseCase } from "src/core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "src/core/application/posts/get-posts.use-case";
 import { UpdatePostUseCase } from "src/core/application/posts/update-post.use-case";
 import { DeletePostUseCase } from "src/core/application/posts/delete-post.use-case";
-import { POST_COMMANDS } from "@repo/contracts";
+import { ToggleReactionUseCase } from "src/core/application/reactions/toggle-reaction.use-case";
+import { GetReactionSummaryBatchUseCase } from "src/core/application/reactions/get-reaction-summary-batch.use-case";
+import { POST_COMMANDS, REACTION_COMMANDS } from "@repo/contracts";
 import type { RPC } from "@repo/contracts";
 
 @Controller()
@@ -18,6 +20,8 @@ export class PostsController {
     private getPostsUseCase: GetPostsUseCase,
     private updatePostUseCase: UpdatePostUseCase,
     private deletePostUseCase: DeletePostUseCase,
+    private toggleReactionUseCase: ToggleReactionUseCase,
+    private getReactionSummaryBatchUseCase: GetReactionSummaryBatchUseCase,
   ) {}
 
   @MessagePattern({ cmd: POST_COMMANDS.createPost })
@@ -121,6 +125,56 @@ export class PostsController {
 
     return {
       success: true,
+    };
+  }
+
+  @MessagePattern({ cmd: REACTION_COMMANDS.toggleReaction })
+  async handleToggleReaction(
+    request: RPC.ToggleReactionRequest,
+  ): Promise<RPC.ToggleReactionReply> {
+    this.logger.debug(
+      "Posts service: handling toggle reaction command",
+      request,
+    );
+
+    const result = await this.toggleReactionUseCase.execute({
+      userId: request.userId,
+      targetId: request.targetId,
+      targetType: request.targetType,
+      reactionType: request.reactionType,
+    });
+
+    return {
+      reactionId: result.reactionId,
+      targetId: result.targetId,
+      reactionType: result.reactionType,
+      targetType: result.targetType,
+      isAdded: result.isAdded,
+    };
+  }
+
+  @MessagePattern({ cmd: REACTION_COMMANDS.getReactionSummaryBatch })
+  async handleGetReactionSummaryBatch(
+    request: RPC.GetReactionSummaryBatchRequest,
+  ): Promise<RPC.GetReactionSummaryBatchReply> {
+    this.logger.debug(
+      "Posts service: handling get reaction summary batch command",
+      request,
+    );
+
+    const result = await this.getReactionSummaryBatchUseCase.execute({
+      targetIds: request.targetIds,
+      targetType: request.targetType,
+      userId: request.userId,
+    });
+
+    return {
+      summaries: result.summaries.map((s) => ({
+        targetId: s.targetId,
+        reactionType: s.reactionType,
+        count: s.count,
+        reactedByCurrentUser: s.reactedByCurrentUser,
+      })),
     };
   }
 }

@@ -1,7 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { AUTH_COMMANDS, POST_COMMANDS } from '@repo/contracts';
+import {
+  AUTH_COMMANDS,
+  POST_COMMANDS,
+  REACTION_COMMANDS,
+} from '@repo/contracts';
 import type { API, RPC } from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
 import { POSTS_SERVICE } from './posts.client';
@@ -73,7 +77,45 @@ export class FeedService {
       }),
     );
 
-    // 4. Enrich posts with author info and return API response
+    // 4. Batch-fetch reaction summaries from posts-service
+    const postIds = rpcReply.data.map((p) => p.id);
+    const reactionSummaryRequest: RPC.GetReactionSummaryBatchRequest = {
+      targetIds: postIds,
+      targetType: 'post',
+      correlationId: getCorrelationId(),
+    };
+
+    let reactionSummaries: RPC.ReactionSummary[] = [];
+    try {
+      const reactionReply = await firstValueFrom(
+        this.postsClient.send<
+          RPC.GetReactionSummaryBatchReply,
+          RPC.GetReactionSummaryBatchRequest
+        >(
+          { cmd: REACTION_COMMANDS.getReactionSummaryBatch },
+          reactionSummaryRequest,
+        ),
+      );
+      reactionSummaries = reactionReply.summaries;
+    } catch (err) {
+      this.logger.warn(
+        'FeedService: could not fetch reaction summaries, continuing without reactions',
+      );
+    }
+
+    // 5. Create reaction map for quick lookup
+    const reactionMap = new Map<
+      string,
+      { likeCount: number; likedByMe: boolean }
+    >();
+    reactionSummaries.forEach((summary) => {
+      reactionMap.set(summary.targetId, {
+        likeCount: summary.count,
+        likedByMe: summary.reactedByCurrentUser ?? false,
+      });
+    });
+
+    // 6. Enrich posts with author info and reactions, return API response
     return {
       data: rpcReply.data.map((post) => ({
         id: post.id,
@@ -85,6 +127,10 @@ export class FeedService {
           name: 'Unknown User',
         },
         createdAt: post.createdAt,
+        reactions: reactionMap.get(post.id) ?? {
+          likeCount: 0,
+          likedByMe: false,
+        },
       })),
       total: rpcReply.total,
       page: rpcReply.page,

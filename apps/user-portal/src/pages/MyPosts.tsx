@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPosts } from '../services/posts';
+import { getFeed } from '../services/posts';
 import type { FeedPost } from '../services/posts';
 import { PostCard } from '../components/feed/PostCard';
 import { getUserProfile } from '../services/auth';
@@ -20,7 +20,8 @@ export function MyPosts() {
           return;
         }
 
-        const response = await getPosts({
+        // Use getFeed to get enriched posts with author and reactions
+        const response = await getFeed({
           authorId: userProfile.id,
           page: 1,
           limit: 50,

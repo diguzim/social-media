@@ -9,6 +9,8 @@ import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "./core/application/posts/get-posts.use-case";
 import { UpdatePostUseCase } from "./core/application/posts/update-post.use-case";
 import { DeletePostUseCase } from "./core/application/posts/delete-post.use-case";
+import { ToggleReactionUseCase } from "./core/application/reactions/toggle-reaction.use-case";
+import { GetReactionSummaryBatchUseCase } from "./core/application/reactions/get-reaction-summary-batch.use-case";
 import {
   LogContextInterceptor,
   getCorrelationId,
@@ -41,6 +43,8 @@ import {
     GetPostsUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
+    ToggleReactionUseCase,
+    GetReactionSummaryBatchUseCase,
     {
       provide: APP_INTERCEPTOR,
       useClass: LogContextInterceptor,

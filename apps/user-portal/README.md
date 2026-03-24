@@ -12,6 +12,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - JWT token storage in localStorage
 - Progressive loading UX with persistent shell + Home page islands
 - Loading states and error handling
+- Like/unlike posts with optimistic updates and reaction counts
+- Storybook for visual component validation and loading state scenarios
 
 ## Routes
 
@@ -78,6 +80,8 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
 - GET /posts?page=1&limit=10&sortOrder=desc
+- GET /posts/feed (feed with author enrichment + like counts)
+- POST /posts/:id/reactions (like/unlike a post)
 - POST /users/email-verification/confirm (public — confirms token from email link)
 - POST /users/email-verification/request (requires auth — resend verification email)
 ```
@@ -171,6 +175,9 @@ The app communicates with the API Gateway which routes requests to microservices
   - `getUserProfile()` - Retrieve cached profile from localStorage
 - `posts.ts` provides:
   - `getPosts()` - GET /posts with pagination/filter query params
+  - `getFeed()` - GET /posts/feed (author-enriched with reaction counts)
+  - `createPost()` - POST /posts (requires auth)
+  - `togglePostReaction()` - POST /posts/:id/reactions (like/unlike, requires auth)
 
 ## Notes
 
@@ -181,3 +188,5 @@ The app communicates with the API Gateway which routes requests to microservices
 - Error states display user-friendly error messages
 - Home uses cached-first rendering for profile data and refreshes in the background when possible
 - Feed refreshes preserve already rendered posts and show local refresh feedback instead of blanking the page
+- Like button uses optimistic updates: UI updates immediately, reverts on network error
+- PostCard displays like count and "liked by me" status from reaction summary

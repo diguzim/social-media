@@ -50,6 +50,16 @@ The service handles RPC messages from the API Gateway:
   - Requires: authorId must match post owner
   - Throws: ForbiddenException if not the author
 
+- `REACTION_COMMANDS.toggleReaction` - Like/unlike a post
+  - Input: `{ userId, targetId, targetType: 'post', reactionType: 'like' }`
+  - Output: `{ reactionId?, targetId, targetType, reactionType, isAdded }`
+  - Behavior: Toggle (create if missing, delete if exists)
+  - Returns: `isAdded: true` if created, `false` if deleted
+
+- `REACTION_COMMANDS.getReactionSummaryBatch` - Get reaction stats for posts
+  - Input: `{ targetIds: [postIds], targetType: 'post', userId? }`
+  - Output: `{ summaries: [{ targetId, reactionType, count, reactedByCurrentUser? }] }`
+  - Returns: Like counts and user's like status for multiple posts (N+1 prevention)
 ## Use Cases
 
 ### CreatePostUseCase
@@ -84,6 +94,21 @@ The service handles RPC messages from the API Gateway:
 2. Verify authorId matches post owner (throw ForbiddenException if not)
 3. Delete post
 4. Return deleted post ID
+
+### ToggleReactionUseCase
+
+1. Check if user already reacted with this reactionType to this post
+2. If yes, delete the existing reaction and return `isAdded: false`
+3. If no, create new reaction and return `isAdded: true`
+4. Idempotent: consecutive calls safely toggle like on/off
+
+### GetReactionSummaryBatchUseCase
+
+1. Accept array of post IDs to summarize
+2. Count likes for each post
+3. If userId provided, mark which posts this user liked
+4. Return summary array with reaction counts and user status
+5. Allows feed to show like counts and "likedByMe" flag without N+1 queries
 
 ## Query Parameters
 
