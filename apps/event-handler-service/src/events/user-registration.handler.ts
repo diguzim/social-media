@@ -11,12 +11,12 @@ export class UserRegistrationHandler {
 
   constructor(private readonly emailService: EmailService) {}
 
-  async handleUserRegistered(event: UserRegisteredEvent): Promise<void> {
+  handleUserRegistered(event: UserRegisteredEvent): void {
     this.logger.log(
       `Processing user registration event for user ${event.userId}: ${event.email}`,
     );
 
-    await this.emailService.sendVerificationEmail(
+    this.emailService.sendVerificationEmail(
       event.email,
       event.name,
       event.verificationToken,
@@ -27,14 +27,14 @@ export class UserRegistrationHandler {
     );
   }
 
-  async handleVerificationEmailRequested(
+  handleVerificationEmailRequested(
     event: VerificationEmailRequestedEvent,
-  ): Promise<void> {
+  ): void {
     this.logger.log(
       `Processing verification email request for user ${event.userId}: ${event.email}`,
     );
 
-    await this.emailService.sendVerificationEmail(
+    this.emailService.sendVerificationEmail(
       event.email,
       event.name,
       event.verificationToken,

@@ -7,4 +7,4 @@ async function bootstrap() {
   console.log("Event handler service is running on port 4003");
 }
 
-bootstrap();
+void bootstrap();

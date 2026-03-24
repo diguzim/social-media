@@ -13,7 +13,7 @@ describe("UserRegistrationHandler", () => {
     handler = new UserRegistrationHandler(emailService);
   });
 
-  it("should send verification email when handling user registration", async () => {
+  it("should send verification email when handling user registration", () => {
     const event = {
       userId: "user-1",
       name: "John Doe",
@@ -23,17 +23,14 @@ describe("UserRegistrationHandler", () => {
       tokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
     };
 
-    await handler.handleUserRegistered(event);
+    handler.handleUserRegistered(event);
 
-    expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
-      event.email,
-      event.name,
-      event.verificationToken,
-    );
-    expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+    expect(emailService.sendVerificationEmail.mock.calls).toEqual([
+      [event.email, event.name, event.verificationToken],
+    ]);
   });
 
-  it("should send verification email when handling a verification re-request", async () => {
+  it("should send verification email when handling a verification re-request", () => {
     const event = {
       userId: "user-1",
       name: "John Doe",
@@ -43,13 +40,10 @@ describe("UserRegistrationHandler", () => {
       tokenExpiresAt: new Date(Date.now() + 86400000).toISOString(),
     };
 
-    await handler.handleVerificationEmailRequested(event);
+    handler.handleVerificationEmailRequested(event);
 
-    expect(emailService.sendVerificationEmail).toHaveBeenCalledWith(
-      event.email,
-      event.name,
-      event.verificationToken,
-    );
-    expect(emailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+    expect(emailService.sendVerificationEmail.mock.calls).toEqual([
+      [event.email, event.name, event.verificationToken],
+    ]);
   });
 });

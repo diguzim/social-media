@@ -56,21 +56,23 @@ export class RabbitMqUserRegisteredConsumer
         USER_EVENTS.EMAIL_VERIFICATION_REQUESTED,
       );
 
-      await channel.consume(this.queueName, async (msg) => {
+      void channel.consume(this.queueName, (msg) => {
         if (!msg) {
           return;
         }
 
         try {
           const routingKey = msg.fields.routingKey;
-          const parsedEvent = JSON.parse(msg.content.toString("utf-8"));
+          const parsedEvent = JSON.parse(
+            msg.content.toString("utf-8"),
+          ) as unknown;
 
           if (routingKey === USER_EVENTS.REGISTERED) {
-            await this.userRegistrationHandler.handleUserRegistered(
+            this.userRegistrationHandler.handleUserRegistered(
               parsedEvent as UserRegisteredEvent,
             );
           } else if (routingKey === USER_EVENTS.EMAIL_VERIFICATION_REQUESTED) {
-            await this.userRegistrationHandler.handleVerificationEmailRequested(
+            this.userRegistrationHandler.handleVerificationEmailRequested(
               parsedEvent as VerificationEmailRequestedEvent,
             );
           } else {

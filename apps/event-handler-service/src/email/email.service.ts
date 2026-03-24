@@ -16,11 +16,11 @@ export class EmailService {
    * TODO: Replace the fake log delivery with a real email provider
    *       (e.g. Resend, SendGrid, Nodemailer).
    */
-  async sendVerificationEmail(
+  sendVerificationEmail(
     to: string,
     name: string,
     verificationToken: string,
-  ): Promise<void> {
+  ): void {
     const appUrl = this.configService.get<string>(
       "APP_URL",
       "http://localhost:3000",
