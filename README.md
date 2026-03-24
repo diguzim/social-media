@@ -118,6 +118,18 @@ this.authClient.send<RPC.LoginReply, RPC.LoginRequest>(
 );
 ```
 
+## Frontend State Architecture (User Portal)
+
+The `user-portal` follows a contract/presenter/provider pattern for page state orchestration:
+
+- Contract interfaces define state + actions consumed by pages
+- Presenters implement those interfaces (current default uses React hooks)
+- Providers inject the chosen presenter at app composition level
+
+Presenters are organized by approach at folder level (for example: `src/state-contracts/home/presenters/hooks/`), similar to backend infra organization patterns.
+
+This keeps page components focused on rendering and makes state management implementation replaceable over time.
+
 ## Exception Handling
 
 Microservices serialize NestJS exceptions over TCP and the API gateway maps them back to HTTP responses (e.g., duplicate email returns 409 Conflict).

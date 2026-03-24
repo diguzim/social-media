@@ -8,6 +8,7 @@ import { VerifyEmail } from '../pages/VerifyEmail';
 import { NotFound } from '../pages/NotFound';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
 import { isAuthenticated } from '../utils';
+import { StateContractsProvider } from '../state-contracts/home';
 
 function ProtectedRoutes() {
   if (!isAuthenticated()) {
@@ -18,23 +19,25 @@ function ProtectedRoutes() {
 
 export function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+    <StateContractsProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* Protected routes with navbar */}
-        <Route element={<ProtectedRoutes />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/my-posts" element={<MyPosts />} />
-        </Route>
+          {/* Protected routes with navbar */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/my-posts" element={<MyPosts />} />
+          </Route>
 
-        {/* Catch-all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Catch-all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </StateContractsProvider>
   );
 }

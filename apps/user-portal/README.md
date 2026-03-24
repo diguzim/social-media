@@ -14,6 +14,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Loading states and error handling
 - Like/unlike posts with optimistic updates and reaction counts
 - Storybook for visual component validation and loading state scenarios
+- Pluggable frontend state architecture via state contracts (interfaces + injectable presenters)
 
 ## Routes
 
@@ -117,9 +118,39 @@ src/
   components/     - Reusable UI components (e.g., Navbar, Feed, PostCard)
   components/loading/ - Shared loading primitives (skeletons, pending buttons, inline status)
   components/home/ - Home page island components
+  state-contracts/ - Frontend state contracts, presenters, and providers (replaceable state management)
   services/       - API clients (auth.ts and posts.ts)
   hooks/          - Custom React hooks (placeholder)
 ```
+
+## Frontend State Contracts (Pluggable State Management)
+
+The portal adopts a backend-inspired architecture for state orchestration:
+
+- **Contracts** define page state + actions (e.g., `HomeStateContract`)
+- **Presenters** implement those contracts using the current strategy (today: React hooks + local state/effects)
+- **Providers** inject which presenter is active at composition root
+- **Pages** consume only the contract, keeping UI components simple and implementation-agnostic
+
+Current rollout:
+
+- Home page uses `StateContractsProvider` + `useHomeStateContract()`
+- Default presenter is `useHomeStatePresenter` under the hooks approach folder
+
+Current folder convention (by implementation approach):
+
+```text
+src/state-contracts/home/
+  home-state.contract.ts              # contract definition
+  home-state-contract.context.tsx     # provider + consumer hook
+  presenters/
+    hooks/
+      use-home-state.presenter.ts     # hooks-based presenter
+```
+
+When adding a new state strategy, create a sibling approach folder (for example `presenters/zustand/` or `presenters/redux/`) and keep pages unchanged.
+
+This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home UI islands.
 
 ## Scripts
 

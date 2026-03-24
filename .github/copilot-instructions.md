@@ -106,6 +106,10 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 
 - Components in `src/components/`, pages in `src/pages/`
 - Services (API calls) in `src/services/`
+- Prefer **state contracts** for page-level orchestration: define a contract interface (`state` + `actions`), implement a default presenter hook, and inject via provider at composition root
+- Pages should consume contract hooks (e.g., `useHomeStateContract`) and stay focused on rendering/composition; avoid embedding heavy orchestration directly in page components
+- Keep state contracts under `src/state-contracts/<feature>/` with clear boundaries between contract, presenter, and provider/context
+- Aggregate presenters by implementation approach under `src/state-contracts/<feature>/presenters/<approach>/` (e.g., `presenters/hooks/`, `presenters/zustand/`, `presenters/redux/`) so architecture intent is obvious from folders
 - Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
 - For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
 - For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending
@@ -137,6 +141,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - All fake test data must include a `Fake E2E` prefix in names
 - Assert stable end-states, not transient loading states
 - Unit tests live alongside the code they test (`*.spec.ts`)
+- For state-contract architecture, add tests that validate provider injection and custom presenter behavior (pages should work with swapped implementations)
 - If tests or new behavior depend on baseline users/posts, update in-memory repository seed data in the same task (and keep test assertions aligned with the new seeded values)
 - For progressive loading UX, assert that already-loaded regions remain visible while only pending islands show fallback UI
 - For interaction-pending UX, test disabled submit controls, duplicate-submit prevention, and visible pending indicators
