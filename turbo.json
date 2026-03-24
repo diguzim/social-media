@@ -1,6 +1,18 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "AUTH_SERVICE_HOST",
+    "AUTH_SERVICE_PORT",
+    "CORS_ORIGIN",
+    "NODE_ENV",
+    "PORT",
+    "POSTS_SERVICE_HOST",
+    "POSTS_SERVICE_PORT",
+    "RABBITMQ_EXCHANGE",
+    "RABBITMQ_URL",
+    "RABBITMQ_USER_REGISTERED_QUEUE"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

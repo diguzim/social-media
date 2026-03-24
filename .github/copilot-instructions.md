@@ -83,6 +83,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Never use `any` unless explicitly necessary (and comment why)
 - Prefer `interface` over `type` for object shapes in contracts
 - Always use named exports (avoid `export default` except in React components)
+- When adding or using environment variables (e.g., `process.env.*`), always declare them in `turbo.json` under `globalEnv` to prevent `turbo/no-undeclared-env-vars` lint errors
 
 ### NestJS / Backend
 
