@@ -29,7 +29,7 @@ describe('GetProfileUseCase', () => {
 
     const result = await useCase.execute({ userId: 'user-1' });
 
-    expect(userRepository.findById).toHaveBeenCalledWith('user-1');
+    expect(userRepository.findById.mock.calls).toContainEqual(['user-1']);
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',

@@ -35,12 +35,12 @@ export class RabbitMqEventPublisher implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async publish<TPayload>(eventName: string, payload: TPayload): Promise<void> {
+  publish<TPayload>(eventName: string, payload: TPayload): Promise<void> {
     if (!this.channel) {
       this.logger.warn(
         `Skipping event '${eventName}' because RabbitMQ is not connected`,
       );
-      return;
+      return Promise.resolve();
     }
 
     try {
@@ -64,6 +64,8 @@ export class RabbitMqEventPublisher implements OnModuleInit, OnModuleDestroy {
         `Failed to publish event '${eventName}': ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+
+    return Promise.resolve();
   }
 
   async onModuleDestroy(): Promise<void> {

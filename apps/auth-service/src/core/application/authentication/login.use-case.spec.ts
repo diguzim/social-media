@@ -50,15 +50,19 @@ describe('LoginUseCase', () => {
       password: 'plain-password',
     });
 
-    expect(userRepository.findByEmail).toHaveBeenCalledWith('jane@doe.com');
-    expect(bcrypt.compare).toHaveBeenCalledWith(
+    expect(userRepository.findByEmail.mock.calls).toContainEqual([
+      'jane@doe.com',
+    ]);
+    expect((bcrypt.compare as jest.Mock).mock.calls).toContainEqual([
       'plain-password',
       'hashed-password',
-    );
-    expect(jwtService.signAsync).toHaveBeenCalledWith({
-      sub: 'user-1',
-      email: 'jane@doe.com',
-    });
+    ]);
+    expect(jwtService.signAsync.mock.calls).toContainEqual([
+      {
+        sub: 'user-1',
+        email: 'jane@doe.com',
+      },
+    ]);
     expect(result).toEqual({
       id: 'user-1',
       email: 'jane@doe.com',

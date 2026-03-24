@@ -69,17 +69,28 @@ describe('RegisterUseCase', () => {
       password: 'plain-password',
     });
 
-    expect(userRepository.findByEmail).toHaveBeenCalledWith('john@doe.com');
-    expect(bcrypt.hash).toHaveBeenCalledWith('plain-password', 10);
-    expect(userRepository.create).toHaveBeenCalledWith({
-      name: 'John Doe',
-      email: 'john@doe.com',
-      passwordHash: 'hashed-password',
-    });
-    expect(createEmailVerificationTokenUseCase.execute).toHaveBeenCalledWith({
-      userId: 'user-1',
-    });
-    expect(eventPublisher.publish).toHaveBeenCalledWith(
+    expect(userRepository.findByEmail.mock.calls).toContainEqual([
+      'john@doe.com',
+    ]);
+    expect((bcrypt.hash as jest.Mock).mock.calls).toContainEqual([
+      'plain-password',
+      10,
+    ]);
+    expect(userRepository.create.mock.calls).toContainEqual([
+      {
+        name: 'John Doe',
+        email: 'john@doe.com',
+        passwordHash: 'hashed-password',
+      },
+    ]);
+    expect(
+      createEmailVerificationTokenUseCase.execute.mock.calls,
+    ).toContainEqual([
+      {
+        userId: 'user-1',
+      },
+    ]);
+    expect(eventPublisher.publish.mock.calls).toContainEqual([
       USER_EVENTS.REGISTERED,
       {
         userId: 'user-1',
@@ -89,7 +100,7 @@ describe('RegisterUseCase', () => {
         verificationToken: 'raw-token',
         tokenExpiresAt: tokenExpiresAt.toISOString(),
       },
-    );
+    ]);
     expect(result).toEqual({
       id: 'user-1',
       name: 'John Doe',
@@ -122,8 +133,8 @@ describe('RegisterUseCase', () => {
       }),
     ).rejects.toThrow('Email already registered');
 
-    expect(userRepository.create).not.toHaveBeenCalled();
-    expect(eventPublisher.publish).not.toHaveBeenCalled();
+    expect(userRepository.create.mock.calls).toHaveLength(0);
+    expect(eventPublisher.publish.mock.calls).toHaveLength(0);
   });
 
   it('should propagate repository errors during creation', async () => {
@@ -146,6 +157,6 @@ describe('RegisterUseCase', () => {
       }),
     ).rejects.toThrow('db failure');
 
-    expect(eventPublisher.publish).not.toHaveBeenCalled();
+    expect(eventPublisher.publish.mock.calls).toHaveLength(0);
   });
 });

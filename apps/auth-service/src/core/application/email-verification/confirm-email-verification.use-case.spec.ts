@@ -68,13 +68,14 @@ describe('ConfirmEmailVerificationUseCase', () => {
 
     const result = await useCase.execute({ token: 'raw-token' });
 
-    expect(tokenRepository.consume).toHaveBeenCalledWith(
-      'token-1',
-      expect.any(Date),
-    );
-    expect(userRepository.markEmailVerified).toHaveBeenCalledWith(
-      'user-1',
-      expect.any(Date),
+    expect(tokenRepository.consume.mock.calls).toHaveLength(1);
+    expect(tokenRepository.consume.mock.calls[0]?.[0]).toBe('token-1');
+    expect(tokenRepository.consume.mock.calls[0]?.[1]).toBeInstanceOf(Date);
+
+    expect(userRepository.markEmailVerified.mock.calls).toHaveLength(1);
+    expect(userRepository.markEmailVerified.mock.calls[0]?.[0]).toBe('user-1');
+    expect(userRepository.markEmailVerified.mock.calls[0]?.[1]).toBeInstanceOf(
+      Date,
     );
     expect(result).toEqual({ status: 'verified', emailVerifiedAt: now });
   });
@@ -103,8 +104,8 @@ describe('ConfirmEmailVerificationUseCase', () => {
 
     const result = await useCase.execute({ token: 'raw-token' });
 
-    expect(tokenRepository.consume).not.toHaveBeenCalled();
-    expect(userRepository.markEmailVerified).not.toHaveBeenCalled();
+    expect(tokenRepository.consume.mock.calls).toHaveLength(0);
+    expect(userRepository.markEmailVerified.mock.calls).toHaveLength(0);
     expect(result).toEqual({
       status: 'already_verified',
       emailVerifiedAt: verifiedAt,
