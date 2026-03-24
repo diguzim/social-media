@@ -62,11 +62,13 @@ The service handles RPC messages from the API Gateway:
 
 1. Check if email already exists (returns ConflictException if true)
 2. Check if username already exists (returns ConflictException if true)
-3. Hash password using bcrypt
-4. Create user in UserRepository
-5. Create a SHA-256-hashed verification token (24h TTL) via `CreateEmailVerificationTokenUseCase`
-6. Publish `USER_EVENTS.REGISTERED` event to RabbitMQ (includes raw token for the email link)
-7. Return user id, username, and email
+3. Normalize username on write (`trim` + lowercase)
+4. Validate username policy (length, allowed characters, reserved names)
+5. Hash password using bcrypt
+6. Create user in UserRepository
+7. Create a SHA-256-hashed verification token (24h TTL) via `CreateEmailVerificationTokenUseCase`
+8. Publish `USER_EVENTS.REGISTERED` event to RabbitMQ (includes raw token for the email link)
+9. Return user id, username, and email
 
 ### LoginUseCase
 
@@ -136,8 +138,10 @@ RABBITMQ_EXCHANGE=social-media.events
 Currently uses **in-memory storage** for development:
 
 - Seeded users are pre-marked with `emailVerifiedAt` so existing E2E flows work without manual verification
+- Usernames are stored with a canonical value (`usernameCanonical`) for consistent uniqueness checks
+- Reserved usernames are blocked (e.g., `admin`, `support`, `root`, `system`)
 - Data persists only during service runtime
-- Ready for PostgreSQL integration
+- Ready for PostgreSQL integration (add a unique index/constraint on `username_canonical` during migration)
 
 ## Testing
 

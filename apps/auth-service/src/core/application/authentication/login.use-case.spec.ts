@@ -19,7 +19,7 @@ describe('LoginUseCase', () => {
     userRepository = {
       create: jest.fn(),
       findByEmail: jest.fn(),
-      findByUsername: jest.fn(),
+      findByUsernameCanonical: jest.fn(),
       findById: jest.fn(),
       markEmailVerified: jest.fn(),
     };
@@ -36,6 +36,7 @@ describe('LoginUseCase', () => {
       id: 'user-1',
       name: 'Jane Doe',
       username: 'janedoe',
+      usernameCanonical: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -92,6 +93,7 @@ describe('LoginUseCase', () => {
       id: 'user-1',
       name: 'Jane Doe',
       username: 'janedoe',
+      usernameCanonical: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
@@ -116,6 +118,7 @@ describe('LoginUseCase', () => {
       id: 'user-1',
       name: 'Jane Doe',
       username: 'janedoe',
+      usernameCanonical: 'janedoe',
       email: 'jane@doe.com',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),

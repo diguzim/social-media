@@ -16,6 +16,7 @@ export class InMemoryUserRepository implements UserRepository {
       id: (this.users.length + 1).toString(),
       name: createUserData.name,
       username: createUserData.username,
+      usernameCanonical: createUserData.usernameCanonical,
       email: createUserData.email,
       passwordHash: createUserData.passwordHash,
       createdAt: new Date(),
@@ -33,8 +34,12 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  async findByUsername(username: string): Promise<User | null> {
-    const user = this.users.find((item) => item.username === username);
+  async findByUsernameCanonical(
+    usernameCanonical: string,
+  ): Promise<User | null> {
+    const user = this.users.find(
+      (item) => item.usernameCanonical === usernameCanonical,
+    );
     return user ?? null;
   }
 
@@ -65,6 +70,7 @@ export class InMemoryUserRepository implements UserRepository {
         id: '1',
         name: 'Alice Johnson',
         username: 'alice',
+        usernameCanonical: 'alice',
         email: 'alice@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-01'),
@@ -75,6 +81,7 @@ export class InMemoryUserRepository implements UserRepository {
         id: '2',
         name: 'Bob Smith',
         username: 'bob',
+        usernameCanonical: 'bob',
         email: 'bob@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-02'),
@@ -84,6 +91,7 @@ export class InMemoryUserRepository implements UserRepository {
         id: '3',
         name: 'Charlie Brown',
         username: 'charlie',
+        usernameCanonical: 'charlie',
         email: 'charlie@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-03'),
@@ -93,6 +101,7 @@ export class InMemoryUserRepository implements UserRepository {
         id: '4',
         name: 'Diana Prince',
         username: 'diana',
+        usernameCanonical: 'diana',
         email: 'diana@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-04'),
@@ -102,6 +111,7 @@ export class InMemoryUserRepository implements UserRepository {
         id: '5',
         name: 'Eve Wilson',
         username: 'eve',
+        usernameCanonical: 'eve',
         email: 'eve@example.com',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-05'),

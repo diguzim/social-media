@@ -2,6 +2,7 @@ export class User {
   id: string;
   name: string;
   username: string;
+  usernameCanonical: string;
   email: string;
   passwordHash: string;
   createdAt: Date;
@@ -13,6 +14,7 @@ export class User {
     this.id = props.id ?? '';
     this.name = props.name ?? '';
     this.username = props.username ?? '';
+    this.usernameCanonical = props.usernameCanonical ?? '';
     this.email = props.email ?? '';
     this.passwordHash = props.passwordHash ?? '';
     this.createdAt = props.createdAt ?? new Date();
