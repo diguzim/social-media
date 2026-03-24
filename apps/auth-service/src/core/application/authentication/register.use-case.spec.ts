@@ -39,7 +39,6 @@ describe('RegisterUseCase', () => {
   });
 
   it('should hash the password and create a user, then emit registration event', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     const createdAtDate = new Date('2024-01-01T00:00:00Z');
@@ -128,7 +127,6 @@ describe('RegisterUseCase', () => {
   });
 
   it('should propagate repository errors during creation', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     userRepository.findByEmail.mockResolvedValue(null);

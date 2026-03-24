@@ -29,7 +29,6 @@ describe('LoginUseCase', () => {
   });
 
   it('should return access token for valid credentials', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     userRepository.findByEmail.mockResolvedValue({
@@ -81,7 +80,6 @@ describe('LoginUseCase', () => {
   });
 
   it('should throw UnauthorizedException when password does not match', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
     userRepository.findByEmail.mockResolvedValue({
@@ -105,7 +103,6 @@ describe('LoginUseCase', () => {
   });
 
   it('should propagate jwt signing errors', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     userRepository.findByEmail.mockResolvedValue({
