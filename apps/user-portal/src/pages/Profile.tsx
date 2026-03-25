@@ -1,33 +1,10 @@
-import { useState, useEffect } from 'react';
-import { getProfile, getUserProfile } from '../services/auth';
-import type { UserProfile as UserProfileType } from '../services/auth';
+import { useProfileStateContract } from '../state-contracts/profile';
 
 export function Profile() {
-  const [user, setUser] = useState<UserProfileType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { state } = useProfileStateContract();
+  const { user, error, isLoading } = state;
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profile = await getProfile();
-        setUser(profile);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load profile');
-        const cachedUser = getUserProfile();
-        if (cachedUser) {
-          setUser(cachedUser);
-          setError('');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div data-testid="profile-loading-state" className="page-container max-w-3xl text-center">
         <p data-testid="profile-loading-text">Loading your profile...</p>

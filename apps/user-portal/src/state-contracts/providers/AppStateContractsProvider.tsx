@@ -3,6 +3,7 @@ import { StateContractsProvider } from '../home';
 import { RegisterStateContractProvider } from '../register';
 import { LoginStateContractProvider } from '../login';
 import { MyPostsStateContractProvider } from '../my-posts';
+import { ProfileStateContractProvider } from '../profile';
 
 type ProviderComponent = ComponentType<{ children: ReactNode }>;
 
@@ -11,6 +12,7 @@ const STATE_CONTRACT_PROVIDERS: ProviderComponent[] = [
   RegisterStateContractProvider,
   LoginStateContractProvider,
   MyPostsStateContractProvider,
+  ProfileStateContractProvider,
 ];
 
 interface AppStateContractsProviderProps {
