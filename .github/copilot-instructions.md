@@ -110,6 +110,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Pages should consume contract hooks (e.g., `useHomeStateContract`, `useRegisterStateContract`, `useLoginStateContract`, `useMyPostsStateContract`) and stay focused on rendering/composition; avoid embedding heavy orchestration directly in page components
 - Keep state contracts under `src/state-contracts/<feature>/` with clear boundaries between contract, presenter, and provider/context
 - Aggregate presenters by implementation approach under `src/state-contracts/<feature>/presenters/<approach>/` (e.g., `presenters/hooks/`, `presenters/zustand/`, `presenters/redux/`) so architecture intent is obvious from folders
+- Aggregate feature providers at composition root via a single app-level wrapper (e.g., `AppStateContractsProvider`) to avoid provider-wrapper nesting in `App.tsx`
 - Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
 - For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
 - For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending

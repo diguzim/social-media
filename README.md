@@ -134,6 +134,7 @@ Current examples in `user-portal`:
 - Register uses `useRegisterStateContract()` with `useRegisterStatePresenter`
 - Login uses `useLoginStateContract()` with `useLoginStatePresenter`
 - MyPosts uses `useMyPostsStateContract()` with `useMyPostsStatePresenter`
+- Composition root uses `AppStateContractsProvider` to aggregate contract providers and prevent wrapper nesting in `App.tsx`
 
 This keeps page components focused on rendering and makes state management implementation replaceable over time.
 

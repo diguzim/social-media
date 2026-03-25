@@ -142,6 +142,7 @@ Current rollout:
 - Default register presenter is `useRegisterStatePresenter` under the hooks approach folder
 - Default login presenter is `useLoginStatePresenter` under the hooks approach folder
 - Default my-posts presenter is `useMyPostsStatePresenter` under the hooks approach folder
+- Composition root uses `AppStateContractsProvider` to aggregate providers and avoid provider-wrapper nesting in `App.tsx`
 
 Current folder convention (by implementation approach):
 
