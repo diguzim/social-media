@@ -1,45 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getFeed } from '../services/posts';
-import type { FeedPost } from '../services/posts';
 import { PostCard } from '../components/feed/PostCard';
-import { getUserProfile } from '../services/auth';
+import { useMyPostsStateContract } from '../state-contracts/my-posts';
 
 export function MyPosts() {
-  const navigate = useNavigate();
-  const [posts, setPosts] = useState<FeedPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { state } = useMyPostsStateContract();
 
-  useEffect(() => {
-    const loadMyPosts = async () => {
-      try {
-        const userProfile = getUserProfile();
-        if (!userProfile) {
-          navigate('/login', { replace: true });
-          return;
-        }
-
-        // Use getFeed to get enriched posts with author and reactions
-        const response = await getFeed({
-          authorId: userProfile.id,
-          page: 1,
-          limit: 50,
-          sortOrder: 'desc',
-        });
-
-        setPosts(response.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load your posts');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMyPosts();
-  }, [navigate]);
-
-  if (loading) {
+  if (state.isLoading) {
     return (
       <div data-testid="my-posts-page" className="page-container max-w-5xl">
         <h1 className="mb-5 text-3xl font-bold text-slate-900">My Posts</h1>
@@ -50,18 +15,18 @@ export function MyPosts() {
     );
   }
 
-  if (error) {
+  if (state.error) {
     return (
       <div data-testid="my-posts-page" className="page-container max-w-5xl">
         <h1 className="mb-5 text-3xl font-bold text-slate-900">My Posts</h1>
         <p data-testid="my-posts-error-message" className="text-danger-600">
-          {error}
+          {state.error}
         </p>
       </div>
     );
   }
 
-  if (posts.length === 0) {
+  if (state.posts.length === 0) {
     return (
       <div data-testid="my-posts-page" className="page-container max-w-5xl">
         <h1 className="mb-5 text-3xl font-bold text-slate-900">My Posts</h1>
@@ -79,10 +44,10 @@ export function MyPosts() {
     <div data-testid="my-posts-page" className="page-container max-w-5xl">
       <h1 className="mb-5 text-3xl font-bold text-slate-900">My Posts</h1>
       <div data-testid="my-posts-count" className="mb-4 text-sm text-slate-600">
-        {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+        {state.posts.length} {state.posts.length === 1 ? 'post' : 'posts'}
       </div>
       <div data-testid="my-posts-list" className="grid gap-3">
-        {posts.map((post) => (
+        {state.posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>
