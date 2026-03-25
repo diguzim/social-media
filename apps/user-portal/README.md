@@ -136,8 +136,10 @@ Current rollout:
 
 - Home page uses `StateContractsProvider` + `useHomeStateContract()`
 - Register page uses `RegisterStateContractProvider` + `useRegisterStateContract()`
+- Login page uses `LoginStateContractProvider` + `useLoginStateContract()`
 - Default presenter is `useHomeStatePresenter` under the hooks approach folder
 - Default register presenter is `useRegisterStatePresenter` under the hooks approach folder
+- Default login presenter is `useLoginStatePresenter` under the hooks approach folder
 
 Current folder convention (by implementation approach):
 
@@ -155,11 +157,18 @@ src/state-contracts/register/
   presenters/
     hooks/
       use-register-state.presenter.ts # hooks-based presenter
+
+src/state-contracts/login/
+  login-state.contract.ts             # contract definition
+  login-state-contract.context.tsx    # provider + consumer hook
+  presenters/
+    hooks/
+      use-login-state.presenter.ts    # hooks-based presenter
 ```
 
 When adding a new state strategy, create a sibling approach folder (for example `presenters/zustand/` or `presenters/redux/`) and keep pages unchanged.
 
-This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home or Register page composition.
+This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home, Register, or Login page composition.
 
 ## Scripts
 

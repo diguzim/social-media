@@ -132,6 +132,7 @@ Current examples in `user-portal`:
 
 - Home uses `useHomeStateContract()` with `useHomeStatePresenter`
 - Register uses `useRegisterStateContract()` with `useRegisterStatePresenter`
+- Login uses `useLoginStateContract()` with `useLoginStatePresenter`
 
 This keeps page components focused on rendering and makes state management implementation replaceable over time.
 

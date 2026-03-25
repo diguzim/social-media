@@ -1,53 +1,26 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { loginUser, getProfile, getUserProfile } from '../services/auth';
 import type { LoginRequest } from '../services/auth';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useLoginStateContract } from '../state-contracts/login';
+
+const LOGIN_FIELDS = ['email', 'password'] as const;
+
+function isLoginField(field: string): field is keyof LoginRequest {
+  return (LOGIN_FIELDS as readonly string[]).includes(field);
+}
 
 export function Login() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState<LoginRequest>({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { state, actions } = useLoginStateContract();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: LoginRequest) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (isLoginField(name)) {
+      actions.updateField(name, value);
+    }
   };
 
-  // Simple validation: all fields must have values
-  const isFormValid = formData.email.trim() !== '' && formData.password.trim() !== '';
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await loginUser(formData);
-
-      // Ensure user profile is loaded and stored in localStorage
-      try {
-        await getProfile();
-      } catch {
-        const cachedUser = getUserProfile();
-        if (!cachedUser) {
-          localStorage.removeItem('jwtToken');
-          throw new Error('Failed to load user profile after login');
-        }
-      }
-
-      navigate('/');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
-    }
+    await actions.submit();
   };
 
   return (
@@ -65,7 +38,7 @@ export function Login() {
             id="email"
             type="text"
             name="email"
-            value={formData.email}
+            value={state.formData.email}
             onChange={handleChange}
             required
             className="input-base"
@@ -81,26 +54,26 @@ export function Login() {
             id="password"
             type="password"
             name="password"
-            value={formData.password}
+            value={state.formData.password}
             onChange={handleChange}
             required
             className="input-base"
           />
         </div>
 
-        {error && (
+        {state.error && (
           <div data-testid="login-error-message" className="status-error">
-            {error}
+            {state.error}
           </div>
         )}
 
         <button
           data-testid="login-submit-button"
           type="submit"
-          disabled={!isFormValid || loading}
+          disabled={!state.isFormValid || state.isLoading}
           className="btn-primary w-full"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {state.isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 

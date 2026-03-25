@@ -107,7 +107,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Components in `src/components/`, pages in `src/pages/`
 - Services (API calls) in `src/services/`
 - Prefer **state contracts** for page-level orchestration: define a contract interface (`state` + `actions`), implement a default presenter hook, and inject via provider at composition root
-- Pages should consume contract hooks (e.g., `useHomeStateContract`, `useRegisterStateContract`) and stay focused on rendering/composition; avoid embedding heavy orchestration directly in page components
+- Pages should consume contract hooks (e.g., `useHomeStateContract`, `useRegisterStateContract`, `useLoginStateContract`) and stay focused on rendering/composition; avoid embedding heavy orchestration directly in page components
 - Keep state contracts under `src/state-contracts/<feature>/` with clear boundaries between contract, presenter, and provider/context
 - Aggregate presenters by implementation approach under `src/state-contracts/<feature>/presenters/<approach>/` (e.g., `presenters/hooks/`, `presenters/zustand/`, `presenters/redux/`) so architecture intent is obvious from folders
 - Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
