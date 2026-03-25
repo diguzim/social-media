@@ -1,5 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import { Feed } from './Feed';
 import { getFeed } from '../../services/posts';
 
@@ -8,6 +10,10 @@ vi.mock('../../services/posts', () => ({
 }));
 
 const mockedGetFeed = vi.mocked(getFeed);
+
+function renderWithRouter(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
 
 function createDeferredPromise<T>(result: T) {
   let resolve!: () => void;
@@ -40,7 +46,7 @@ describe('Feed', () => {
       totalPages: 1,
     });
 
-    render(<Feed />);
+    renderWithRouter(<Feed />);
 
     expect(screen.getByTestId('feed-loading-state')).toBeInTheDocument();
 
@@ -66,7 +72,7 @@ describe('Feed', () => {
       totalPages: 0,
     });
 
-    render(<Feed />);
+    renderWithRouter(<Feed />);
 
     expect(await screen.findByTestId('feed-empty-state')).toBeInTheDocument();
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
@@ -75,7 +81,7 @@ describe('Feed', () => {
   it('renders error state when request fails', async () => {
     mockedGetFeed.mockRejectedValueOnce(new Error('Failed to fetch feed'));
 
-    render(<Feed />);
+    renderWithRouter(<Feed />);
 
     expect(await screen.findByTestId('feed-error-state')).toBeInTheDocument();
     expect(screen.getByText('Failed to fetch feed')).toBeInTheDocument();
@@ -120,12 +126,16 @@ describe('Feed', () => {
       })
       .mockReturnValueOnce(deferredRefresh.promise);
 
-    const { rerender } = render(<Feed refreshKey={0} />);
+    const { rerender } = renderWithRouter(<Feed refreshKey={0} />);
 
     expect(await screen.findByTestId('feed-section')).toBeInTheDocument();
     expect(screen.getByTestId('post-title-p1')).toHaveTextContent('First load');
 
-    rerender(<Feed refreshKey={1} />);
+    rerender(
+      <MemoryRouter>
+        <Feed refreshKey={1} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByTestId('post-title-p1')).toBeInTheDocument();
     expect(screen.getByTestId('feed-refreshing-status')).toHaveTextContent('Refreshing feed...');

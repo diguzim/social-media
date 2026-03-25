@@ -59,10 +59,11 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - User profile fetched via GET `/users/me` and cached as `user`
    - User redirected to home page
 
-3. **Protected Pages** (`/`, `/profile`) - Authenticated user area
+3. **Protected Pages** (`/`, `/profile`, `/users/:userId`) - Authenticated user area
    - Route guard requires both `jwtToken` and `user` in localStorage
    - Home (`/`) shows "Welcome {name}!" and user summary
    - Profile (`/profile`) shows dedicated profile details
+   - UserProfile (`/users/:userId`) shows another user's public profile details
    - Logout clears auth data and redirects to `/login`
 
 ## Event-Driven Architecture
@@ -134,6 +135,8 @@ Current examples in `user-portal`:
 - Register uses `useRegisterStateContract()` with `useRegisterStatePresenter`
 - Login uses `useLoginStateContract()` with `useLoginStatePresenter`
 - MyPosts uses `useMyPostsStateContract()` with `useMyPostsStatePresenter`
+- Profile uses `useProfileStateContract()` with `useProfileStatePresenter`
+- UserProfile uses `useUserProfileStateContract()` with `useUserProfileStatePresenter`
 - Composition root uses `AppStateContractsProvider` to aggregate contract providers and prevent wrapper nesting in `App.tsx`
 
 This keeps page components focused on rendering and makes state management implementation replaceable over time.

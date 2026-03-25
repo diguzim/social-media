@@ -3,6 +3,7 @@ import { Home } from '../pages/Home';
 import { Register } from '../pages/Register';
 import { Login } from '../pages/Login';
 import { Profile } from '../pages/Profile';
+import { UserProfile } from '../pages/UserProfile';
 import { MyPosts } from '../pages/MyPosts';
 import { VerifyEmail } from '../pages/VerifyEmail';
 import { NotFound } from '../pages/NotFound';
@@ -31,6 +32,7 @@ export function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/users/:userId" element={<UserProfile />} />
             <Route path="/my-posts" element={<MyPosts />} />
           </Route>
 

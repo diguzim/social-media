@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Logger,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -110,6 +111,36 @@ export class UsersController {
       name: rpcReply.name,
       username: rpcReply.username,
       email: rpcReply.email,
+      emailVerifiedAt: rpcReply.emailVerifiedAt,
+    };
+  }
+
+  @Get(':userId/profile')
+  @UseGuards(JwtAuthGuard)
+  async getPublicProfile(
+    @Param('userId') userId: string,
+  ): Promise<API.GetPublicProfileResponse> {
+    this.logger.debug(
+      'API Gateway: forwarding getPublicProfile to auth service',
+      { userId },
+    );
+
+    const rpcRequest: RPC.GetProfileRequest = {
+      userId,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.authClient.send<RPC.GetProfileReply, RPC.GetProfileRequest>(
+        { cmd: AUTH_COMMANDS.getProfile },
+        rpcRequest,
+      ),
+    );
+
+    return {
+      id: rpcReply.id,
+      name: rpcReply.name,
+      username: rpcReply.username,
       emailVerifiedAt: rpcReply.emailVerifiedAt,
     };
   }

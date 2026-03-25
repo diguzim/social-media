@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   LoginResponse,
   GetProfileResponse,
+  GetPublicProfileResponse,
   ConfirmEmailVerificationRequest,
   ConfirmEmailVerificationResponse,
   RequestEmailVerificationResponse,
@@ -23,6 +24,7 @@ export type {
 };
 
 export type UserProfile = GetProfileResponse;
+export type PublicUserProfile = GetPublicProfileResponse;
 
 const EMAIL_CONFIRM_INFLIGHT = new Map<string, Promise<ConfirmEmailVerificationResponse>>();
 const EMAIL_CONFIRM_RECENT = new Map<
@@ -91,6 +93,27 @@ export async function getProfile(): Promise<UserProfile> {
   const profile = await response.json();
   storeUserProfile(profile);
   return profile;
+}
+
+export async function getPublicProfile(userId: string): Promise<PublicUserProfile> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user profile');
+  }
+
+  return response.json();
 }
 
 export async function confirmEmailVerification(

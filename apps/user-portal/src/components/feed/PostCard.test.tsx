@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import type { ToggleReactionResponse } from '@repo/contracts/api';
 import { PostCard } from './PostCard';
 import * as postsService from '../../services/posts';
@@ -8,9 +10,13 @@ vi.mock('../../services/posts', () => ({
   togglePostReaction: vi.fn(),
 }));
 
+function renderWithRouter(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
+
 describe('PostCard', () => {
   it('renders post content and metadata', () => {
-    render(
+    renderWithRouter(
       <PostCard
         post={{
           id: 'post-1',
@@ -30,7 +36,7 @@ describe('PostCard', () => {
   });
 
   it('renders author name from enriched post', () => {
-    render(
+    renderWithRouter(
       <PostCard
         post={{
           id: 'post-2',
@@ -48,7 +54,7 @@ describe('PostCard', () => {
 
   describe('Like button', () => {
     it('renders like button with initial state (not liked)', () => {
-      render(
+      renderWithRouter(
         <PostCard
           post={{
             id: 'post-3',
@@ -68,7 +74,7 @@ describe('PostCard', () => {
     });
 
     it('renders like button with liked state', () => {
-      render(
+      renderWithRouter(
         <PostCard
           post={{
             id: 'post-4',
@@ -96,7 +102,7 @@ describe('PostCard', () => {
         isAdded: true,
       });
 
-      render(
+      renderWithRouter(
         <PostCard
           post={{
             id: 'post-5',
@@ -138,7 +144,7 @@ describe('PostCard', () => {
 
       vi.mocked(postsService.togglePostReaction).mockImplementation(() => requestPromise);
 
-      render(
+      renderWithRouter(
         <PostCard
           post={{
             id: 'post-6',
@@ -191,7 +197,7 @@ describe('PostCard', () => {
         isAdded: true,
       });
 
-      render(
+      renderWithRouter(
         <PostCard
           post={{
             id: 'post-7',

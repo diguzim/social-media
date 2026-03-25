@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { FeedPost } from '../../services/posts';
 import { togglePostReaction } from '../../services/posts';
 import { PendingButton } from '../loading/PendingButton';
@@ -60,7 +61,15 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
       <footer className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-3 text-xs text-slate-500">
-          <span data-testid={`post-author-${post.id}`}>Author: {authorLabel}</span>
+          <span data-testid={`post-author-${post.id}`}>
+            Author:{' '}
+            <Link
+              to={`/users/${post.author.id}`}
+              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              {authorLabel}
+            </Link>
+          </span>
           <span data-testid={`post-created-at-${post.id}`}>{createdAt}</span>
         </div>
 

@@ -8,6 +8,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
 - User profile page with email verification status
+- User public profile page for viewing other users by id
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
 - Progressive loading UX with persistent shell + Home page islands
@@ -22,6 +23,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/register` - User registration form
 - `/login` - User login form
 - `/profile` - Protected profile page with verification status
+- `/users/:userId` - Protected public profile page for another user
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
 
@@ -80,6 +82,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users (register)
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
+- GET /users/:userId/profile (requires Authorization: Bearer {token})
 - GET /posts?page=1&limit=10&sortOrder=desc
 - GET /posts/feed (feed with author enrichment + like counts)
 - POST /posts/:id/reactions (like/unlike a post)
@@ -138,10 +141,14 @@ Current rollout:
 - Register page uses `RegisterStateContractProvider` + `useRegisterStateContract()`
 - Login page uses `LoginStateContractProvider` + `useLoginStateContract()`
 - MyPosts page uses `MyPostsStateContractProvider` + `useMyPostsStateContract()`
+- Profile page uses `ProfileStateContractProvider` + `useProfileStateContract()`
+- UserProfile page uses `UserProfileStateContractProvider` + `useUserProfileStateContract()`
 - Default presenter is `useHomeStatePresenter` under the hooks approach folder
 - Default register presenter is `useRegisterStatePresenter` under the hooks approach folder
 - Default login presenter is `useLoginStatePresenter` under the hooks approach folder
 - Default my-posts presenter is `useMyPostsStatePresenter` under the hooks approach folder
+- Default profile presenter is `useProfileStatePresenter` under the hooks approach folder
+- Default user-profile presenter is `useUserProfileStatePresenter` under the hooks approach folder
 - Composition root uses `AppStateContractsProvider` to aggregate providers and avoid provider-wrapper nesting in `App.tsx`
 
 Current folder convention (by implementation approach):
@@ -174,6 +181,20 @@ src/state-contracts/my-posts/
   presenters/
     hooks/
       use-my-posts-state.presenter.ts # hooks-based presenter
+
+src/state-contracts/profile/
+  profile-state.contract.ts           # contract definition
+  profile-state-contract.context.tsx  # provider + consumer hook
+  presenters/
+    hooks/
+      use-profile-state.presenter.ts  # hooks-based presenter
+
+src/state-contracts/user-profile/
+  user-profile-state.contract.ts              # contract definition
+  user-profile-state-contract.context.tsx     # provider + consumer hook
+  presenters/
+    hooks/
+      use-user-profile-state.presenter.ts     # hooks-based presenter
 ```
 
 When adding a new state strategy, create a sibling approach folder (for example `presenters/zustand/` or `presenters/redux/`) and keep pages unchanged.
