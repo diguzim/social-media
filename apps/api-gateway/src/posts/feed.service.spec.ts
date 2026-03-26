@@ -30,6 +30,16 @@ const makeGetPostsReply = (posts: ReturnType<typeof makePost>[]) => ({
   totalPages: 1,
 });
 
+const makeReactionSummaryReply = (
+  summaries: Array<{
+    targetId: string;
+    count: number;
+    reactedByCurrentUser?: boolean;
+  }> = [],
+) => ({
+  summaries,
+});
+
 describe('FeedService', () => {
   let service: FeedService;
 
@@ -48,7 +58,9 @@ describe('FeedService', () => {
 
   it('enriches posts with author names', async () => {
     const post = makePost('p1', 'u1');
-    mockPostsClient.send.mockReturnValue(of(makeGetPostsReply([post])));
+    mockPostsClient.send
+      .mockImplementationOnce(() => of(makeGetPostsReply([post])))
+      .mockImplementationOnce(() => of(makeReactionSummaryReply()));
     mockAuthClient.send.mockReturnValue(
       of({ id: 'u1', name: 'Alice', email: 'alice@example.com' }),
     );
@@ -62,7 +74,9 @@ describe('FeedService', () => {
 
   it('deduplicates authorId lookups across multiple posts', async () => {
     const posts = [makePost('p1', 'u1'), makePost('p2', 'u1')];
-    mockPostsClient.send.mockReturnValue(of(makeGetPostsReply(posts)));
+    mockPostsClient.send
+      .mockImplementationOnce(() => of(makeGetPostsReply(posts)))
+      .mockImplementationOnce(() => of(makeReactionSummaryReply()));
     mockAuthClient.send.mockReturnValue(
       of({ id: 'u1', name: 'Alice', email: 'alice@example.com' }),
     );
@@ -78,7 +92,9 @@ describe('FeedService', () => {
 
   it('falls back to "Unknown User" when auth-service throws', async () => {
     const post = makePost('p1', 'u-missing');
-    mockPostsClient.send.mockReturnValue(of(makeGetPostsReply([post])));
+    mockPostsClient.send
+      .mockImplementationOnce(() => of(makeGetPostsReply([post])))
+      .mockImplementationOnce(() => of(makeReactionSummaryReply()));
     mockAuthClient.send.mockReturnValue(
       throwError(() => new Error('not found')),
     );
@@ -92,7 +108,9 @@ describe('FeedService', () => {
   });
 
   it('passes pagination and filter params to posts-service', async () => {
-    mockPostsClient.send.mockReturnValue(of(makeGetPostsReply([])));
+    mockPostsClient.send
+      .mockImplementationOnce(() => of(makeGetPostsReply([])))
+      .mockImplementationOnce(() => of(makeReactionSummaryReply()));
 
     await service.getFeed(2, 5, 'u1', 'desc');
 
@@ -107,7 +125,9 @@ describe('FeedService', () => {
   });
 
   it('returns empty data when posts-service returns no posts', async () => {
-    mockPostsClient.send.mockReturnValue(of(makeGetPostsReply([])));
+    mockPostsClient.send
+      .mockImplementationOnce(() => of(makeGetPostsReply([])))
+      .mockImplementationOnce(() => of(makeReactionSummaryReply()));
 
     const result = await service.getFeed();
 
