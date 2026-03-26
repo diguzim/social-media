@@ -179,7 +179,7 @@ describe("Create Post Flow", () => {
 
     // Verify post author is current user (by checking authorId matches)
     cy.getByTestId("my-posts-list").within(() => {
-      cy.contains(`Author: ${testUser.id}`).should("exist");
+      cy.contains(`Author: ${testUser.name}`).should("exist");
     });
   });
 
