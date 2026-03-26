@@ -215,7 +215,6 @@ Each service has a production Dockerfile for deployment:
 
 ## TODO
 
-- [ ] Comments feature (phase 2: add as separate reaction targetType)
 - [ ] Reaction types (phase 2: extend from just "like" to emoji reactions)
 - [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)

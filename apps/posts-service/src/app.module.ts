@@ -9,6 +9,10 @@ import { GetPostUseCase } from "./core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "./core/application/posts/get-posts.use-case";
 import { UpdatePostUseCase } from "./core/application/posts/update-post.use-case";
 import { DeletePostUseCase } from "./core/application/posts/delete-post.use-case";
+import { CreateCommentUseCase } from "./core/application/comments/create-comment.use-case";
+import { GetCommentsUseCase } from "./core/application/comments/get-comments.use-case";
+import { UpdateCommentUseCase } from "./core/application/comments/update-comment.use-case";
+import { DeleteCommentUseCase } from "./core/application/comments/delete-comment.use-case";
 import { ToggleReactionUseCase } from "./core/application/reactions/toggle-reaction.use-case";
 import { GetReactionSummaryBatchUseCase } from "./core/application/reactions/get-reaction-summary-batch.use-case";
 import {
@@ -43,6 +47,10 @@ import {
     GetPostsUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
+    CreateCommentUseCase,
+    GetCommentsUseCase,
+    UpdateCommentUseCase,
+    DeleteCommentUseCase,
     ToggleReactionUseCase,
     GetReactionSummaryBatchUseCase,
     {

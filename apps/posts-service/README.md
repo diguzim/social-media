@@ -60,6 +60,24 @@ The service handles RPC messages from the API Gateway:
   - Input: `{ targetIds: [postIds], targetType: 'post', userId? }`
   - Output: `{ summaries: [{ targetId, reactionType, count, reactedByCurrentUser? }] }`
   - Returns: Like counts and user's like status for multiple posts (N+1 prevention)
+
+- `COMMENT_COMMANDS.createComment` - Create a comment in a post
+  - Input: `{ postId, authorId, content }`
+  - Output: `{ id, postId, authorId, content, createdAt, updatedAt? }`
+
+- `COMMENT_COMMANDS.getComments` - List comments for a post
+  - Input: `{ postId, page?, limit?, sortOrder? }`
+  - Output: `{ data: [comments], total, page, limit, totalPages }`
+
+- `COMMENT_COMMANDS.updateComment` - Update a comment
+  - Input: `{ postId, commentId, authorId, content }`
+  - Output: `{ id, postId, authorId, content, createdAt, updatedAt? }`
+  - Requires: authorId must match comment owner
+
+- `COMMENT_COMMANDS.deleteComment` - Delete a comment
+  - Input: `{ postId, commentId, authorId }`
+  - Output: `{ success: true }`
+  - Requires: authorId must match comment owner
 ## Use Cases
 
 ### CreatePostUseCase
@@ -213,6 +231,7 @@ curl -X DELETE http://localhost:4000/posts/1 \
 - **Filtering**: Filter by author ID
 - **Sorting**: Sort by creation date or title in ascending/descending order
 - **Ownership Verification**: Only post authors can edit or delete
+- **Comment Ownership Verification**: Only comment authors can edit or delete comments
 - **Correlation Tracking**: Request correlation IDs for tracing
 - **Structured Logging**: Pino logger with request context
 

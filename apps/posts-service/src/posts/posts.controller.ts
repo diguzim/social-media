@@ -5,9 +5,17 @@ import { GetPostUseCase } from "src/core/application/posts/get-post.use-case";
 import { GetPostsUseCase } from "src/core/application/posts/get-posts.use-case";
 import { UpdatePostUseCase } from "src/core/application/posts/update-post.use-case";
 import { DeletePostUseCase } from "src/core/application/posts/delete-post.use-case";
+import { CreateCommentUseCase } from "src/core/application/comments/create-comment.use-case";
+import { GetCommentsUseCase } from "src/core/application/comments/get-comments.use-case";
+import { UpdateCommentUseCase } from "src/core/application/comments/update-comment.use-case";
+import { DeleteCommentUseCase } from "src/core/application/comments/delete-comment.use-case";
 import { ToggleReactionUseCase } from "src/core/application/reactions/toggle-reaction.use-case";
 import { GetReactionSummaryBatchUseCase } from "src/core/application/reactions/get-reaction-summary-batch.use-case";
-import { POST_COMMANDS, REACTION_COMMANDS } from "@repo/contracts";
+import {
+  COMMENT_COMMANDS,
+  POST_COMMANDS,
+  REACTION_COMMANDS,
+} from "@repo/contracts";
 import type { RPC } from "@repo/contracts";
 
 @Controller()
@@ -20,6 +28,10 @@ export class PostsController {
     private getPostsUseCase: GetPostsUseCase,
     private updatePostUseCase: UpdatePostUseCase,
     private deletePostUseCase: DeletePostUseCase,
+    private createCommentUseCase: CreateCommentUseCase,
+    private getCommentsUseCase: GetCommentsUseCase,
+    private updateCommentUseCase: UpdateCommentUseCase,
+    private deleteCommentUseCase: DeleteCommentUseCase,
     private toggleReactionUseCase: ToggleReactionUseCase,
     private getReactionSummaryBatchUseCase: GetReactionSummaryBatchUseCase,
   ) {}
@@ -120,6 +132,106 @@ export class PostsController {
 
     await this.deletePostUseCase.execute({
       postId: request.postId,
+      authorId: request.authorId,
+    });
+
+    return {
+      success: true,
+    };
+  }
+
+  @MessagePattern({ cmd: COMMENT_COMMANDS.createComment })
+  async handleCreateComment(
+    request: RPC.CreateCommentRequest,
+  ): Promise<RPC.CreateCommentReply> {
+    this.logger.debug(
+      "Posts service: handling create comment command",
+      request,
+    );
+
+    const comment = await this.createCommentUseCase.execute({
+      postId: request.postId,
+      authorId: request.authorId,
+      content: request.content,
+    });
+
+    return {
+      id: comment.id,
+      postId: comment.postId,
+      authorId: comment.authorId,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt?.toISOString(),
+    };
+  }
+
+  @MessagePattern({ cmd: COMMENT_COMMANDS.getComments })
+  async handleGetComments(
+    request: RPC.GetCommentsRequest,
+  ): Promise<RPC.GetCommentsReply> {
+    this.logger.debug("Posts service: handling get comments command", request);
+
+    const result = await this.getCommentsUseCase.execute({
+      postId: request.postId,
+      page: request.page,
+      limit: request.limit,
+      sortOrder: request.sortOrder,
+    });
+
+    return {
+      data: result.data.map((comment) => ({
+        id: comment.id,
+        postId: comment.postId,
+        authorId: comment.authorId,
+        content: comment.content,
+        createdAt: comment.createdAt.toISOString(),
+        updatedAt: comment.updatedAt?.toISOString(),
+      })),
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
+    };
+  }
+
+  @MessagePattern({ cmd: COMMENT_COMMANDS.updateComment })
+  async handleUpdateComment(
+    request: RPC.UpdateCommentRequest,
+  ): Promise<RPC.UpdateCommentReply> {
+    this.logger.debug(
+      "Posts service: handling update comment command",
+      request,
+    );
+
+    const comment = await this.updateCommentUseCase.execute({
+      postId: request.postId,
+      commentId: request.commentId,
+      authorId: request.authorId,
+      content: request.content,
+    });
+
+    return {
+      id: comment.id,
+      postId: comment.postId,
+      authorId: comment.authorId,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt?.toISOString(),
+    };
+  }
+
+  @MessagePattern({ cmd: COMMENT_COMMANDS.deleteComment })
+  async handleDeleteComment(
+    request: RPC.DeleteCommentRequest,
+  ): Promise<RPC.DeleteCommentReply> {
+    this.logger.debug(
+      "Posts service: handling delete comment command",
+      request,
+    );
+
+    await this.deleteCommentUseCase.execute({
+      postId: request.postId,
+      commentId: request.commentId,
       authorId: request.authorId,
     });
 

@@ -1,4 +1,5 @@
 import type {
+  Comment,
   GetPostsRequest,
   GetPostsResponse,
   GetFeedRequest,
@@ -6,6 +7,13 @@ import type {
   FeedPost as ApiFeedPost,
   CreatePostRequest,
   CreatePostResponse,
+  CreateCommentRequest,
+  CreateCommentResponse,
+  GetCommentsRequest,
+  GetCommentsResponse,
+  UpdateCommentRequest,
+  UpdateCommentResponse,
+  DeleteCommentResponse,
   ToggleReactionRequest,
   ToggleReactionResponse,
 } from '@repo/contracts/api';
@@ -14,6 +22,7 @@ const API_BASE_URL = 'http://localhost:4000';
 
 // FeedPost from /feed endpoint includes author and reactions
 export type FeedPost = ApiFeedPost;
+export type PostComment = Comment;
 
 export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
   const query = new URLSearchParams();
@@ -107,6 +116,109 @@ export async function togglePostReaction(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to toggle reaction');
+  }
+
+  return response.json();
+}
+
+export async function getPostComments(
+  postId: string,
+  params: GetCommentsRequest = {}
+): Promise<GetCommentsResponse> {
+  const query = new URLSearchParams();
+
+  if (params.page !== undefined) query.set('page', String(params.page));
+  if (params.limit !== undefined) query.set('limit', String(params.limit));
+  if (params.sortOrder) query.set('sortOrder', params.sortOrder);
+
+  const endpoint = `${API_BASE_URL}/posts/${postId}/comments${query.toString() ? `?${query.toString()}` : ''}`;
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch comments');
+  }
+
+  return response.json();
+}
+
+export async function createPostComment(
+  postId: string,
+  data: CreateCommentRequest
+): Promise<CreateCommentResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create comment');
+  }
+
+  return response.json();
+}
+
+export async function updatePostComment(
+  postId: string,
+  commentId: string,
+  data: UpdateCommentRequest
+): Promise<UpdateCommentResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments/${commentId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update comment');
+  }
+
+  return response.json();
+}
+
+export async function deletePostComment(
+  postId: string,
+  commentId: string
+): Promise<DeleteCommentResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to delete comment');
   }
 
   return response.json();

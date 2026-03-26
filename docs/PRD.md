@@ -49,7 +49,7 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 | PostgreSQL persistence  | High     | Replace in-memory repos in auth + posts services |
 | MongoDB persistence     | High     | Explore NoSQL fit for posts                      |
 | Like / reaction system  | Medium   | Event-driven via event-handler-service           |
-| Comments                | Medium   | New microservice                                 |
+| Comments                | Medium   | Flat comments CRUD in posts-service (initial)    |
 | Follow / unfollow users | Medium   | Graph-like data                                  |
 | Notifications           | Low      | WebSocket or polling                             |
 | Media uploads           | Low      | S3 or local storage                              |

@@ -16,7 +16,11 @@ import { ClientProxy } from '@nestjs/microservices';
 import { POSTS_SERVICE } from './posts.client';
 import { FeedService } from './feed.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { POST_COMMANDS, REACTION_COMMANDS } from '@repo/contracts';
+import {
+  COMMENT_COMMANDS,
+  POST_COMMANDS,
+  REACTION_COMMANDS,
+} from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
 import type { API, RPC } from '@repo/contracts';
 import { firstValueFrom } from 'rxjs';
@@ -248,6 +252,148 @@ export class PostsController {
       reactionType: rpcReply.reactionType,
       targetType: rpcReply.targetType,
       isAdded: rpcReply.isAdded,
+    };
+  }
+
+  @Post(':id/comments')
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @Param('id') id: string,
+    @Body() payload: API.CreateCommentRequest,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.CreateCommentResponse> {
+    this.logger.debug(
+      'API Gateway: forwarding create comment to posts service',
+    );
+
+    const rpcRequest: RPC.CreateCommentRequest = {
+      postId: id,
+      authorId: req.user.userId,
+      content: payload.content,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.postsClient.send<RPC.CreateCommentReply, RPC.CreateCommentRequest>(
+        { cmd: COMMENT_COMMANDS.createComment },
+        rpcRequest,
+      ),
+    );
+
+    return {
+      id: rpcReply.id,
+      postId: rpcReply.postId,
+      authorId: rpcReply.authorId,
+      content: rpcReply.content,
+      createdAt: rpcReply.createdAt,
+      updatedAt: rpcReply.updatedAt,
+    };
+  }
+
+  @Get(':id/comments')
+  async getComments(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+  ): Promise<API.GetCommentsResponse> {
+    this.logger.debug('API Gateway: forwarding get comments to posts service');
+
+    const rpcRequest: RPC.GetCommentsRequest = {
+      postId: id,
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      sortOrder,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.postsClient.send<RPC.GetCommentsReply, RPC.GetCommentsRequest>(
+        { cmd: COMMENT_COMMANDS.getComments },
+        rpcRequest,
+      ),
+    );
+
+    return {
+      data: rpcReply.data.map((comment) => ({
+        id: comment.id,
+        postId: comment.postId,
+        authorId: comment.authorId,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+      })),
+      total: rpcReply.total,
+      page: rpcReply.page,
+      limit: rpcReply.limit,
+      totalPages: rpcReply.totalPages,
+    };
+  }
+
+  @Patch(':postId/comments/:commentId')
+  @UseGuards(JwtAuthGuard)
+  async updateComment(
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+    @Body() payload: API.UpdateCommentRequest,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.UpdateCommentResponse> {
+    this.logger.debug(
+      'API Gateway: forwarding update comment to posts service',
+    );
+
+    const rpcRequest: RPC.UpdateCommentRequest = {
+      postId,
+      commentId,
+      authorId: req.user.userId,
+      content: payload.content,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.postsClient.send<RPC.UpdateCommentReply, RPC.UpdateCommentRequest>(
+        { cmd: COMMENT_COMMANDS.updateComment },
+        rpcRequest,
+      ),
+    );
+
+    return {
+      id: rpcReply.id,
+      postId: rpcReply.postId,
+      authorId: rpcReply.authorId,
+      content: rpcReply.content,
+      createdAt: rpcReply.createdAt,
+      updatedAt: rpcReply.updatedAt,
+    };
+  }
+
+  @Delete(':postId/comments/:commentId')
+  @UseGuards(JwtAuthGuard)
+  async deleteComment(
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.DeleteCommentResponse> {
+    this.logger.debug(
+      'API Gateway: forwarding delete comment to posts service',
+    );
+
+    const rpcRequest: RPC.DeleteCommentRequest = {
+      postId,
+      commentId,
+      authorId: req.user.userId,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.postsClient.send<RPC.DeleteCommentReply, RPC.DeleteCommentRequest>(
+        { cmd: COMMENT_COMMANDS.deleteComment },
+        rpcRequest,
+      ),
+    );
+
+    return {
+      success: rpcReply.success,
     };
   }
 }

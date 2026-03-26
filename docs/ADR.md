@@ -146,3 +146,33 @@ Use **Option 3: token store with timestamp**.
 ✅ `emailVerifiedAt` provides an audit timestamp, not just a flag  
 ⚠️ Each resend creates a new token row — old tokens remain in the store until expiry  
 ⚠️ Dedicated resend event (`user.emailVerificationRequested`) adds one more routing key/handler path to maintain
+
+---
+
+## ADR-006: Comments in Posts-Service (Initial Scope)
+
+**Date:** 2026-03  
+**Status:** Accepted
+
+### Context
+
+The roadmap listed comments as a future standalone microservice. For initial delivery speed and simpler integration with existing feed/post ownership flows, the team needed an incremental implementation path.
+
+### Decision
+
+Implement comments **inside `posts-service`** first, with a flat model and full CRUD:
+
+- create/list/update/delete comments for posts
+- ownership checks for update/delete
+- API Gateway exposes HTTP endpoints and translates to RPC comment commands
+- frontend renders comments in Home and My Posts through shared PostCard UI
+
+Threading/replies are out of scope for this phase.
+
+### Consequences
+
+✅ Faster delivery using existing infra, auth guards, and RPC plumbing  
+✅ Reuses posts domain boundaries and ownership enforcement patterns  
+✅ Keeps migration path open to split comments into a dedicated service later  
+⚠️ `posts-service` grows in scope and may need extraction as complexity increases  
+⚠️ Future split will require contract and data-migration planning

@@ -64,6 +64,27 @@ API Gateway (Port 4000)
   - Guards: **JwtAuthGuard** + ownership verification
   - Returns: `{ success: true }`
 
+- `POST /posts/:id/comments` - Create a comment in a post
+  - Body: `{ content }`
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ id, postId, authorId, content, createdAt, updatedAt? }`
+
+- `GET /posts/:id/comments` - List comments for a post
+  - Query params: `?page=1&limit=20&sortOrder=asc`
+  - Returns: `{ data: [comments], total, page, limit, totalPages }`
+
+- `PATCH /posts/:postId/comments/:commentId` - Update own comment
+  - Body: `{ content }`
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard** + ownership verification
+  - Returns: `{ id, postId, authorId, content, createdAt, updatedAt? }`
+
+- `DELETE /posts/:postId/comments/:commentId` - Delete own comment
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard** + ownership verification
+  - Returns: `{ success: true }`
+
 ## Configuration
 
 Environment variables (see `.env.example`):

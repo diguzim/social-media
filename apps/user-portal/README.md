@@ -14,6 +14,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Progressive loading UX with persistent shell + Home page islands
 - Loading states and error handling
 - Like/unlike posts with optimistic updates and reaction counts
+- Flat comments CRUD directly on post cards (create, list, edit own, delete own)
 - Storybook for visual component validation and loading state scenarios
 - Pluggable frontend state architecture via state contracts (interfaces + injectable presenters)
 
@@ -86,6 +87,10 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - GET /posts?page=1&limit=10&sortOrder=desc
 - GET /posts/feed (feed with author enrichment + like counts)
 - POST /posts/:id/reactions (like/unlike a post)
+- GET /posts/:id/comments (list comments for a post)
+- POST /posts/:id/comments (create comment)
+- PATCH /posts/:postId/comments/:commentId (update own comment)
+- DELETE /posts/:postId/comments/:commentId (delete own comment)
 - POST /users/email-verification/confirm (public — confirms token from email link)
 - POST /users/email-verification/request (requires auth — resend verification email)
 ```
