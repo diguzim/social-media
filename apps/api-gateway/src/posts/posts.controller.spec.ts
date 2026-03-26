@@ -5,6 +5,8 @@ import { PostsController } from './posts.controller';
 import { FeedService } from './feed.service';
 import { POSTS_SERVICE } from './posts.client';
 import type { API } from '@repo/contracts';
+import { COMMENT_COMMANDS } from '@repo/contracts';
+import { of } from 'rxjs';
 
 const mockFeedService = {
   getFeed: jest.fn(),
@@ -77,5 +79,138 @@ describe('PostsController – GET /posts/feed', () => {
 
     expect(result.data[0]?.author).toEqual({ id: 'u1', name: 'Alice' });
     expect(result.data[0]?.authorId).toBe('u1');
+  });
+});
+
+describe('PostsController – comments endpoints', () => {
+  let controller: PostsController;
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [PostsController],
+      providers: [
+        { provide: POSTS_SERVICE, useValue: mockPostsClient },
+        { provide: FeedService, useValue: mockFeedService },
+      ],
+    }).compile();
+
+    controller = module.get<PostsController>(PostsController);
+  });
+
+  it('forwards create comment to posts service and maps reply', async () => {
+    const rpcReply = {
+      id: 'comment-1',
+      postId: 'post-1',
+      authorId: 'user-1',
+      content: 'Nice post',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: null,
+    };
+
+    mockPostsClient.send.mockReturnValue(of(rpcReply));
+
+    const result = await controller.createComment(
+      'post-1',
+      { content: 'Nice post' },
+      { user: { userId: 'user-1' } },
+    );
+
+    expect(mockPostsClient.send).toHaveBeenCalledWith(
+      { cmd: COMMENT_COMMANDS.createComment },
+      {
+        postId: 'post-1',
+        authorId: 'user-1',
+        content: 'Nice post',
+        correlationId: undefined,
+      },
+    );
+    expect(result).toEqual(rpcReply);
+  });
+
+  it('forwards get comments query to posts service and maps pagination', async () => {
+    const rpcReply = {
+      data: [
+        {
+          id: 'comment-1',
+          postId: 'post-2',
+          authorId: 'user-2',
+          content: 'First',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: null,
+        },
+      ],
+      total: 1,
+      page: 2,
+      limit: 5,
+      totalPages: 1,
+    };
+
+    mockPostsClient.send.mockReturnValue(of(rpcReply));
+
+    const result = await controller.getComments('post-2', '2', '5', 'asc');
+
+    expect(mockPostsClient.send).toHaveBeenCalledWith(
+      { cmd: COMMENT_COMMANDS.getComments },
+      {
+        postId: 'post-2',
+        page: 2,
+        limit: 5,
+        sortOrder: 'asc',
+        correlationId: undefined,
+      },
+    );
+    expect(result).toEqual(rpcReply);
+  });
+
+  it('forwards update comment to posts service and maps reply', async () => {
+    const rpcReply = {
+      id: 'comment-2',
+      postId: 'post-3',
+      authorId: 'user-3',
+      content: 'Updated content',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T01:00:00.000Z',
+    };
+
+    mockPostsClient.send.mockReturnValue(of(rpcReply));
+
+    const result = await controller.updateComment(
+      'post-3',
+      'comment-2',
+      { content: 'Updated content' },
+      { user: { userId: 'user-3' } },
+    );
+
+    expect(mockPostsClient.send).toHaveBeenCalledWith(
+      { cmd: COMMENT_COMMANDS.updateComment },
+      {
+        postId: 'post-3',
+        commentId: 'comment-2',
+        authorId: 'user-3',
+        content: 'Updated content',
+        correlationId: undefined,
+      },
+    );
+    expect(result).toEqual(rpcReply);
+  });
+
+  it('forwards delete comment to posts service and maps success response', async () => {
+    mockPostsClient.send.mockReturnValue(of({ success: true }));
+
+    const result = await controller.deleteComment('post-4', 'comment-4', {
+      user: { userId: 'user-4' },
+    });
+
+    expect(mockPostsClient.send).toHaveBeenCalledWith(
+      { cmd: COMMENT_COMMANDS.deleteComment },
+      {
+        postId: 'post-4',
+        commentId: 'comment-4',
+        authorId: 'user-4',
+        correlationId: undefined,
+      },
+    );
+    expect(result).toEqual({ success: true });
   });
 });

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactElement } from 'react';
 import type { ToggleReactionResponse } from '@repo/contracts/api';
@@ -8,6 +8,10 @@ import * as postsService from '../../services/posts';
 
 vi.mock('../../services/posts', () => ({
   togglePostReaction: vi.fn(),
+  getPostComments: vi.fn(),
+  createPostComment: vi.fn(),
+  updatePostComment: vi.fn(),
+  deletePostComment: vi.fn(),
 }));
 
 function renderWithRouter(ui: ReactElement) {
@@ -15,6 +19,27 @@ function renderWithRouter(ui: ReactElement) {
 }
 
 describe('PostCard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        id: 'user-1',
+        name: 'Alice',
+        username: 'alice',
+        email: 'alice@example.com',
+      })
+    );
+
+    vi.mocked(postsService.getPostComments).mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      limit: 50,
+      totalPages: 1,
+    });
+  });
+
   it('renders post content and metadata', () => {
     renderWithRouter(
       <PostCard
@@ -217,6 +242,216 @@ describe('PostCard', () => {
 
       await waitFor(() => {
         expect(onReactionChange).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
+  describe('Comments', () => {
+    it('loads comments when opening comments section', async () => {
+      vi.mocked(postsService.getPostComments).mockResolvedValue({
+        data: [
+          {
+            id: 'comment-1',
+            postId: 'post-comments-1',
+            authorId: 'user-2',
+            content: 'Great post!',
+            createdAt: '2026-03-07T10:00:00.000Z',
+            updatedAt: null,
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 50,
+        totalPages: 1,
+      });
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-comments-1',
+            title: 'Post with comments',
+            content: 'Content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('comments-open-post-comments-1'));
+
+      await waitFor(() => {
+        expect(postsService.getPostComments).toHaveBeenCalledWith('post-comments-1', {
+          page: 1,
+          limit: 50,
+          sortOrder: 'asc',
+        });
+      });
+
+      expect(screen.getByTestId('comments-list-post-comments-1')).toHaveTextContent('Great post!');
+    });
+
+    it('creates a new comment and reloads comments list', async () => {
+      vi.mocked(postsService.createPostComment).mockResolvedValue({
+        id: 'comment-2',
+        postId: 'post-comments-2',
+        authorId: 'user-1',
+        content: 'My comment',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        updatedAt: null,
+      });
+
+      vi.mocked(postsService.getPostComments)
+        .mockResolvedValueOnce({
+          data: [],
+          total: 0,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+        })
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 'comment-2',
+              postId: 'post-comments-2',
+              authorId: 'user-1',
+              content: 'My comment',
+              createdAt: '2026-03-07T10:00:00.000Z',
+              updatedAt: null,
+            },
+          ],
+          total: 1,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+        });
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-comments-2',
+            title: 'Post with create comment',
+            content: 'Content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('comments-open-post-comments-2'));
+      fireEvent.change(screen.getByTestId('comment-input-post-comments-2'), {
+        target: { value: 'My comment' },
+      });
+      fireEvent.click(screen.getByTestId('comment-submit-post-comments-2'));
+
+      await waitFor(() => {
+        expect(postsService.createPostComment).toHaveBeenCalledWith('post-comments-2', {
+          content: 'My comment',
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comments-list-post-comments-2')).toHaveTextContent('My comment');
+      });
+    });
+
+    it('updates and deletes own comment', async () => {
+      vi.mocked(postsService.updatePostComment).mockResolvedValue({
+        id: 'comment-owner',
+        postId: 'post-comments-3',
+        authorId: 'user-1',
+        content: 'Edited by owner',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        updatedAt: '2026-03-07T11:00:00.000Z',
+      });
+      vi.mocked(postsService.deletePostComment).mockResolvedValue({ success: true });
+
+      vi.mocked(postsService.getPostComments)
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 'comment-owner',
+              postId: 'post-comments-3',
+              authorId: 'user-1',
+              content: 'Original owner comment',
+              createdAt: '2026-03-07T10:00:00.000Z',
+              updatedAt: null,
+            },
+          ],
+          total: 1,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+        })
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 'comment-owner',
+              postId: 'post-comments-3',
+              authorId: 'user-1',
+              content: 'Edited by owner',
+              createdAt: '2026-03-07T10:00:00.000Z',
+              updatedAt: '2026-03-07T11:00:00.000Z',
+            },
+          ],
+          total: 1,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+        })
+        .mockResolvedValueOnce({
+          data: [],
+          total: 0,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+        });
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-comments-3',
+            title: 'Post with owner comment actions',
+            content: 'Content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('comments-open-post-comments-3'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Original owner comment')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('comment-edit-post-comments-3-comment-owner'));
+      fireEvent.change(screen.getByTestId('comment-edit-input-post-comments-3-comment-owner'), {
+        target: { value: 'Edited by owner' },
+      });
+      fireEvent.click(screen.getByTestId('comment-edit-save-post-comments-3-comment-owner'));
+
+      await waitFor(() => {
+        expect(postsService.updatePostComment).toHaveBeenCalledWith(
+          'post-comments-3',
+          'comment-owner',
+          { content: 'Edited by owner' }
+        );
+      });
+
+      fireEvent.click(screen.getByTestId('comment-delete-post-comments-3-comment-owner'));
+
+      await waitFor(() => {
+        expect(postsService.deletePostComment).toHaveBeenCalledWith(
+          'post-comments-3',
+          'comment-owner'
+        );
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comments-empty-post-comments-3')).toBeInTheDocument();
       });
     });
   });

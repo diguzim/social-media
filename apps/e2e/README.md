@@ -22,6 +22,11 @@ cypress/
       login.cy.ts         # User login flow
       home.cy.ts          # Home page and profile/feed view
       verify-email.cy.ts  # Email verification page flow
+    posts/
+      feed.cy.ts          # Feed API enrichment and pagination checks
+      create-post.cy.ts   # Create post UI flow on Home/My Posts
+      reactions.cy.ts     # Post like toggle API behavior
+      comments.cy.ts      # Post comments CRUD on Home and My Posts
   support/
     commands.ts           # Custom Cypress commands
     e2e.ts               # Global hooks and setup
@@ -215,6 +220,13 @@ Currently covers:
 - **Login**: Valid/invalid credentials, redirect, token storage
 - **Home**: Profile fetch, data display, logout, navigation
 - **Verify Email**: Token confirmation call, single-request guard, missing-token error state
+
+### Posts
+
+- **Feed**: Enriched author data, pagination, and filter behavior
+- **Create Post**: Form validation, submit UX, and visibility in Home/My Posts
+- **Reactions**: Toggle like flow and feed reaction summaries
+- **Comments**: Create/edit/delete own comments and ownership restrictions across Home/My Posts
 
 ## Best Practices
 
