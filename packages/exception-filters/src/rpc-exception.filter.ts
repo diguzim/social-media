@@ -27,24 +27,42 @@ export class RpcExceptionFilter implements ExceptionFilter {
     // Handle RpcException from microservices
     // The error payload is nested in the exception
     let errorPayload = null;
+    const httpExceptionPayload =
+      typeof exception?.getResponse === "function"
+        ? exception.getResponse()
+        : null;
 
     if (exception instanceof RpcException) {
       errorPayload = exception.getError();
+    } else if (httpExceptionPayload) {
+      errorPayload = httpExceptionPayload;
     } else if (exception?.error) {
       errorPayload = exception.error;
     } else {
       errorPayload = exception;
     }
 
+    const normalizedPayload =
+      typeof errorPayload === "string"
+        ? {
+            message: errorPayload,
+            statusCode: exception?.getStatus?.() || exception?.status,
+          }
+        : errorPayload;
+
     // Extract status code and message from the error payload
     const statusCode =
-      errorPayload?.statusCode ||
-      errorPayload?.status ||
+      normalizedPayload?.statusCode ||
+      normalizedPayload?.status ||
       exception?.status ||
       HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
-      errorPayload?.message || exception?.message || "Internal server error";
+      normalizedPayload?.message ||
+      exception?.message ||
+      "Internal server error";
+
+    const errorName = normalizedPayload?.error || this.getErrorName(statusCode);
 
     // Ensure statusCode is numeric
     const numericStatus =
@@ -55,7 +73,7 @@ export class RpcExceptionFilter implements ExceptionFilter {
     response.status(numericStatus).json({
       statusCode: numericStatus,
       message,
-      error: this.getErrorName(numericStatus),
+      error: errorName,
     });
   }
 

@@ -84,6 +84,7 @@ POSTS_SERVICE_PORT=4002
 
 - **CORS**: Enabled for `http://localhost:3000` (frontend)
 - **JWT Authentication**: Authorization header validation via JwtAuthGuard
+- **Request Validation**: Global `ValidationPipe` with DTO classes on users endpoints (`whitelist`, `forbidNonWhitelisted`, `forbidUnknownValues`)
 - **Exception Handling**: AllExceptionsFilter for serializing microservice errors
 - **Request Logging**: Correlation ID tracking and request duration
 - **RPC Routing**: @nestjs/microservices ClientProxy pattern

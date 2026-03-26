@@ -16,6 +16,10 @@ import { AUTH_COMMANDS } from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
 import type { API, RPC } from '@repo/contracts';
 import { firstValueFrom } from 'rxjs';
+import { RegisterBodyDto } from './dto/register-body.dto';
+import { LoginBodyDto } from './dto/login-body.dto';
+import { UserIdParamDto } from './dto/user-id-param.dto';
+import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
 
 @Controller('users')
 export class UsersController {
@@ -25,7 +29,7 @@ export class UsersController {
 
   @Post()
   async createUser(
-    @Body() user: API.RegisterRequest,
+    @Body() user: RegisterBodyDto,
   ): Promise<API.RegisterResponse> {
     this.logger.debug(
       'API Gateway: forwarding user registration to auth service',
@@ -56,7 +60,7 @@ export class UsersController {
   }
 
   @Post('login')
-  async login(@Body() payload: API.LoginRequest): Promise<API.LoginResponse> {
+  async login(@Body() payload: LoginBodyDto): Promise<API.LoginResponse> {
     this.logger.debug('API Gateway: forwarding login to auth service', payload);
 
     // Transform API request to RPC request
@@ -118,8 +122,10 @@ export class UsersController {
   @Get(':userId/profile')
   @UseGuards(JwtAuthGuard)
   async getPublicProfile(
-    @Param('userId') userId: string,
+    @Param() params: UserIdParamDto,
   ): Promise<API.GetPublicProfileResponse> {
+    const { userId } = params;
+
     this.logger.debug(
       'API Gateway: forwarding getPublicProfile to auth service',
       { userId },
@@ -151,7 +157,7 @@ export class UsersController {
    */
   @Post('email-verification/confirm')
   async confirmEmailVerification(
-    @Body() body: API.ConfirmEmailVerificationRequest,
+    @Body() body: ConfirmEmailVerificationBodyDto,
   ): Promise<API.ConfirmEmailVerificationResponse> {
     this.logger.debug('API Gateway: confirming email verification');
 
