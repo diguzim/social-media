@@ -244,20 +244,21 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
         {!isCommentsVisible ? null : (
           <>
-            <div className="mb-3 flex gap-2">
-              <input
+            <div className="mb-3 flex items-start gap-2">
+              <textarea
                 data-testid={`comment-input-${post.id}`}
                 value={newCommentContent}
                 onChange={(event) => setNewCommentContent(event.target.value)}
                 placeholder="Write a comment..."
-                className="input-field min-h-[40px]"
+                rows={3}
+                className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100"
                 disabled={isCommentCreating}
               />
               <PendingButton
                 data-testid={`comment-submit-${post.id}`}
                 onClick={handleCreateComment}
                 disabled={isCommentCreating || !newCommentContent.trim()}
-                className="btn-primary px-3 py-2 text-sm"
+                className="btn-primary self-start rounded-full px-4 py-2 text-sm font-semibold shadow-sm"
                 isPending={isCommentCreating}
                 idleText="Comment"
                 pendingText="..."
@@ -298,11 +299,12 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
                       {isEditing ? (
                         <>
-                          <input
+                          <textarea
                             data-testid={`comment-edit-input-${post.id}-${comment.id}`}
                             value={editingCommentContent}
                             onChange={(event) => setEditingCommentContent(event.target.value)}
-                            className="input-field min-h-[36px]"
+                            rows={3}
+                            className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100"
                             disabled={isMutating}
                           />
                           <div className="mt-2 flex gap-2">
