@@ -13,6 +13,10 @@ import {
 export class InMemoryCommentRepository implements CommentRepository {
   private comments: Comment[] = [];
 
+  constructor() {
+    this.seedComments();
+  }
+
   // eslint-disable-next-line @typescript-eslint/require-await
   async create(createCommentData: CreateCommentData): Promise<Comment> {
     const comment = new Comment({
@@ -103,5 +107,93 @@ export class InMemoryCommentRepository implements CommentRepository {
     }
 
     this.comments.splice(index, 1);
+  }
+
+  private seedComments(): void {
+    const seedData = [
+      {
+        id: "1",
+        postId: "1",
+        authorId: "2",
+        content: "Great introduction. I use TypeScript daily.",
+        createdAt: new Date("2025-02-01T10:00:00"),
+      },
+      {
+        id: "2",
+        postId: "1",
+        authorId: "3",
+        content: "Nice tips, especially around strict mode.",
+        createdAt: new Date("2025-02-01T10:05:00"),
+      },
+      {
+        id: "3",
+        postId: "6",
+        authorId: "1",
+        content: "Clean code examples here are solid.",
+        createdAt: new Date("2025-02-01T11:10:00"),
+      },
+      {
+        id: "4",
+        postId: "10",
+        authorId: "4",
+        content: "This monitoring post aged very well.",
+        createdAt: new Date("2025-02-01T12:30:00"),
+      },
+      {
+        id: "5",
+        postId: "23",
+        authorId: "1",
+        content: "Comment on post with unknown author for fallback testing.",
+        createdAt: new Date("2025-02-01T13:15:00"),
+      },
+      {
+        id: "6",
+        postId: "2",
+        authorId: "5",
+        content: "Async/await still wins for readability.",
+        createdAt: new Date("2025-02-01T14:20:00"),
+      },
+      // Comment referencing a post that does not exist.
+      // Useful for edge-case tests where linked resources are missing.
+      {
+        id: "7",
+        postId: "9999",
+        authorId: "2",
+        content: "Ghost thread comment used in missing-resource scenarios.",
+        createdAt: new Date("2025-02-01T15:00:00"),
+      },
+    ];
+
+    this.mergeSeedComments(seedData);
+  }
+
+  private mergeSeedComments(
+    seedData: Array<{
+      id: string;
+      postId: string;
+      authorId: string;
+      content: string;
+      createdAt: Date;
+    }>,
+  ): void {
+    seedData.forEach((data) => {
+      const alreadyExists = this.comments.some(
+        (comment) => comment.id === data.id,
+      );
+
+      if (alreadyExists) {
+        return;
+      }
+
+      this.comments.push(
+        new Comment({
+          id: data.id,
+          postId: data.postId,
+          authorId: data.authorId,
+          content: data.content,
+          createdAt: data.createdAt,
+        }),
+      );
+    });
   }
 }

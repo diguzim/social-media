@@ -11,6 +11,10 @@ import {
 export class InMemoryReactionRepository implements ReactionRepository {
   private reactions: Reaction[] = [];
 
+  constructor() {
+    this.seedReactions();
+  }
+
   // eslint-disable-next-line @typescript-eslint/require-await
   async create(createReactionData: CreateReactionData): Promise<Reaction> {
     const reaction = new Reaction({
@@ -96,6 +100,118 @@ export class InMemoryReactionRepository implements ReactionRepository {
         count,
         reactedByCurrentUser: userReacted,
       };
+    });
+  }
+
+  private seedReactions(): void {
+    const seedData = [
+      {
+        id: "1",
+        userId: "1",
+        targetId: "1",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T10:20:00"),
+      },
+      {
+        id: "2",
+        userId: "2",
+        targetId: "1",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T10:22:00"),
+      },
+      {
+        id: "3",
+        userId: "3",
+        targetId: "2",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T10:25:00"),
+      },
+      {
+        id: "4",
+        userId: "4",
+        targetId: "6",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T11:35:00"),
+      },
+      {
+        id: "5",
+        userId: "5",
+        targetId: "6",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T11:40:00"),
+      },
+      {
+        id: "6",
+        userId: "1",
+        targetId: "10",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T12:40:00"),
+      },
+      {
+        id: "7",
+        userId: "2",
+        targetId: "23",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T13:20:00"),
+      },
+      {
+        id: "8",
+        userId: "3",
+        targetId: "23",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T13:30:00"),
+      },
+      // Like on a post that does not exist (edge-case seed)
+      {
+        id: "9",
+        userId: "1",
+        targetId: "9999",
+        targetType: "post" as const,
+        reactionType: "like" as const,
+        createdAt: new Date("2025-02-01T15:10:00"),
+      },
+    ];
+
+    this.mergeSeedReactions(seedData);
+  }
+
+  private mergeSeedReactions(
+    seedData: Array<{
+      id: string;
+      userId: string;
+      targetId: string;
+      targetType: "post";
+      reactionType: "like";
+      createdAt: Date;
+    }>,
+  ): void {
+    seedData.forEach((data) => {
+      const alreadyExists = this.reactions.some(
+        (reaction) => reaction.id === data.id,
+      );
+
+      if (alreadyExists) {
+        return;
+      }
+
+      this.reactions.push(
+        new Reaction({
+          id: data.id,
+          userId: data.userId,
+          targetId: data.targetId,
+          targetType: data.targetType,
+          reactionType: data.reactionType,
+          createdAt: data.createdAt,
+        }),
+      );
     });
   }
 }

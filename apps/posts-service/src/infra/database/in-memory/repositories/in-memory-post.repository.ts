@@ -11,7 +11,11 @@ import {
 
 @Injectable()
 export class InMemoryPostRepository implements PostRepository {
-  private posts: Post[] = this.seedPosts();
+  private posts: Post[] = [];
+
+  constructor() {
+    this.seedPosts();
+  }
 
   // eslint-disable-next-line @typescript-eslint/require-await
   async create(createPostData: CreatePostData): Promise<Post> {
@@ -111,7 +115,7 @@ export class InMemoryPostRepository implements PostRepository {
     };
   }
 
-  private seedPosts(): Post[] {
+  private seedPosts(): void {
     const seedData = [
       // Alice's posts (5)
       {
@@ -293,10 +297,36 @@ export class InMemoryPostRepository implements PostRepository {
         authorId: "5",
         createdAt: new Date("2025-01-31T10:00:00"),
       },
+      // Post with author that does not exist in auth-service seed
+      {
+        id: "23",
+        title: "Orphaned Author Post",
+        content:
+          "This post references an author that does not exist to validate feed fallback behavior.",
+        authorId: "999",
+        createdAt: new Date("2025-02-01T09:10:00"),
+      },
     ];
 
-    return seedData.map(
-      (data) =>
+    this.mergeSeedPosts(seedData);
+  }
+
+  private mergeSeedPosts(
+    seedData: Array<{
+      id: string;
+      title: string;
+      content: string;
+      authorId: string;
+      createdAt: Date;
+    }>,
+  ): void {
+    seedData.forEach((data) => {
+      const alreadyExists = this.posts.some((post) => post.id === data.id);
+      if (alreadyExists) {
+        return;
+      }
+
+      this.posts.push(
         new Post({
           id: data.id,
           title: data.title,
@@ -304,6 +334,7 @@ export class InMemoryPostRepository implements PostRepository {
           authorId: data.authorId,
           createdAt: data.createdAt,
         }),
-    );
+      );
+    });
   }
 }

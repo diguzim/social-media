@@ -17,7 +17,7 @@ API Gateway (HTTP)
   ↓ TCP Request
 Posts Service (Port 4002)
   └─→ PostRepository (in-memory storage)
-       └─ Seeded with 22 sample posts
+  └─ Seeded with posts, comments, and reactions for happy-path + edge scenarios
 ```
 
 ## Commands
@@ -172,7 +172,9 @@ Post entity:
 
 Currently uses **in-memory storage** for development:
 
-- Seeded with 22 sample posts on startup
+- Seeded on startup with sample posts, comments, and likes
+- Includes edge cases with references to non-existent resources (for fallback/error scenario testing)
+- Seed merge is non-destructive by ID (if a record already exists, it is kept)
 - Each post has a unique incrementing ID
 - Data persists only during service runtime
 - Ready for PostgreSQL integration
