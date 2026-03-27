@@ -126,6 +126,9 @@ PORT=4003
 RABBITMQ_URL=amqp://guest:guest@localhost:5672
 RABBITMQ_EXCHANGE=social-media.events
 RABBITMQ_USER_REGISTERED_QUEUE=social-media.user-registered
+LOGS_TO_LOKI=true
+LOKI_HOST=http://localhost
+LOKI_PORT=3100
 ```
 
 ## Message Flow

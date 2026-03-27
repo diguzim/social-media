@@ -18,6 +18,26 @@ import {
   getUserId,
 } from '@repo/log-context';
 
+const serviceName = 'api-gateway';
+const environment = process.env.NODE_ENV ?? 'development';
+const logsToLokiEnabled = (process.env.LOGS_TO_LOKI ?? 'true') === 'true';
+const lokiHost = `${process.env.LOKI_HOST ?? 'http://localhost'}:${process.env.LOKI_PORT ?? '3100'}`;
+const lokiTransport = logsToLokiEnabled
+  ? {
+      target: 'pino-loki',
+      options: {
+        host: lokiHost,
+        batching: {
+          interval: 5,
+        },
+        labels: {
+          service: serviceName,
+          environment,
+        },
+      },
+    }
+  : undefined;
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +45,7 @@ import {
     }),
     LoggerModule.forRoot({
       pinoHttp: {
+        transport: lokiTransport,
         customProps: (req, res) => ({
           correlationId: getCorrelationId(),
           userId:
@@ -32,8 +53,8 @@ import {
           requestDurationMs:
             (res as { responseTime?: number }).responseTime ??
             getRequestDurationMs(),
-          service: 'api-gateway',
-          environment: process.env.NODE_ENV ?? 'development',
+          service: serviceName,
+          environment,
         }),
       },
     }),

@@ -34,7 +34,7 @@ We run infrastructure in Docker and keep services local for hot reload.
 
 - PostgreSQL: `localhost:5432` (for future use)
 - Loki: `localhost:3100` (log aggregation)
-- Grafana: `localhost:3001` (visualization, admin/admin)
+- Grafana: `localhost:3002` (visualization, admin/admin)
 - RabbitMQ: `localhost:5672` (message broker)
 
 Start infra:
@@ -159,6 +159,7 @@ Create environment files (per service):
 cp apps/api-gateway/.env.example apps/api-gateway/.env
 cp apps/auth-service/.env.example apps/auth-service/.env
 cp apps/posts-service/.env.example apps/posts-service/.env
+cp apps/event-handler-service/.env.example apps/event-handler-service/.env
 ```
 
 Build all packages/apps:
@@ -179,6 +180,41 @@ Recommended hybrid workflow (infrastructure in Docker, services local):
 docker compose -f docker-compose.infra.yml up -d
 pnpm dev
 ```
+
+## Logging and Observability (Loki + Grafana)
+
+Backend services emit structured logs with Pino and now ship logs directly to Loki via `pino-loki`.
+
+Current pipeline:
+
+```text
+api-gateway/auth-service/posts-service/event-handler-service
+   -> nestjs-pino
+   -> pino-loki transport
+   -> Loki (http://localhost:3100)
+   -> Grafana Explore/Dashboards (http://localhost:3002)
+```
+
+Required environment variables (already present in each service `.env.example`):
+
+```env
+LOGS_TO_LOKI=true
+LOKI_HOST=http://localhost
+LOKI_PORT=3100
+```
+
+Quick usage:
+
+1. Start infra: `docker compose -f docker-compose.infra.yml up -d`
+2. Start services: `pnpm dev`
+3. Open Grafana at `http://localhost:3002` (admin/admin)
+4. Go to Explore and run a query like:
+
+```logql
+{service="api-gateway", environment="development"} | json
+```
+
+Tip: filter by `correlationId` to trace a request across services.
 
 Run a single app:
 

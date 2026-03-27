@@ -131,6 +131,9 @@ JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=1h
 RABBITMQ_URL=amqp://guest:guest@localhost:5672
 RABBITMQ_EXCHANGE=social-media.events
+LOGS_TO_LOKI=true
+LOKI_HOST=http://localhost
+LOKI_PORT=3100
 ```
 
 ## Storage

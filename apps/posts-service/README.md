@@ -140,6 +140,14 @@ When listing posts via `GET /posts`:
 &sortOrder=desc      # Sort order: asc or desc (default: desc)
 ```
 
+Logging environment variables:
+
+```env
+LOGS_TO_LOKI=true
+LOKI_HOST=http://localhost
+LOKI_PORT=3100
+```
+
 Example:
 
 ```

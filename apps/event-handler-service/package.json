@@ -21,15 +21,16 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@repo/events": "workspace:*",
-    "@repo/exception-filters": "workspace:*",
-    "@repo/log-context": "workspace:*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.1.12",
+    "@repo/events": "workspace:*",
+    "@repo/exception-filters": "workspace:*",
+    "@repo/log-context": "workspace:*",
     "amqplib": "^0.10.5",
     "nestjs-pino": "^4.1.0",
+    "pino-loki": "^3.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
