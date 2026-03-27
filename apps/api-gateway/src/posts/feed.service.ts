@@ -25,6 +25,7 @@ export class FeedService {
     limit?: number,
     authorId?: string,
     sortOrder?: 'asc' | 'desc',
+    currentUserId?: string,
   ): Promise<API.GetFeedResponse> {
     this.logger.debug('FeedService: fetching posts from posts-service');
 
@@ -85,6 +86,7 @@ export class FeedService {
     const reactionSummaryRequest: RPC.GetReactionSummaryBatchRequest = {
       targetIds: postIds,
       targetType: 'post',
+      userId: currentUserId,
       correlationId: getCorrelationId(),
     };
 

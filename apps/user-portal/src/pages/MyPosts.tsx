@@ -2,7 +2,7 @@ import { PostCard } from '../components/feed/PostCard';
 import { useMyPostsStateContract } from '../state-contracts/my-posts';
 
 export function MyPosts() {
-  const { state } = useMyPostsStateContract();
+  const { state, actions } = useMyPostsStateContract();
 
   if (state.isLoading) {
     return (
@@ -48,7 +48,13 @@ export function MyPosts() {
       </div>
       <div data-testid="my-posts-list" className="grid gap-3">
         {state.posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={post}
+            onReactionChange={() => {
+              void actions.refresh();
+            }}
+          />
         ))}
       </div>
     </div>

@@ -12,6 +12,13 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
   let jwtToken1: string;
   let jwtToken2: string;
 
+  const getFeedAsUser = (token: string) =>
+    cy.request({
+      method: "GET",
+      url: `${API_BASE_URL}/posts/feed?limit=10`,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
   const createPostAsUser1 = () =>
     cy
       .request({
@@ -96,7 +103,7 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
         body: { reactionType: "like" },
       });
 
-      cy.request(`${API_BASE_URL}/posts/feed?limit=10`).then((res) => {
+      getFeedAsUser(jwtToken1).then((res) => {
         const post = res.body.data.find((p: { id: string }) => p.id === postId);
         expect(post).to.exist;
         expect(post).to.have.property("reactions");
@@ -116,12 +123,25 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
         body: { reactionType: "like" },
       });
 
-      // Current feed endpoint is public; likedByMe is false for user perspective.
+      getFeedAsUser(jwtToken1).then((res) => {
+        const post = res.body.data.find((p: { id: string }) => p.id === postId);
+        expect(post).to.exist;
+        expect(post.reactions.likeCount).to.be.greaterThan(0);
+        expect(post.reactions.likedByMe).to.equal(true);
+      });
+    });
+  });
+
+  it("marks likedByMe=false in feed for a different user", () => {
+    createPostAsUser1().then((postId) => {
       cy.request({
-        method: "GET",
-        url: `${API_BASE_URL}/posts/feed?limit=10`,
-        headers: { Authorization: `Bearer ${jwtToken2}` },
-      }).then((res) => {
+        method: "POST",
+        url: `${API_BASE_URL}/posts/${postId}/reactions`,
+        headers: { Authorization: `Bearer ${jwtToken1}` },
+        body: { reactionType: "like" },
+      });
+
+      getFeedAsUser(jwtToken2).then((res) => {
         const post = res.body.data.find((p: { id: string }) => p.id === postId);
         expect(post).to.exist;
         expect(post.reactions.likeCount).to.be.greaterThan(0);
@@ -178,7 +198,7 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
         );
         // Count includes both likes
         expect(post.reactions.likeCount).to.equal(2);
-        expect(post.reactions.likedByMe).to.equal(false);
+        expect(post.reactions.likedByMe).to.equal(true);
       });
 
       // User 2 also sees likeCount=2.
@@ -191,8 +211,83 @@ describe("POST /posts/:id/reactions (Like Toggle)", () => {
           (p: { id: string }) => p.id === newPostId,
         );
         expect(post.reactions.likeCount).to.equal(2);
-        expect(post.reactions.likedByMe).to.equal(false);
+        expect(post.reactions.likedByMe).to.equal(true);
       });
+    });
+  });
+});
+
+describe("Like UI persistence after refresh", () => {
+  const createPostForAuthenticatedSession = (
+    title: string,
+    content: string,
+  ) => {
+    return cy.window().then((win) => {
+      const token = win.localStorage.getItem("jwtToken");
+      if (!token) {
+        throw new Error("Expected jwtToken in localStorage");
+      }
+
+      return cy
+        .request({
+          method: "POST",
+          url: `${API_BASE_URL}/posts`,
+          headers: { Authorization: `Bearer ${token}` },
+          body: { title, content },
+        })
+        .then((res) => res.body.id as string);
+    });
+  };
+
+  beforeEach(() => {
+    cy.authenticateViaApi({ password: "ReactionRefresh123!" });
+  });
+
+  it("keeps liked state and count after reload on Home", () => {
+    const title = `Fake E2E Home Refresh Like ${faker.lorem.words(3)}`;
+    const content = faker.lorem.paragraph();
+
+    createPostForAuthenticatedSession(title, content).then((postId) => {
+      cy.reload();
+
+      cy.getByTestId(`post-card-${postId}`).should("be.visible");
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Like");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "0");
+
+      cy.getByTestId(`like-button-${postId}`).click();
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Liked");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "1");
+
+      cy.reload();
+
+      cy.getByTestId(`post-card-${postId}`).should("be.visible");
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Liked");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "1");
+    });
+  });
+
+  it("keeps liked state and count after reload on My Posts", () => {
+    const title = `Fake E2E MyPosts Refresh Like ${faker.lorem.words(3)}`;
+    const content = faker.lorem.paragraph();
+
+    createPostForAuthenticatedSession(title, content).then((postId) => {
+      cy.visit("/my-posts");
+      cy.getByTestId("my-posts-page").should("be.visible");
+
+      cy.getByTestId(`post-card-${postId}`).should("be.visible");
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Like");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "0");
+
+      cy.getByTestId(`like-button-${postId}`).click();
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Liked");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "1");
+
+      cy.reload();
+
+      cy.getByTestId("my-posts-page").should("be.visible");
+      cy.getByTestId(`post-card-${postId}`).should("be.visible");
+      cy.getByTestId(`like-button-${postId}`).should("contain.text", "Liked");
+      cy.getByTestId(`like-count-${postId}`).should("contain.text", "1");
     });
   });
 });

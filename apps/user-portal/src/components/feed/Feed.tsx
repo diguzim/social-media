@@ -15,6 +15,7 @@ export function Feed({ refreshKey = 0 }: FeedProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [refreshError, setRefreshError] = useState('');
+  const [reactionRefreshKey, setReactionRefreshKey] = useState(0);
   const hasLoadedOnceRef = useRef(false);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export function Feed({ refreshKey = 0 }: FeedProps) {
     return () => {
       isActive = false;
     };
-  }, [refreshKey]);
+  }, [refreshKey, reactionRefreshKey]);
 
   if (loading && posts.length === 0) {
     return (
@@ -125,7 +126,13 @@ export function Feed({ refreshKey = 0 }: FeedProps) {
 
       <div className="grid gap-3">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={post}
+            onReactionChange={() => {
+              setReactionRefreshKey((current) => current + 1);
+            }}
+          />
         ))}
       </div>
     </section>

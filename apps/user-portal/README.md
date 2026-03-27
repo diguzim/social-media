@@ -85,7 +85,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - GET /users/me (requires Authorization: Bearer {token})
 - GET /users/:userId/profile (requires Authorization: Bearer {token})
 - GET /posts?page=1&limit=10&sortOrder=desc
-- GET /posts/feed (feed with author enrichment + like counts)
+- GET /posts/feed (requires auth; feed with author enrichment + like counts + likedByMe)
 - POST /posts/:id/reactions (like/unlike a post)
 - GET /posts/:id/comments (list comments for a post)
 - POST /posts/:id/comments (create comment)
@@ -260,7 +260,7 @@ The app communicates with the API Gateway which routes requests to microservices
   - `getUserProfile()` - Retrieve cached profile from localStorage
 - `posts.ts` provides:
   - `getPosts()` - GET /posts with pagination/filter query params
-  - `getFeed()` - GET /posts/feed (author-enriched with reaction counts)
+  - `getFeed()` - GET /posts/feed (requires auth; author-enriched with reaction counts and likedByMe)
   - `createPost()` - POST /posts (requires auth)
   - `togglePostReaction()` - POST /posts/:id/reactions (like/unlike, requires auth)
 

@@ -68,7 +68,9 @@ export class PostsController {
   }
 
   @Get('feed')
+  @UseGuards(JwtAuthGuard)
   async getFeed(
+    @Request() req: { user: { userId: string } },
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('authorId') authorId?: string,
@@ -80,6 +82,7 @@ export class PostsController {
       limit ? parseInt(limit, 10) : undefined,
       authorId,
       sortOrder,
+      req.user.userId,
     );
   }
 

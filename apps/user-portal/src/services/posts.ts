@@ -48,6 +48,11 @@ export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsRe
 }
 
 export async function getFeed(params: GetFeedRequest = {}): Promise<GetFeedResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
   const query = new URLSearchParams();
 
   if (params.page !== undefined) query.set('page', String(params.page));
@@ -60,6 +65,7 @@ export async function getFeed(params: GetFeedRequest = {}): Promise<GetFeedRespo
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
   });
 

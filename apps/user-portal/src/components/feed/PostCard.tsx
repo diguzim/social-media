@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getUserProfile } from '../../services/auth';
 import type { FeedPost, PostComment } from '../../services/posts';
@@ -36,6 +36,11 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
   const [isCommentMutatingId, setIsCommentMutatingId] = useState<string | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentContent, setEditingCommentContent] = useState('');
+
+  useEffect(() => {
+    setLocalLikeCount(likeCount);
+    setLocalLikedByMe(likedByMe);
+  }, [likeCount, likedByMe]);
 
   const loadComments = async () => {
     setCommentsError('');

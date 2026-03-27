@@ -50,6 +50,12 @@ API Gateway (Port 4000)
   - Query params: `?page=1&limit=10&authorId=user-1&sortOrder=desc`
   - Returns: `{ data: [posts], total, page, limit, totalPages }`
 
+- `GET /posts/feed` - Get author-enriched feed with reaction summary from current user perspective
+  - Query params: `?page=1&limit=10&authorId=user-1&sortOrder=desc`
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ data: [feedPosts], total, page, limit, totalPages }`
+
 - `GET /posts/:id` - Get a specific post
   - Returns: `{ id, title, content, authorId, createdAt }`
 
