@@ -1,6 +1,7 @@
 export interface FeedPostAuthor {
   id: string;
   name: string;
+  avatarUrl?: string;
 }
 
 export interface FeedPost {

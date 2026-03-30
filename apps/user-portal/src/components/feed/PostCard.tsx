@@ -20,6 +20,8 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
   const currentUser = getUserProfile();
   const createdAt = new Date(post.createdAt).toLocaleString();
   const authorLabel = post.author.name;
+  const authorInitial = authorLabel.trim().charAt(0).toUpperCase() || '?';
+  const hasAvatar = Boolean(post.author.avatarUrl);
   const likeCount = post.reactions?.likeCount ?? 0;
   const likedByMe = post.reactions?.likedByMe ?? false;
 
@@ -166,31 +168,37 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
   return (
     <article data-testid={`post-card-${post.id}`} className="card p-4">
-      <header className="mb-2.5">
-        <h3 data-testid={`post-title-${post.id}`} className="text-lg font-semibold text-slate-900">
-          {post.title}
-        </h3>
-      </header>
+      <header className="mb-3 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          {hasAvatar ? (
+            <img
+              data-testid={`post-author-avatar-${post.id}`}
+              src={post.author.avatarUrl}
+              alt={`${authorLabel} profile picture`}
+              className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover"
+            />
+          ) : (
+            <div
+              data-testid={`post-author-avatar-fallback-${post.id}`}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
+              aria-label={`${authorLabel} avatar fallback`}
+            >
+              {authorInitial}
+            </div>
+          )}
 
-      <p
-        data-testid={`post-content-${post.id}`}
-        className="mb-3 whitespace-pre-line text-sm leading-6 text-slate-700"
-      >
-        {post.content}
-      </p>
-
-      <footer className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex gap-3 text-xs text-slate-500">
-          <span data-testid={`post-author-${post.id}`}>
-            Author:{' '}
+          <div className="min-w-0">
             <Link
+              data-testid={`post-author-link-${post.id}`}
               to={`/users/${post.author.id}`}
-              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+              className="line-clamp-1 text-sm font-semibold text-slate-900 hover:text-blue-700 hover:underline"
             >
               {authorLabel}
             </Link>
-          </span>
-          <span data-testid={`post-created-at-${post.id}`}>{createdAt}</span>
+            <p data-testid={`post-created-at-${post.id}`} className="text-xs text-slate-500">
+              {createdAt}
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -212,7 +220,20 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
             {localLikeCount}
           </span>
         </div>
-      </footer>
+      </header>
+
+      <div className="mb-2.5">
+        <h3 data-testid={`post-title-${post.id}`} className="text-lg font-semibold text-slate-900">
+          {post.title}
+        </h3>
+      </div>
+
+      <p
+        data-testid={`post-content-${post.id}`}
+        className="mb-3 whitespace-pre-line text-sm leading-6 text-slate-700"
+      >
+        {post.content}
+      </p>
 
       <section
         data-testid={`post-comments-${post.id}`}

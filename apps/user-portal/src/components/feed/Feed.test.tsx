@@ -60,7 +60,7 @@ describe('Feed', () => {
 
     expect(await screen.findByTestId('feed-section')).toBeInTheDocument();
     expect(screen.getByTestId('post-title-p1')).toHaveTextContent('Post A');
-    expect(screen.getByTestId('post-author-p1')).toHaveTextContent('Author: Alice');
+    expect(screen.getByTestId('post-author-link-p1')).toHaveTextContent('Alice');
   });
 
   it('renders empty state when no posts are returned', async () => {

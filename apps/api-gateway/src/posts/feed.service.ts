@@ -3,6 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import {
   AUTH_COMMANDS,
+  IMAGE_COMMANDS,
   POST_COMMANDS,
   REACTION_COMMANDS,
 } from '@repo/contracts';
@@ -10,6 +11,7 @@ import type { API, RPC } from '@repo/contracts';
 import { getCorrelationId } from '@repo/log-context';
 import { POSTS_SERVICE } from './posts.client';
 import { AUTH_SERVICE } from '../auth/auth.client';
+import { IMAGE_SERVICE } from '../images/image.client';
 
 @Injectable()
 export class FeedService {
@@ -18,6 +20,7 @@ export class FeedService {
   constructor(
     @Inject(POSTS_SERVICE) private readonly postsClient: ClientProxy,
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
+    @Inject(IMAGE_SERVICE) private readonly imageClient: ClientProxy,
   ) {}
 
   async getFeed(
@@ -68,7 +71,13 @@ export class FeedService {
               profileRequest,
             ),
           );
-          authorMap.set(userId, { id: profile.id, name: profile.name });
+
+          const avatarUrl = await this.tryBuildAvatarUrl(userId);
+          authorMap.set(userId, {
+            id: profile.id,
+            name: profile.name,
+            avatarUrl,
+          });
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           _err
@@ -145,5 +154,28 @@ export class FeedService {
       limit: rpcReply.limit,
       totalPages: rpcReply.totalPages,
     };
+  }
+
+  private async tryBuildAvatarUrl(userId: string): Promise<string | undefined> {
+    const rpcRequest: RPC.GetProfileImageRequest = {
+      userId,
+      correlationId: getCorrelationId(),
+    };
+
+    try {
+      await firstValueFrom(
+        this.imageClient.send<
+          RPC.GetProfileImageReply,
+          RPC.GetProfileImageRequest
+        >({ cmd: IMAGE_COMMANDS.getProfileImage }, rpcRequest),
+      );
+
+      const baseUrl =
+        process.env.API_PUBLIC_BASE_URL ??
+        `http://localhost:${process.env.PORT ?? '4000'}`;
+      return `${baseUrl}/users/${userId}/avatar`;
+    } catch {
+      return undefined;
+    }
   }
 }

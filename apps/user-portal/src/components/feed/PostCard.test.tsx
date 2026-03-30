@@ -48,7 +48,11 @@ describe('PostCard', () => {
           title: 'My first post',
           content: 'Hello feed!',
           authorId: 'user-1',
-          author: { id: 'user-1', name: 'Alice' },
+          author: {
+            id: 'user-1',
+            name: 'Alice',
+            avatarUrl: 'http://localhost:4000/users/user-1/avatar',
+          },
           createdAt: '2026-03-07T10:00:00.000Z',
         }}
       />
@@ -56,11 +60,12 @@ describe('PostCard', () => {
 
     expect(screen.getByTestId('post-title-post-1')).toHaveTextContent('My first post');
     expect(screen.getByTestId('post-content-post-1')).toHaveTextContent('Hello feed!');
-    expect(screen.getByTestId('post-author-post-1')).toHaveTextContent('Author: Alice');
+    expect(screen.getByTestId('post-author-link-post-1')).toHaveTextContent('Alice');
+    expect(screen.getByTestId('post-author-avatar-post-1')).toBeInTheDocument();
     expect(screen.getByTestId('post-created-at-post-1')).toBeInTheDocument();
   });
 
-  it('renders author name from enriched post', () => {
+  it('renders author fallback avatar when avatarUrl is missing', () => {
     renderWithRouter(
       <PostCard
         post={{
@@ -74,7 +79,8 @@ describe('PostCard', () => {
       />
     );
 
-    expect(screen.getByTestId('post-author-post-2')).toHaveTextContent('Author: Bob');
+    expect(screen.getByTestId('post-author-link-post-2')).toHaveTextContent('Bob');
+    expect(screen.getByTestId('post-author-avatar-fallback-post-2')).toHaveTextContent('B');
   });
 
   describe('Like button', () => {

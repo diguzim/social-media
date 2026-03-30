@@ -56,8 +56,31 @@ describe("GET /posts/feed", () => {
         expect(post.author).to.have.property("id").that.is.a("string");
         expect(post.author).to.have.property("name").that.is.a("string");
         expect(post.author.name).not.to.equal("Unknown User");
+        if (post.author.avatarUrl) {
+          expect(post.author.avatarUrl).to.match(/\/users\/[^/]+\/avatar$/);
+        }
       },
     );
+  });
+
+  it("returns a reachable avatar URL when the author has one", () => {
+    cy.request(`${API_BASE_URL}/posts/feed?limit=20`).then((res) => {
+      const postWithAvatar = (
+        res.body.data as { author: { avatarUrl?: string } }[]
+      ).find((post) => Boolean(post.author.avatarUrl));
+
+      if (!postWithAvatar?.author.avatarUrl) {
+        return;
+      }
+
+      cy.request({
+        method: "GET",
+        url: postWithAvatar.author.avatarUrl,
+      }).then((avatarRes) => {
+        expect(avatarRes.status).to.equal(200);
+        expect(avatarRes.headers["content-type"]).to.match(/^image\//);
+      });
+    });
   });
 
   it("returns author.name matching the registered user", () => {
