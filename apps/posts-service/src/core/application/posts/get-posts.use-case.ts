@@ -14,6 +14,12 @@ export interface GetPostsPostOutput {
   content: string;
   authorId: string;
   createdAt: Date;
+  images: Array<{
+    id: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: Date;
+  }>;
 }
 
 export interface GetPostsOutput {
@@ -43,6 +49,7 @@ export class GetPostsUseCase {
         content: post.content,
         authorId: post.authorId,
         createdAt: post.createdAt,
+        images: post.images,
       })),
       total: result.total,
       page: result.page,

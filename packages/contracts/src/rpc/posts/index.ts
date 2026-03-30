@@ -8,3 +8,4 @@ export * from "./update-post.contract.js";
 export * from "./delete-post.contract.js";
 export * from "./reactions.contract.js";
 export * from "./comments.contract.js";
+export * from "./post-image.contract.js";

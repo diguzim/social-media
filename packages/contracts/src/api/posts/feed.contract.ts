@@ -15,6 +15,13 @@ export interface FeedPost {
     likeCount: number;
     likedByMe: boolean;
   };
+  images?: Array<{
+    id: string;
+    imageUrl: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: string;
+  }>;
 }
 
 export interface GetFeedRequest {

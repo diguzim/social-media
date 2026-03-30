@@ -11,6 +11,12 @@ export interface UpdatePostInput {
   authorId: string;
   title?: string;
   content?: string;
+  images?: Array<{
+    id: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: Date;
+  }>;
 }
 
 export interface UpdatePostOutput {
@@ -19,6 +25,12 @@ export interface UpdatePostOutput {
   content: string;
   authorId: string;
   createdAt: Date;
+  images: Array<{
+    id: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: Date;
+  }>;
 }
 
 @Injectable()
@@ -26,7 +38,7 @@ export class UpdatePostUseCase {
   constructor(private readonly postRepository: PostRepository) {}
 
   async execute(input: UpdatePostInput): Promise<UpdatePostOutput> {
-    if (!input.title && !input.content) {
+    if (!input.title && !input.content && !input.images) {
       throw new BadRequestException("Nothing to update");
     }
 
@@ -44,6 +56,7 @@ export class UpdatePostUseCase {
       postId: input.postId,
       title: input.title,
       content: input.content,
+      images: input.images,
     });
 
     return {
@@ -52,6 +65,7 @@ export class UpdatePostUseCase {
       content: updated.content,
       authorId: updated.authorId,
       createdAt: updated.createdAt,
+      images: updated.images,
     };
   }
 }

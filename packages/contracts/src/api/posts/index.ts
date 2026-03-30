@@ -9,3 +9,4 @@ export * from "./get-posts.contract.js";
 export * from "./update-comment.contract.js";
 export * from "./update-post.contract.js";
 export * from "./toggle-reaction.contract.js";
+export * from "./post-image.contract.js";

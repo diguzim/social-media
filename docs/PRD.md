@@ -36,7 +36,7 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 | User login / logout           | ✅ Done | JWT access tokens                     |
 | View profile                  | ✅ Done | `/users/me` endpoint                  |
 | Upload profile picture        | ✅ Done | JPG/PNG up to 2MB, resized to 200x200 |
-| Create post                   | ✅ Done | Title + content                       |
+| Create post                   | ✅ Done | Title + content (+ optional images)   |
 | View home feed                | ✅ Done | Paginated, newest first               |
 | View "My Posts"               | ✅ Done | Filtered by current user              |
 | Enriched feed (`/posts/feed`) | ✅ Done | Author name resolved at gateway       |
@@ -53,7 +53,7 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 | Comments                | Medium   | Flat comments CRUD in posts-service (initial)    |
 | Follow / unfollow users | Medium   | Graph-like data                                  |
 | Notifications           | Low      | WebSocket or polling                             |
-| Media uploads           | Low      | S3 or local storage                              |
+| Media uploads           | ✅ Done  | Optional post images (JPG/PNG/GIF, up to 10)    |
 | OAuth / social login    | Low      | Google, GitHub                                   |
 | Public guest feed       | Low      | No auth required                                 |
 

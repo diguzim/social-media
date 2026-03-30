@@ -19,7 +19,7 @@ Client (Browser)
 API Gateway (Port 4000)
   ├─→ Auth Service (TCP Port 4001)  [register, login, getProfile]
   ├─→ Posts Service (TCP Port 4002) [create, read, update, delete posts]
-  └─→ Image Service (TCP Port 4004) [profile avatar upload + lookup]
+  └─→ Image Service (TCP Port 4004) [profile avatar + post image upload/lookup]
 ```
 
 ## Endpoints
@@ -52,9 +52,10 @@ API Gateway (Port 4000)
 ### Posts
 
 - `POST /posts` - Create a new post
-  - Body: `{ title, content }`
+  - Content-Type: `multipart/form-data` with `title`, `content`, optional `images[]`
   - Headers: `Authorization: Bearer {token}`
-  - Returns: `{ id, title, content, authorId, createdAt }`
+  - Validation: up to 10 images, JPG/PNG/GIF, max 10MB each
+  - Returns: `{ id, title, content, authorId, createdAt, images[] }`
   - Guards: **JwtAuthGuard**
 
 - `GET /posts` - List all posts with pagination and filtering
@@ -68,13 +69,34 @@ API Gateway (Port 4000)
   - Returns: `{ data: [feedPosts], total, page, limit, totalPages }`
 
 - `GET /posts/:id` - Get a specific post
-  - Returns: `{ id, title, content, authorId, createdAt }`
+  - Returns: `{ id, title, content, authorId, createdAt, images[] }`
 
 - `PATCH /posts/:id` - Update a post
   - Body: `{ title?, content? }`
   - Headers: `Authorization: Bearer {token}`
   - Guards: **JwtAuthGuard** + ownership verification
-  - Returns: `{ id, title, content, authorId, createdAt }`
+  - Returns: `{ id, title, content, authorId, createdAt, images[] }`
+
+- `POST /posts/:id/images` - Add images incrementally to an existing post
+  - Content-Type: `multipart/form-data` with `images[]`
+  - Headers: `Authorization: Bearer {token}`
+  - Validation: total images per post cannot exceed 10, JPG/PNG/GIF, max 10MB each
+  - Guards: **JwtAuthGuard** + ownership verification
+  - Returns: updated post payload with `images[]`
+
+- `DELETE /posts/:id/images/:imageId` - Remove a post image
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard** + ownership verification
+  - Returns: updated post payload with `images[]`
+
+- `PATCH /posts/:id/images/reorder` - Reorder post images
+  - Body: `{ imageOrder: string[] }`
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard** + ownership verification
+  - Returns: updated post payload with reordered `images[]`
+
+- `GET /posts/:postId/images/:imageId` - Retrieve post image bytes
+  - Returns: image stream with proper `Content-Type`
 
 - `DELETE /posts/:id` - Delete a post
   - Headers: `Authorization: Bearer {token}`

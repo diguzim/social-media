@@ -25,6 +25,7 @@ export class InMemoryPostRepository implements PostRepository {
       content: createPostData.content,
       authorId: createPostData.authorId,
       createdAt: new Date(),
+      images: createPostData.images ?? [],
     });
 
     this.posts.push(post);
@@ -57,6 +58,7 @@ export class InMemoryPostRepository implements PostRepository {
       content: updatePostData.content ?? current.content,
       authorId: current.authorId,
       createdAt: current.createdAt,
+      images: updatePostData.images ?? current.images,
     });
 
     this.posts[index] = updated;
@@ -318,6 +320,12 @@ export class InMemoryPostRepository implements PostRepository {
       content: string;
       authorId: string;
       createdAt: Date;
+      images?: Array<{
+        id: string;
+        mimeType: string;
+        orderIndex: number;
+        uploadedAt: Date;
+      }>;
     }>,
   ): void {
     seedData.forEach((data) => {
@@ -333,6 +341,7 @@ export class InMemoryPostRepository implements PostRepository {
           content: data.content,
           authorId: data.authorId,
           createdAt: data.createdAt,
+          images: data.images ?? [],
         }),
       );
     });

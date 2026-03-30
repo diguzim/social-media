@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { TouchEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { getUserProfile } from '../../services/auth';
 import type { FeedPost, PostComment } from '../../services/posts';
@@ -38,11 +39,58 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
   const [isCommentMutatingId, setIsCommentMutatingId] = useState<string | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentContent, setEditingCommentContent] = useState('');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const postImages = post.images ?? [];
+  const hasImages = postImages.length > 0;
 
   useEffect(() => {
     setLocalLikeCount(likeCount);
     setLocalLikedByMe(likedByMe);
   }, [likeCount, likedByMe]);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [post.id, postImages.length]);
+
+  const showPreviousImage = () => {
+    if (!hasImages) return;
+    setCurrentImageIndex((prev) => (prev === 0 ? postImages.length - 1 : prev - 1));
+  };
+
+  const showNextImage = () => {
+    if (!hasImages) return;
+    setCurrentImageIndex((prev) => (prev === postImages.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    setTouchStartX(event.touches[0]?.clientX ?? null);
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (touchStartX === null) {
+      return;
+    }
+
+    const touchEndX = event.changedTouches[0]?.clientX;
+    if (typeof touchEndX !== 'number') {
+      return;
+    }
+
+    const delta = touchStartX - touchEndX;
+    if (Math.abs(delta) < 40) {
+      return;
+    }
+
+    if (delta > 0) {
+      showNextImage();
+    } else {
+      showPreviousImage();
+    }
+
+    setTouchStartX(null);
+  };
 
   const loadComments = async () => {
     setCommentsError('');
@@ -234,6 +282,74 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
       >
         {post.content}
       </p>
+
+      {hasImages && (
+        <section data-testid={`post-images-${post.id}`} className="mb-3">
+          <div
+            className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <img
+              data-testid={`post-image-main-${post.id}`}
+              src={postImages[currentImageIndex]?.imageUrl}
+              alt={`Post image ${currentImageIndex + 1} of ${postImages.length}`}
+              className="h-[500px] w-full object-contain"
+            />
+
+            {postImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  data-testid={`post-image-prev-${post.id}`}
+                  onClick={showPreviousImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white hover:bg-black/60"
+                  aria-label="Previous image"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  data-testid={`post-image-next-${post.id}`}
+                  onClick={showNextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white hover:bg-black/60"
+                  aria-label="Next image"
+                >
+                  →
+                </button>
+                <div className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-0.5 text-xs text-white">
+                  {currentImageIndex + 1}/{postImages.length}
+                </div>
+              </>
+            )}
+          </div>
+
+          {postImages.length > 1 && (
+            <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+              {postImages.map((image, index) => (
+                <button
+                  key={image.id}
+                  type="button"
+                  data-testid={`post-image-thumb-${post.id}-${index}`}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`shrink-0 overflow-hidden rounded border-2 ${
+                    currentImageIndex === index
+                      ? 'border-primary-500'
+                      : 'border-transparent hover:border-slate-300'
+                  }`}
+                  aria-label={`View image ${index + 1}`}
+                >
+                  <img
+                    src={image.imageUrl}
+                    alt="Post image thumbnail"
+                    className="h-12 w-12 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <section
         data-testid={`post-comments-${post.id}`}

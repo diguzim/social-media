@@ -24,6 +24,10 @@ const API_BASE_URL = 'http://localhost:4000';
 export type FeedPost = ApiFeedPost;
 export type PostComment = Comment;
 
+export interface CreatePostInput extends CreatePostRequest {
+  images?: File[];
+}
+
 export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
   const query = new URLSearchParams();
 
@@ -76,24 +80,34 @@ export async function getFeed(params: GetFeedRequest = {}): Promise<GetFeedRespo
   return response.json();
 }
 
-export async function createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
+export async function createPost(data: CreatePostInput): Promise<CreatePostResponse> {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
     throw new Error('No authentication token found');
   }
 
+  const formData = new FormData();
+  formData.append('title', data.title);
+  formData.append('content', data.content);
+  data.images?.forEach((file) => {
+    formData.append('images', file);
+  });
+
   const response = await fetch(`${API_BASE_URL}/posts`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data),
+    body: formData,
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to create post');
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create post');
+    }
+    throw new Error('Failed to create post');
   }
 
   return response.json();

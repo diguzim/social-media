@@ -269,6 +269,10 @@ Each service has a production Dockerfile for deployment:
 - [ ] Caching (Redis)
 - [ ] Rate limiting
 - [ ] Search service (Elasticsearch)
+- [ ] Friends/followers graph (follow/unfollow + follower/following lists)
+- [ ] Notifications center (in-app + delivery channels)
+- [ ] Privacy controls (public/private profiles and visibility rules)
+- [ ] Albums and grouped media management
 
 ## Notes
 

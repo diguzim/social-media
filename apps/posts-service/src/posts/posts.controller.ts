@@ -54,6 +54,12 @@ export class PostsController {
       content: post.content,
       authorId: post.authorId,
       createdAt: post.createdAt.toISOString(),
+      images: post.images.map((img) => ({
+        id: img.id,
+        mimeType: img.mimeType,
+        orderIndex: img.orderIndex,
+        uploadedAt: img.uploadedAt.toISOString(),
+      })),
     };
   }
 
@@ -71,6 +77,12 @@ export class PostsController {
       content: post.content,
       authorId: post.authorId,
       createdAt: post.createdAt.toISOString(),
+      images: post.images.map((img) => ({
+        id: img.id,
+        mimeType: img.mimeType,
+        orderIndex: img.orderIndex,
+        uploadedAt: img.uploadedAt.toISOString(),
+      })),
     };
   }
 
@@ -94,6 +106,12 @@ export class PostsController {
         content: post.content,
         authorId: post.authorId,
         createdAt: post.createdAt.toISOString(),
+        images: post.images.map((img) => ({
+          id: img.id,
+          mimeType: img.mimeType,
+          orderIndex: img.orderIndex,
+          uploadedAt: img.uploadedAt.toISOString(),
+        })),
       })),
       total: result.total,
       page: result.page,
@@ -113,6 +131,12 @@ export class PostsController {
       authorId: request.authorId,
       title: request.title,
       content: request.content,
+      images: request.images?.map((img) => ({
+        id: img.id,
+        mimeType: img.mimeType,
+        orderIndex: img.orderIndex,
+        uploadedAt: new Date(img.uploadedAt),
+      })),
     });
 
     return {
@@ -121,6 +145,12 @@ export class PostsController {
       content: post.content,
       authorId: post.authorId,
       createdAt: post.createdAt.toISOString(),
+      images: post.images.map((img) => ({
+        id: img.id,
+        mimeType: img.mimeType,
+        orderIndex: img.orderIndex,
+        uploadedAt: img.uploadedAt.toISOString(),
+      })),
     };
   }
 

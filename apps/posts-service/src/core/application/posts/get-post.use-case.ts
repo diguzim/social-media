@@ -11,6 +11,12 @@ export interface GetPostOutput {
   content: string;
   authorId: string;
   createdAt: Date;
+  images: Array<{
+    id: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: Date;
+  }>;
 }
 
 @Injectable()
@@ -30,6 +36,7 @@ export class GetPostUseCase {
       content: post.content,
       authorId: post.authorId,
       createdAt: post.createdAt,
+      images: post.images,
     };
   }
 }

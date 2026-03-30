@@ -11,6 +11,13 @@ export interface Post {
   content: string;
   authorId: string;
   createdAt: string; // ISO string
+  images?: Array<{
+    id: string;
+    imageUrl: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: string;
+  }>;
 }
 
 export interface GetPostsResponse {

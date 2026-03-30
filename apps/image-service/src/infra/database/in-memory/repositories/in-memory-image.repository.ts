@@ -10,6 +10,7 @@ import {
 @Injectable()
 export class InMemoryImageRepository implements ImageRepository {
   private readonly imagesByUserId = new Map<string, Image>();
+  private readonly imagesByPostId = new Map<string, Image[]>();
   private nextId = 1;
 
   constructor() {
@@ -31,6 +32,68 @@ export class InMemoryImageRepository implements ImageRepository {
 
   async findProfileImageByUserId(userId: string): Promise<Image | null> {
     return this.imagesByUserId.get(userId) ?? null;
+  }
+
+  async savePostImage(data: {
+    postId: string;
+    userId: string;
+    mimeType: string;
+    storagePath: string;
+    orderIndex: number;
+  }): Promise<Image> {
+    const image = new Image({
+      id: `img-${this.nextId++}`,
+      postId: data.postId,
+      userId: data.userId,
+      mimeType: data.mimeType,
+      storagePath: data.storagePath,
+      orderIndex: data.orderIndex,
+      uploadedAt: new Date(),
+    });
+
+    const images = this.imagesByPostId.get(data.postId) ?? [];
+    images.push(image);
+    this.imagesByPostId.set(data.postId, images);
+
+    return image;
+  }
+
+  async findPostImageById(
+    postId: string,
+    imageId: string,
+  ): Promise<Image | null> {
+    const images = this.imagesByPostId.get(postId) ?? [];
+    return images.find((img) => img.id === imageId) ?? null;
+  }
+
+  async findPostImagesByPostId(postId: string): Promise<Image[]> {
+    const images = this.imagesByPostId.get(postId) ?? [];
+    return [...images].sort(
+      (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0),
+    );
+  }
+
+  async deletePostImage(postId: string, imageId: string): Promise<void> {
+    const images = this.imagesByPostId.get(postId) ?? [];
+    const filtered = images.filter((img) => img.id !== imageId);
+    filtered.forEach((img, idx) => {
+      img.orderIndex = idx;
+    });
+    this.imagesByPostId.set(postId, filtered);
+  }
+
+  async reorderPostImages(postId: string, imageOrder: string[]): Promise<void> {
+    const images = this.imagesByPostId.get(postId) ?? [];
+    const imageMap = new Map(images.map((img) => [img.id, img]));
+    const reordered = imageOrder
+      .map((id) => imageMap.get(id))
+      .filter((img): img is Image => img !== undefined);
+
+    reordered.forEach((img, idx) => {
+      img.orderIndex = idx;
+    });
+
+    this.imagesByPostId.set(postId, reordered);
   }
 
   private seedProfileImages(): void {

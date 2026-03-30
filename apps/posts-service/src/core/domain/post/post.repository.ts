@@ -1,15 +1,17 @@
-import { Post } from "./post.entity";
+import { Post, PostImage } from "./post.entity";
 
 export interface CreatePostData {
   title: string;
   content: string;
   authorId: string;
+  images?: PostImage[];
 }
 
 export interface UpdatePostData {
   postId: string;
   title?: string;
   content?: string;
+  images?: PostImage[];
 }
 
 export interface DeletePostData {

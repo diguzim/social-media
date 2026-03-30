@@ -4,6 +4,7 @@ import { basename, join, resolve } from "path";
 import {
   ImageStorageProvider,
   SaveProfileImageInput,
+  SavePostImageInput,
 } from "./image-storage.provider";
 
 @Injectable()
@@ -27,6 +28,24 @@ export class LocalFileStorageProvider implements ImageStorageProvider {
   }
 
   async readProfileImage(storagePath: string): Promise<Buffer> {
+    return readFile(storagePath);
+  }
+
+  async savePostImage(input: SavePostImageInput): Promise<string> {
+    await mkdir(this.baseDir, { recursive: true });
+
+    const sanitizedName = basename(input.originalName).replace(
+      /[^a-zA-Z0-9_.-]/g,
+      "_",
+    );
+    const filename = `post-${input.postId}-${input.userId}-${Date.now()}-${sanitizedName}`;
+    const fullPath = join(this.baseDir, filename);
+
+    await writeFile(fullPath, input.fileBuffer);
+    return fullPath;
+  }
+
+  async readPostImage(storagePath: string): Promise<Buffer> {
     return readFile(storagePath);
   }
 }

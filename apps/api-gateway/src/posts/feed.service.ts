@@ -148,6 +148,15 @@ export class FeedService {
           likeCount: 0,
           likedByMe: false,
         },
+        images: (post.images ?? [])
+          .sort((a, b) => a.orderIndex - b.orderIndex)
+          .map((image) => ({
+            id: image.id,
+            imageUrl: this.buildPostImageUrl(post.id, image.id),
+            mimeType: image.mimeType,
+            orderIndex: image.orderIndex,
+            uploadedAt: image.uploadedAt,
+          })),
       })),
       total: rpcReply.total,
       page: rpcReply.page,
@@ -177,5 +186,13 @@ export class FeedService {
     } catch {
       return undefined;
     }
+  }
+
+  private buildPostImageUrl(postId: string, imageId: string): string {
+    const baseUrl =
+      process.env.API_PUBLIC_BASE_URL ??
+      `http://localhost:${process.env.PORT ?? '4000'}`;
+
+    return `${baseUrl}/posts/${postId}/images/${imageId}`;
   }
 }

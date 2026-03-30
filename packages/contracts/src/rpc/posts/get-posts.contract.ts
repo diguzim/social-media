@@ -12,6 +12,12 @@ export interface GetPostsPostReply {
   content: string;
   authorId: string;
   createdAt: string; // ISO string
+  images?: Array<{
+    id: string;
+    mimeType: string;
+    orderIndex: number;
+    uploadedAt: string;
+  }>;
 }
 
 export interface GetPostsReply {

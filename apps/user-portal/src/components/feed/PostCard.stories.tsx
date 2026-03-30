@@ -84,3 +84,40 @@ export const LikedWithManyLikes: Story = {
     },
   },
 };
+
+export const WithImagesCarousel: Story = {
+  args: {
+    post: {
+      id: 'post-6',
+      title: 'Photo dump from the weekend',
+      content: 'Swipe through the highlights ✨',
+      authorId: '3',
+      author: { id: '3', name: 'Charlie', avatarUrl: 'http://localhost:4000/users/3/avatar' },
+      createdAt: '2025-01-15T08:30:00.000Z',
+      reactions: { likeCount: 17, likedByMe: false },
+      images: [
+        {
+          id: 'img-1',
+          imageUrl: 'https://picsum.photos/id/237/900/600',
+          mimeType: 'image/jpeg',
+          orderIndex: 0,
+          uploadedAt: '2025-01-15T08:30:00.000Z',
+        },
+        {
+          id: 'img-2',
+          imageUrl: 'https://picsum.photos/id/238/900/600',
+          mimeType: 'image/jpeg',
+          orderIndex: 1,
+          uploadedAt: '2025-01-15T08:30:00.000Z',
+        },
+        {
+          id: 'img-3',
+          imageUrl: 'https://picsum.photos/id/239/900/600',
+          mimeType: 'image/jpeg',
+          orderIndex: 2,
+          uploadedAt: '2025-01-15T08:30:00.000Z',
+        },
+      ],
+    },
+  },
+};

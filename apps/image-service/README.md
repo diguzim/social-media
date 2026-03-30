@@ -1,10 +1,10 @@
 # Image Service
 
-NestJS TCP microservice responsible for image storage concerns, starting with profile avatars.
+NestJS TCP microservice responsible for image storage concerns, currently handling profile avatars and post images.
 
 ## Purpose
 
-- Receive profile avatar upload RPC requests from API Gateway
+- Receive profile avatar and post image upload RPC requests from API Gateway
 - Validate and normalize image uploads
 - Resize avatars to `200x200`
 - Persist files using a storage provider abstraction (local first, S3 later)
@@ -17,6 +17,7 @@ API Gateway (HTTP + multipart)
   ↓ TCP RPC
 Image Service (Port 4004)
   ├─→ UploadProfileImageUseCase (validate + resize)
+  ├─→ UploadPostImageUseCase (validate + persist original bytes)
   ├─→ ImageStorageProvider (local filesystem implementation)
   └─→ ImageRepository (in-memory metadata)
 ```
@@ -31,11 +32,34 @@ Image Service (Port 4004)
   - Input: `{ userId }`
   - Output: `{ imageId, userId, fileBase64, contentLength, mimeType, uploadedAt }`
 
+- `IMAGE_COMMANDS.uploadPostImage`
+  - Input: `{ postId, userId, fileBase64, mimeType, originalName, fileSize }`
+  - Output: `{ imageId, postId, mimeType, orderIndex, uploadedAt }`
+
+- `IMAGE_COMMANDS.getPostImage`
+  - Input: `{ postId, imageId }`
+  - Output: `{ imageId, postId, fileBase64, contentLength, mimeType, orderIndex, uploadedAt }`
+
+- `IMAGE_COMMANDS.deletePostImage`
+  - Input: `{ postId, imageId, userId }`
+  - Output: `{ success }`
+
+- `IMAGE_COMMANDS.reorderPostImages`
+  - Input: `{ postId, userId, imageOrder[] }`
+  - Output: `{ success }`
+
 ## Validation Rules
 
 - Allowed MIME types: `image/jpeg`, `image/png`
 - Max file size: `2MB`
 - Image is resized to `200x200` (`fit: cover`)
+
+### Post images
+
+- Allowed MIME types: `image/jpeg`, `image/png`, `image/gif`
+- Max file size: `10MB` per image
+- Max images per post: `10`
+- Bytes are stored without resize/transcoding for now
 
 ## Configuration
 
