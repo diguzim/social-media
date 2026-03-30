@@ -18,7 +18,8 @@ Client (Browser)
   ↓ HTTP
 API Gateway (Port 4000)
   ├─→ Auth Service (TCP Port 4001)  [register, login, getProfile]
-  └─→ Posts Service (TCP Port 4002) [create, read, update, delete posts]
+  ├─→ Posts Service (TCP Port 4002) [create, read, update, delete posts]
+  └─→ Image Service (TCP Port 4004) [profile avatar upload + lookup]
 ```
 
 ## Endpoints
@@ -35,8 +36,17 @@ API Gateway (Port 4000)
 
 - `GET /users/me` - Get current user profile
   - Headers: `Authorization: Bearer {token}`
-  - Returns: `{ id, name, username, email, emailVerifiedAt }`
+  - Returns: `{ id, name, username, email, emailVerifiedAt, avatarUrl? }`
   - Guards: **JwtAuthGuard** (requires valid JWT)
+
+- `POST /users/avatar` - Upload current user's profile avatar
+  - Content-Type: `multipart/form-data` with `file` field
+  - Headers: `Authorization: Bearer {token}`
+  - Validation: JPG/PNG only, max 2MB
+  - Returns: `{ imageUrl, uploadedAt }`
+
+- `GET /users/:userId/avatar` - Retrieve profile avatar image bytes
+  - Returns: image stream with proper `Content-Type`
 
 ### Posts
 
@@ -105,6 +115,9 @@ AUTH_SERVICE_PORT=4001
 
 POSTS_SERVICE_HOST=localhost
 POSTS_SERVICE_PORT=4002
+
+IMAGE_SERVICE_HOST=localhost
+IMAGE_SERVICE_PORT=4004
 
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost

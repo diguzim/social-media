@@ -14,8 +14,16 @@ function TestConsumer() {
       <span data-testid="profile-state-user-name">{state.user?.name}</span>
       <span data-testid="profile-state-error">{state.error}</span>
       <span data-testid="profile-state-loading">{String(state.isLoading)}</span>
+      <span data-testid="profile-state-avatar-uploading">{String(state.isAvatarUploading)}</span>
+      <span data-testid="profile-state-avatar-error">{state.avatarUploadError}</span>
       <button data-testid="profile-refresh-btn" onClick={() => actions.refresh()}>
         refresh
+      </button>
+      <button
+        data-testid="profile-upload-avatar-btn"
+        onClick={() => actions.uploadAvatar(new File(['x'], 'avatar.png'))}
+      >
+        upload
       </button>
     </div>
   );
@@ -24,6 +32,7 @@ function TestConsumer() {
 describe('ProfileStateContractProvider', () => {
   it('injects a custom ProfileStateContract implementation', async () => {
     const refresh = vi.fn().mockResolvedValue(undefined);
+    const uploadAvatar = vi.fn().mockResolvedValue(undefined);
 
     const useFakeProfileStateContract: UseProfileStateContract = () => ({
       state: {
@@ -36,9 +45,12 @@ describe('ProfileStateContractProvider', () => {
         },
         error: '',
         isLoading: false,
+        isAvatarUploading: false,
+        avatarUploadError: '',
       },
       actions: {
         refresh,
+        uploadAvatar,
       },
     });
 
@@ -54,5 +66,8 @@ describe('ProfileStateContractProvider', () => {
 
     screen.getByTestId('profile-refresh-btn').click();
     expect(refresh).toHaveBeenCalledTimes(1);
+
+    screen.getByTestId('profile-upload-avatar-btn').click();
+    expect(uploadAvatar).toHaveBeenCalledTimes(1);
   });
 });

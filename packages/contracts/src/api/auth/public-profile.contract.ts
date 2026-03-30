@@ -7,4 +7,5 @@ export interface GetPublicProfileResponse {
   name: string;
   username: string;
   emailVerifiedAt: string | null;
+  avatarUrl?: string;
 }

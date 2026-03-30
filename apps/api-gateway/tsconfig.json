@@ -1,7 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "multer"],
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,

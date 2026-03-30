@@ -7,3 +7,4 @@ export * as RPC from "./rpc/index.js";
 // Legacy exports for backward compatibility (to be removed)
 export * from "./auth/index.js";
 export * from "./posts/index.js";
+export * from "./image/index.js";

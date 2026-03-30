@@ -4,4 +4,5 @@ export interface GetProfileResponse {
   username: string;
   email: string;
   emailVerifiedAt: string | null;
+  avatarUrl?: string;
 }

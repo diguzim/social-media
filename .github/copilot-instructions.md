@@ -14,6 +14,7 @@ apps/
   api-gateway/       # NestJS HTTP server (port 4000) — public-facing entry point
   auth-service/      # NestJS TCP microservice (port 4001) — user registration + JWT auth
   posts-service/     # NestJS TCP microservice (port 4002) — post CRUD
+  image-service/     # NestJS TCP microservice (port 4004) — profile image upload/storage
   event-handler-service/ # NestJS — consumes domain events
   user-portal/       # React 18 + Vite + Tailwind CSS (port 3000)
   e2e/               # Cypress 13 E2E tests
@@ -58,7 +59,7 @@ This avoids N+1 queries and keeps each microservice focused on its own domain.
 
 ### Current Database
 
-Both services use **in-memory repositories** behind repository interfaces.
+Auth, posts, and image services use **in-memory repositories** behind repository interfaces.
 When switching to real DBs, only the infra layer changes — domain and application layers are untouched.
 
 ## Tech Stack
@@ -189,9 +190,11 @@ pnpm build
 
 ## Ports
 
-| Service             | Port |
-| ------------------- | ---- |
-| user-portal (React) | 3000 |
-| api-gateway         | 4000 |
-| auth-service        | 4001 |
-| posts-service       | 4002 |
+| Service               | Port |
+| --------------------- | ---- |
+| user-portal (React)   | 3000 |
+| api-gateway           | 4000 |
+| auth-service          | 4001 |
+| posts-service         | 4002 |
+| event-handler-service | 4003 |
+| image-service         | 4004 |

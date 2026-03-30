@@ -30,17 +30,18 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 
 ### MVP (current)
 
-| Feature                       | Status  | Notes                              |
-| ----------------------------- | ------- | ---------------------------------- |
-| User registration             | ✅ Done | Email + password, stored in-memory |
-| User login / logout           | ✅ Done | JWT access tokens                  |
-| View profile                  | ✅ Done | `/users/me` endpoint               |
-| Create post                   | ✅ Done | Title + content                    |
-| View home feed                | ✅ Done | Paginated, newest first            |
-| View "My Posts"               | ✅ Done | Filtered by current user           |
-| Enriched feed (`/posts/feed`) | ✅ Done | Author name resolved at gateway    |
-| Edit own post                 | ✅ Done | Author-gated PATCH                 |
-| Delete own post               | ✅ Done | Author-gated DELETE                |
+| Feature                       | Status  | Notes                                 |
+| ----------------------------- | ------- | ------------------------------------- |
+| User registration             | ✅ Done | Email + password, stored in-memory    |
+| User login / logout           | ✅ Done | JWT access tokens                     |
+| View profile                  | ✅ Done | `/users/me` endpoint                  |
+| Upload profile picture        | ✅ Done | JPG/PNG up to 2MB, resized to 200x200 |
+| Create post                   | ✅ Done | Title + content                       |
+| View home feed                | ✅ Done | Paginated, newest first               |
+| View "My Posts"               | ✅ Done | Filtered by current user              |
+| Enriched feed (`/posts/feed`) | ✅ Done | Author name resolved at gateway       |
+| Edit own post                 | ✅ Done | Author-gated PATCH                    |
+| Delete own post               | ✅ Done | Author-gated DELETE                   |
 
 ### Planned
 

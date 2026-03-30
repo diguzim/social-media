@@ -86,6 +86,7 @@ volumes:
   postgres_data:
   loki_data:
   grafana_data:
+  images_data:
 
 networks:
   social-media-network:

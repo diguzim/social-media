@@ -8,6 +8,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
 - User profile page with email verification status
+- Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - User public profile page for viewing other users by id
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
@@ -36,7 +37,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Redirects to login page on success; verification email is sent automatically
 
 2. **Login** - User authenticates
-  - Form submits to `POST /users/login` (api-gateway) using email or username plus password
+
+- Form submits to `POST /users/login` (api-gateway) using email or username plus password
 
 - JWT token stored in localStorage (`jwtToken`)
 - User profile fetched from `GET /users/me` and cached in localStorage (`user`)
@@ -60,7 +62,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - **JWT Token** - localStorage key `jwtToken` (from login response)
 - **User Profile** - localStorage key `user` (from /users/me response)
-  - Structure: `{ id, name, username, email, emailVerifiedAt }`
+  - Structure: `{ id, name, username, email, emailVerifiedAt, avatarUrl? }`
 
 ## Test Selectors (`data-testid`)
 
@@ -84,6 +86,8 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
 - GET /users/:userId/profile (requires Authorization: Bearer {token})
+- POST /users/avatar (requires auth; multipart image upload)
+- GET /users/:userId/avatar (public image stream)
 - GET /posts?page=1&limit=10&sortOrder=desc
 - GET /posts/feed (requires auth; feed with author enrichment + like counts + likedByMe)
 - POST /posts/:id/reactions (like/unlike a post)
@@ -257,6 +261,7 @@ The app communicates with the API Gateway which routes requests to microservices
   - `registerUser()` - POST /users
   - `loginUser()` - POST /users/login (stores JWT in localStorage)
   - `getProfile()` - GET /users/me (stores user profile in localStorage)
+  - `uploadProfileAvatar()` - POST /users/avatar (multipart upload)
   - `getUserProfile()` - Retrieve cached profile from localStorage
 - `posts.ts` provides:
   - `getPosts()` - GET /posts with pagination/filter query params

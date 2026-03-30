@@ -176,3 +176,32 @@ Threading/replies are out of scope for this phase.
 ✅ Keeps migration path open to split comments into a dedicated service later  
 ⚠️ `posts-service` grows in scope and may need extraction as complexity increases  
 ⚠️ Future split will require contract and data-migration planning
+
+---
+
+## ADR-007: Image-Service for Profile Pictures (Local Storage First)
+
+**Date:** 2026-03  
+**Status:** Accepted
+
+### Context
+
+The platform needs profile image uploads now, and post/comment images later. We want a simple local development implementation that can evolve to cloud object storage (for example S3) without rewriting application logic.
+
+### Decision
+
+Introduce a dedicated **`image-service`** microservice (TCP, port 4004) with its own contracts and clean boundaries:
+
+- API Gateway accepts `multipart/form-data` uploads at `POST /users/avatar`
+- Gateway forwards image payload to image-service through `RPC` contracts
+- image-service validates JPG/PNG and 2MB limit, resizes to 200x200, and stores files through a storage provider abstraction
+- Local implementation uses file storage (`IMAGE_STORAGE_DIR`) while preserving a replaceable provider interface for future S3 migration
+- Gateway serves profile images through `GET /users/:userId/avatar` and enriches profile responses with `avatarUrl`
+
+### Consequences
+
+✅ Reusable image boundary for future post/comment media  
+✅ Storage backend can be swapped without changing use cases/controllers  
+✅ Keeps upload-specific logic out of auth/posts services  
+⚠️ Adds one more microservice and TCP dependency in local dev  
+⚠️ Current file serving happens in API Gateway; future CDN/object-store URLs may be preferable in production

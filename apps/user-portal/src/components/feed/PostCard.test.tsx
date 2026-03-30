@@ -256,7 +256,7 @@ describe('PostCard', () => {
             authorId: 'user-2',
             content: 'Great post!',
             createdAt: '2026-03-07T10:00:00.000Z',
-            updatedAt: null,
+            updatedAt: undefined,
           },
         ],
         total: 1,
@@ -298,7 +298,7 @@ describe('PostCard', () => {
         authorId: 'user-1',
         content: 'My comment',
         createdAt: '2026-03-07T10:00:00.000Z',
-        updatedAt: null,
+        updatedAt: undefined,
       });
 
       vi.mocked(postsService.getPostComments)
@@ -317,7 +317,7 @@ describe('PostCard', () => {
               authorId: 'user-1',
               content: 'My comment',
               createdAt: '2026-03-07T10:00:00.000Z',
-              updatedAt: null,
+              updatedAt: undefined,
             },
           ],
           total: 1,
@@ -376,7 +376,7 @@ describe('PostCard', () => {
               authorId: 'user-1',
               content: 'Original owner comment',
               createdAt: '2026-03-07T10:00:00.000Z',
-              updatedAt: null,
+              updatedAt: undefined,
             },
           ],
           total: 1,

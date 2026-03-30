@@ -26,6 +26,11 @@ export type {
 export type UserProfile = GetProfileResponse;
 export type PublicUserProfile = GetPublicProfileResponse;
 
+export interface UploadProfileAvatarResponse {
+  imageUrl: string;
+  uploadedAt: string;
+}
+
 const EMAIL_CONFIRM_INFLIGHT = new Map<string, Promise<ConfirmEmailVerificationResponse>>();
 const EMAIL_CONFIRM_RECENT = new Map<
   string,
@@ -176,6 +181,31 @@ export async function requestEmailVerification(): Promise<RequestEmailVerificati
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to send verification email');
+  }
+
+  return response.json();
+}
+
+export async function uploadProfileAvatar(file: File): Promise<UploadProfileAvatarResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`${API_BASE_URL}/users/avatar`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to upload profile image');
   }
 
   return response.json();

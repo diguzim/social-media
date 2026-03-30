@@ -1,6 +1,6 @@
 # Social Media Monorepo
 
-Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, auth and posts services, an event handler service, and shared packages.
+Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, auth/posts/image services, an event handler service, and shared packages.
 
 ## Stack
 
@@ -16,6 +16,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `api-gateway`: HTTP entrypoint for clients (port 4000)
 - `auth-service`: Auth microservice listening on TCP (port 4001)
 - `posts-service`: Posts microservice listening on TCP (port 4002)
+- `image-service`: Image microservice listening on TCP (port 4004) for profile picture upload/storage
 - `event-handler-service`: Background worker that processes domain events (port 4003)
 - `user-portal`: React + Vite frontend for user management (port 3000)
 
@@ -64,6 +65,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - Home (`/`) shows "Welcome {name}!" and user summary
    - Profile (`/profile`) shows dedicated profile details
    - UserProfile (`/users/:userId`) shows another user's public profile details
+   - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`
 
 ## Event-Driven Architecture
@@ -159,6 +161,7 @@ Create environment files (per service):
 cp apps/api-gateway/.env.example apps/api-gateway/.env
 cp apps/auth-service/.env.example apps/auth-service/.env
 cp apps/posts-service/.env.example apps/posts-service/.env
+cp apps/image-service/.env.example apps/image-service/.env
 cp apps/event-handler-service/.env.example apps/event-handler-service/.env
 ```
 
@@ -188,7 +191,7 @@ Backend services emit structured logs with Pino and now ship logs directly to Lo
 Current pipeline:
 
 ```text
-api-gateway/auth-service/posts-service/event-handler-service
+api-gateway/auth-service/posts-service/image-service/event-handler-service
    -> nestjs-pino
    -> pino-loki transport
    -> Loki (http://localhost:3100)
@@ -222,6 +225,7 @@ Run a single app:
 pnpm --filter api-gateway dev
 pnpm --filter auth-service dev
 pnpm --filter posts-service dev
+pnpm --filter image-service dev
 pnpm --filter event-handler-service dev
 pnpm --filter user-portal dev
 pnpm --filter user-portal storybook

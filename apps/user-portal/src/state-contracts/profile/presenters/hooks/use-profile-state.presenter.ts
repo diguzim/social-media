@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getProfile, getUserProfile } from '../../../../services/auth';
+import { getProfile, getUserProfile, uploadProfileAvatar } from '../../../../services/auth';
 import type { ProfileStateContract } from '../../profile-state.contract';
 
 export function useProfileStatePresenter(): ProfileStateContract {
   const [user, setUser] = useState<ProfileStateContract['state']['user']>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [avatarUploadError, setAvatarUploadError] = useState('');
 
   const fetchProfile = useCallback(async () => {
     setError('');
@@ -35,14 +37,35 @@ export function useProfileStatePresenter(): ProfileStateContract {
     await fetchProfile();
   }, [fetchProfile]);
 
+  const uploadAvatar = useCallback(
+    async (file: File) => {
+      setAvatarUploadError('');
+      setIsAvatarUploading(true);
+
+      try {
+        await uploadProfileAvatar(file);
+        await fetchProfile();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to upload profile image';
+        setAvatarUploadError(message);
+      } finally {
+        setIsAvatarUploading(false);
+      }
+    },
+    [fetchProfile]
+  );
+
   return {
     state: {
       user,
       error,
       isLoading,
+      isAvatarUploading,
+      avatarUploadError,
     },
     actions: {
       refresh,
+      uploadAvatar,
     },
   };
 }
