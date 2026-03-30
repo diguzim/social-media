@@ -40,6 +40,12 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      'max-lines': ['warn', { max: 350, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': [
+        'warn',
+        { max: 120, skipBlankLines: true, skipComments: true, IIFEs: true },
+      ],
+      complexity: ['warn', 20],
       'no-undef': 'off',
       'react/react-in-jsx-scope': 'off',
     },

@@ -109,9 +109,20 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Services (API calls) in `src/services/`
 - Prefer **state contracts** for page-level orchestration: define a contract interface (`state` + `actions`), implement a default presenter hook, and inject via provider at composition root
 - Pages should consume contract hooks (e.g., `useHomeStateContract`, `useRegisterStateContract`, `useLoginStateContract`, `useMyPostsStateContract`) and stay focused on rendering/composition; avoid embedding heavy orchestration directly in page components
+- Differentiate **page logic** from **component logic** explicitly:
+  - Route/page orchestration (navigation, screen-level loading/error, cross-island coordination) belongs in page state contracts/presenters
+  - Reusable component orchestration (card/form widget workflows) belongs in component-scoped hooks colocated with the component
+  - Presentational UI components should receive state/actions via props and avoid direct service calls when a controller hook already exists
 - Keep state contracts under `src/state-contracts/<feature>/` with clear boundaries between contract, presenter, and provider/context
 - Aggregate presenters by implementation approach under `src/state-contracts/<feature>/presenters/<approach>/` (e.g., `presenters/hooks/`, `presenters/zustand/`, `presenters/redux/`) so architecture intent is obvious from folders
 - Aggregate feature providers at composition root via a single app-level wrapper (e.g., `AppStateContractsProvider`) to avoid provider-wrapper nesting in `App.tsx`
+- Break down oversized components when complexity grows. Prefer decomposition before adding more behavior when a component starts accumulating many local states/effects/handlers.
+- Prefer this split for complex UI islands:
+  - `ComponentName.tsx` (composition shell)
+  - `component-name/use-*.ts` (control hooks)
+  - `component-name/ComponentName*.tsx` (presentational slices)
+  - optional `component-name/types.ts` (local view-model types/utilities)
+- Keep lint complexity constraints as **soft limits** (warnings) to guide decomposition without blocking delivery.
 - Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
 - For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
 - For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending

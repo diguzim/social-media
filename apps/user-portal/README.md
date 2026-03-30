@@ -211,6 +211,31 @@ When adding a new state strategy, create a sibling approach folder (for example 
 
 This allows replacing internals later (Context-only, Zustand, Redux Toolkit, or another approach) without rewriting Home, Register, Login, or MyPosts page composition.
 
+## Component Decomposition and Control/UI Split
+
+Besides page-level state contracts, reusable components follow a component-scoped controller pattern:
+
+- **Page logic** stays in page contracts/presenters (route orchestration, navigation, screen-level loading/error)
+- **Component logic** stays in colocated hooks near the component (widget workflows, local async interactions)
+- **UI slices** stay presentational and receive state/actions via props
+
+Recommended structure for complex components:
+
+```text
+src/components/<feature>/
+  ComponentName.tsx                # composition shell
+  component-name/
+    use-*.ts                       # control hooks (async/data/event orchestration)
+    ComponentName*.tsx             # presentational slices
+    types.ts                       # local view-model types/utilities (optional)
+```
+
+Soft decomposition thresholds (warning-level guidance):
+
+- avoid accumulating many local `useState` + `useEffect` blocks in one component
+- split when a component starts mixing multiple domains (example: media carousel + comments + edit workflow + reactions)
+- prefer extracting behavior to hooks before adding new responsibilities to an already large component
+
 ## Scripts
 
 - `pnpm dev` - Start development server (port 3000)

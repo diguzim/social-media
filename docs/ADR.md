@@ -205,3 +205,43 @@ Introduce a dedicated **`image-service`** microservice (TCP, port 4004) with its
 ✅ Keeps upload-specific logic out of auth/posts services  
 ⚠️ Adds one more microservice and TCP dependency in local dev  
 ⚠️ Current file serving happens in API Gateway; future CDN/object-store URLs may be preferable in production
+
+---
+
+## ADR-008: Frontend Component Decomposition and Logic/UI Separation
+
+**Date:** 2026-03  
+**Status:** Accepted
+
+### Context
+
+Page-level orchestration already uses state contracts and presenters, but some reusable components accumulated multiple workflows in single files (for example: post editing, media carousel, comments CRUD, and reactions in one card).
+
+This increased cognitive load, made reviews slower, and raised regression risk when adding new behavior.
+
+### Decision
+
+Adopt a two-level frontend boundary:
+
+1. **Page logic** (route orchestration, navigation, cross-island coordination) remains in `state-contracts/*` presenters.
+2. **Component logic** (widget workflows and local async orchestration) moves to component-scoped hooks colocated with each complex component.
+3. **UI slices** remain presentational and receive state/actions via props.
+
+Recommended structure:
+
+```text
+ComponentName.tsx                # composition shell
+component-name/use-*.ts          # control hooks
+component-name/ComponentName*.tsx # presentational slices
+component-name/types.ts          # local view types/utilities (optional)
+```
+
+Complexity constraints are initially **soft limits** (warnings/guidance), not hard delivery blockers.
+
+### Consequences
+
+✅ Clearer ownership between route orchestration and reusable component workflows  
+✅ Smaller, testable units and easier targeted Storybook coverage  
+✅ Safer incremental feature additions in complex UI islands  
+⚠️ More files per feature and some prop-plumbing overhead  
+⚠️ Teams must consistently apply the split to avoid drifting back to monolithic components
