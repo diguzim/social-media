@@ -48,12 +48,15 @@ export class ImageController {
       userId: request.userId,
     });
 
-    const image = await this.getProfileImageUseCase.execute(request.userId);
+    const { image, fileBuffer } = await this.getProfileImageUseCase.execute(
+      request.userId,
+    );
 
     return {
       imageId: image.id,
       userId: image.userId,
-      storagePath: image.storagePath,
+      fileBase64: fileBuffer.toString("base64"),
+      contentLength: fileBuffer.length,
       mimeType: image.mimeType,
       uploadedAt: image.uploadedAt.toISOString(),
     };

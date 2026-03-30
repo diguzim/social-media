@@ -20,6 +20,7 @@ describe("UploadProfileImageUseCase", () => {
 
   const imageStorageProvider: ImageStorageProvider = {
     saveProfileImage: jest.fn(async () => "/tmp/profile-image.png"),
+    readProfileImage: jest.fn(),
   };
 
   it("uploads a valid png image", async () => {

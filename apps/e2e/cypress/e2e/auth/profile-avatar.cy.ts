@@ -26,12 +26,46 @@ describe("Profile Avatar Upload", () => {
       .and("include", "/users/")
       .and("include", "/avatar");
 
+    cy.getByTestId("profile-avatar-image")
+      .invoke("attr", "src")
+      .then((avatarUrl) => {
+        expect(avatarUrl, "avatarUrl").to.be.a("string").and.not.be.empty;
+
+        cy.request({
+          url: avatarUrl as string,
+          encoding: "binary",
+        }).then((response) => {
+          expect(response.status).to.equal(200);
+          expect(response.headers["content-type"]).to.match(
+            /^image\/(png|jpeg)/,
+          );
+          expect(response.body.length).to.be.greaterThan(0);
+        });
+      });
+
     cy.reload();
 
     cy.getByTestId("profile-avatar-image")
       .should("have.attr", "src")
       .and("include", "/users/")
       .and("include", "/avatar");
+
+    cy.getByTestId("profile-avatar-image")
+      .invoke("attr", "src")
+      .then((avatarUrl) => {
+        expect(avatarUrl, "avatarUrl").to.be.a("string").and.not.be.empty;
+
+        cy.request({
+          url: avatarUrl as string,
+          encoding: "binary",
+        }).then((response) => {
+          expect(response.status).to.equal(200);
+          expect(response.headers["content-type"]).to.match(
+            /^image\/(png|jpeg)/,
+          );
+          expect(response.body.length).to.be.greaterThan(0);
+        });
+      });
   });
 
   it("rejects unsupported file types on client validation", () => {

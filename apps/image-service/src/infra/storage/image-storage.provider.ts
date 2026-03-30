@@ -6,4 +6,5 @@ export interface SaveProfileImageInput {
 
 export abstract class ImageStorageProvider {
   abstract saveProfileImage(input: SaveProfileImageInput): Promise<string>;
+  abstract readProfileImage(storagePath: string): Promise<Buffer>;
 }

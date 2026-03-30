@@ -17,6 +17,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `auth-service`: Auth microservice listening on TCP (port 4001)
 - `posts-service`: Posts microservice listening on TCP (port 4002)
 - `image-service`: Image microservice listening on TCP (port 4004) for profile picture upload/storage
+   - Avatar retrieval is transport-safe (byte payload), avoiding cross-service filesystem path coupling
 - `event-handler-service`: Background worker that processes domain events (port 4003)
 - `user-portal`: React + Vite frontend for user management (port 3000)
 

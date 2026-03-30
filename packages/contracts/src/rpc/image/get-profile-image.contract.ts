@@ -6,7 +6,8 @@ export interface GetProfileImageRequest {
 export interface GetProfileImageReply {
   imageId: string;
   userId: string;
-  storagePath: string;
+  fileBase64: string;
+  contentLength: number;
   mimeType: string;
   uploadedAt: string;
 }

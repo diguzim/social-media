@@ -28,7 +28,6 @@ import { LoginBodyDto } from './dto/login-body.dto';
 import { UserIdParamDto } from './dto/user-id-param.dto';
 import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
 import { IMAGE_SERVICE } from 'src/images/image.client';
-import { createReadStream, existsSync } from 'fs';
 import type { Express, Response } from 'express';
 
 @Controller('users')
@@ -239,14 +238,16 @@ export class UsersController {
       throw new NotFoundException('Profile image not found');
     }
 
-    if (!existsSync(rpcReply.storagePath)) {
+    const fileBuffer = Buffer.from(rpcReply.fileBase64, 'base64');
+    if (fileBuffer.length === 0) {
       throw new NotFoundException('Profile image not found');
     }
 
     res.setHeader('Content-Type', rpcReply.mimeType);
+    res.setHeader('Content-Length', String(rpcReply.contentLength));
     res.setHeader('Cache-Control', 'public, max-age=60');
 
-    return new StreamableFile(createReadStream(rpcReply.storagePath));
+    return new StreamableFile(fileBuffer);
   }
 
   /**

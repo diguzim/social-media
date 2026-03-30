@@ -29,7 +29,7 @@ Image Service (Port 4004)
 
 - `IMAGE_COMMANDS.getProfileImage`
   - Input: `{ userId }`
-  - Output: `{ imageId, userId, storagePath, mimeType, uploadedAt }`
+  - Output: `{ imageId, userId, fileBase64, contentLength, mimeType, uploadedAt }`
 
 ## Validation Rules
 
@@ -67,3 +67,4 @@ pnpm --filter image-service dev
 
 - Metadata is currently in-memory and resets on restart.
 - Storage provider is abstracted so local filesystem can be swapped for S3-compatible storage later.
+- Retrieval over RPC returns image bytes/metadata, so API Gateway does not depend on filesystem paths from this service.

@@ -47,6 +47,7 @@ API Gateway (Port 4000)
 
 - `GET /users/:userId/avatar` - Retrieve profile avatar image bytes
   - Returns: image stream with proper `Content-Type`
+  - Implementation note: gateway streams bytes returned by image-service RPC (no shared filesystem path dependency)
 
 ### Posts
 

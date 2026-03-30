@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { basename, join, resolve } from "path";
 import {
   ImageStorageProvider,
@@ -24,5 +24,9 @@ export class LocalFileStorageProvider implements ImageStorageProvider {
 
     await writeFile(fullPath, input.fileBuffer);
     return fullPath;
+  }
+
+  async readProfileImage(storagePath: string): Promise<Buffer> {
+    return readFile(storagePath);
   }
 }
