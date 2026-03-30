@@ -7,7 +7,13 @@ import { PostCard } from './PostCard';
 import * as postsService from '../../services/posts';
 
 vi.mock('../../services/posts', () => ({
+  addPostImages: vi.fn(),
   togglePostReaction: vi.fn(),
+  updatePost: vi.fn(),
+  deletePost: vi.fn(),
+  removePostImage: vi.fn(),
+  reorderPostImages: vi.fn(),
+  sortPostImages: vi.fn((images: unknown[] | undefined) => (images ? [...images] : [])),
   getPostComments: vi.fn(),
   createPostComment: vi.fn(),
   updatePostComment: vi.fn(),
@@ -81,6 +87,294 @@ describe('PostCard', () => {
 
     expect(screen.getByTestId('post-author-link-post-2')).toHaveTextContent('Bob');
     expect(screen.getByTestId('post-author-avatar-fallback-post-2')).toHaveTextContent('B');
+  });
+
+  describe('Post management', () => {
+    it('shows edit/delete controls only for post owner', () => {
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-1',
+            title: 'Owner post',
+            content: 'Owner content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      expect(screen.getByTestId('post-edit-post-manage-1')).toBeInTheDocument();
+      expect(screen.getByTestId('post-delete-post-manage-1')).toBeInTheDocument();
+    });
+
+    it('hides edit/delete controls for non-owner posts', () => {
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-2',
+            title: 'Not mine',
+            content: 'Other user content',
+            authorId: 'user-2',
+            author: { id: 'user-2', name: 'Bob' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      expect(screen.queryByTestId('post-edit-post-manage-2')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('post-delete-post-manage-2')).not.toBeInTheDocument();
+    });
+
+    it('edits title/content and saves post', async () => {
+      vi.mocked(postsService.updatePost).mockResolvedValue({
+        id: 'post-manage-3',
+        title: 'Updated title',
+        content: 'Updated content',
+        authorId: 'user-1',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        images: [],
+      });
+
+      const onReactionChange = vi.fn();
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-3',
+            title: 'Original title',
+            content: 'Original content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+          onReactionChange={onReactionChange}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('post-edit-post-manage-3'));
+
+      fireEvent.change(screen.getByTestId('post-edit-title-input-post-manage-3'), {
+        target: { value: '  Updated title  ' },
+      });
+      fireEvent.change(screen.getByTestId('post-edit-content-input-post-manage-3'), {
+        target: { value: '  Updated content  ' },
+      });
+
+      fireEvent.click(screen.getByTestId('post-save-post-manage-3'));
+
+      await waitFor(() => {
+        expect(postsService.updatePost).toHaveBeenCalledWith('post-manage-3', {
+          title: 'Updated title',
+          content: 'Updated content',
+        });
+      });
+
+      expect(screen.getByTestId('post-title-post-manage-3')).toHaveTextContent('Updated title');
+      expect(screen.getByTestId('post-content-post-manage-3')).toHaveTextContent('Updated content');
+      expect(onReactionChange).toHaveBeenCalledTimes(1);
+    });
+
+    it('deletes post after confirmation and shows deleted state', async () => {
+      vi.mocked(postsService.deletePost).mockResolvedValue({ success: true });
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-4',
+            title: 'Delete me',
+            content: 'Delete content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('post-delete-post-manage-4'));
+
+      await waitFor(() => {
+        expect(postsService.deletePost).toHaveBeenCalledWith('post-manage-4');
+      });
+
+      expect(screen.getByTestId('post-deleted-post-manage-4')).toBeInTheDocument();
+      confirmSpy.mockRestore();
+    });
+
+    it('removes selected existing image on save', async () => {
+      vi.mocked(postsService.updatePost).mockResolvedValue({
+        id: 'post-manage-5',
+        title: 'Image post',
+        content: 'Image content',
+        authorId: 'user-1',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        images: [
+          {
+            id: 'img-1',
+            imageUrl: 'http://localhost:4000/posts/post-manage-5/images/img-1',
+            mimeType: 'image/png',
+            orderIndex: 0,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+          {
+            id: 'img-2',
+            imageUrl: 'http://localhost:4000/posts/post-manage-5/images/img-2',
+            mimeType: 'image/png',
+            orderIndex: 1,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+      });
+      vi.mocked(postsService.removePostImage).mockResolvedValue({
+        id: 'post-manage-5',
+        title: 'Image post',
+        content: 'Image content',
+        authorId: 'user-1',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        images: [
+          {
+            id: 'img-2',
+            imageUrl: 'http://localhost:4000/posts/post-manage-5/images/img-2',
+            mimeType: 'image/png',
+            orderIndex: 0,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+      });
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-5',
+            title: 'Image post',
+            content: 'Image content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+            images: [
+              {
+                id: 'img-1',
+                imageUrl: 'http://localhost:4000/posts/post-manage-5/images/img-1',
+                mimeType: 'image/png',
+                orderIndex: 0,
+                uploadedAt: '2026-03-07T10:00:00.000Z',
+              },
+              {
+                id: 'img-2',
+                imageUrl: 'http://localhost:4000/posts/post-manage-5/images/img-2',
+                mimeType: 'image/png',
+                orderIndex: 1,
+                uploadedAt: '2026-03-07T10:00:00.000Z',
+              },
+            ],
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('post-edit-post-manage-5'));
+      fireEvent.click(screen.getByTestId('post-edit-image-remove-post-manage-5-0'));
+      fireEvent.click(screen.getByTestId('post-save-post-manage-5'));
+
+      await waitFor(() => {
+        expect(postsService.removePostImage).toHaveBeenCalledWith('post-manage-5', 'img-1');
+      });
+    });
+
+    it('reorders existing images on save when drag order changes', async () => {
+      vi.mocked(postsService.updatePost).mockResolvedValue({
+        id: 'post-manage-6',
+        title: 'Image order',
+        content: 'Image order content',
+        authorId: 'user-1',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        images: [
+          {
+            id: 'img-1',
+            imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-1',
+            mimeType: 'image/png',
+            orderIndex: 0,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+          {
+            id: 'img-2',
+            imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-2',
+            mimeType: 'image/png',
+            orderIndex: 1,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+      });
+      vi.mocked(postsService.reorderPostImages).mockResolvedValue({
+        id: 'post-manage-6',
+        title: 'Image order',
+        content: 'Image order content',
+        authorId: 'user-1',
+        createdAt: '2026-03-07T10:00:00.000Z',
+        images: [
+          {
+            id: 'img-2',
+            imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-2',
+            mimeType: 'image/png',
+            orderIndex: 0,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+          {
+            id: 'img-1',
+            imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-1',
+            mimeType: 'image/png',
+            orderIndex: 1,
+            uploadedAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+      });
+
+      renderWithRouter(
+        <PostCard
+          post={{
+            id: 'post-manage-6',
+            title: 'Image order',
+            content: 'Image order content',
+            authorId: 'user-1',
+            author: { id: 'user-1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+            images: [
+              {
+                id: 'img-1',
+                imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-1',
+                mimeType: 'image/png',
+                orderIndex: 0,
+                uploadedAt: '2026-03-07T10:00:00.000Z',
+              },
+              {
+                id: 'img-2',
+                imageUrl: 'http://localhost:4000/posts/post-manage-6/images/img-2',
+                mimeType: 'image/png',
+                orderIndex: 1,
+                uploadedAt: '2026-03-07T10:00:00.000Z',
+              },
+            ],
+          }}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('post-edit-post-manage-6'));
+
+      const firstImage = screen.getByTestId('post-edit-image-item-post-manage-6-0');
+      const secondImage = screen.getByTestId('post-edit-image-item-post-manage-6-1');
+
+      fireEvent.dragStart(firstImage);
+      fireEvent.dragOver(secondImage);
+      fireEvent.drop(secondImage);
+
+      fireEvent.click(screen.getByTestId('post-save-post-manage-6'));
+
+      await waitFor(() => {
+        expect(postsService.reorderPostImages).toHaveBeenCalledWith('post-manage-6', {
+          imageOrder: ['img-2', 'img-1'],
+        });
+      });
+    });
   });
 
   describe('Like button', () => {

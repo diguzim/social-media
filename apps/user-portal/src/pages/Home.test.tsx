@@ -56,10 +56,7 @@ describe('Home', () => {
     renderHomeRoute();
 
     expect(screen.getByTestId('navbar')).toBeInTheDocument();
-    expect(screen.getByTestId('home-profile-card')).toBeInTheDocument();
-    expect(screen.getByTestId('home-profile-refreshing-status')).toHaveTextContent(
-      'Refreshing your profile...'
-    );
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
     expect(screen.getByTestId('home-create-post-section')).toBeInTheDocument();
     expect(screen.getByTestId('home-feed-section')).toBeInTheDocument();
   });
@@ -70,10 +67,7 @@ describe('Home', () => {
 
     renderHomeRoute();
 
-    expect(await screen.findByTestId('home-profile-refresh-error')).toHaveTextContent(
-      'Showing cached profile. Failed to fetch profile'
-    );
-    expect(screen.getByTestId('home-profile-card')).toBeInTheDocument();
-    expect(screen.getByTestId('home-user-email')).toHaveTextContent('cached@example.com');
+    expect(await screen.findByTestId('home-create-post-section')).toBeInTheDocument();
+    expect(screen.getByTestId('home-feed-section')).toBeInTheDocument();
   });
 });

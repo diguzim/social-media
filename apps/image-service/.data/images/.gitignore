@@ -1,0 +1,8 @@
+# Ignore runtime uploaded images generated during local development/tests
+*
+
+# Keep repository seed images versioned
+!seed-user-1.png
+!seed-user-3.png
+!seed-user-5.png
+!.gitignore

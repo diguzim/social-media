@@ -25,6 +25,7 @@ cypress/
     posts/
       feed.cy.ts          # Feed API enrichment and pagination checks
       create-post.cy.ts   # Create post UI flow on Home/My Posts
+      manage-post.cy.ts   # Edit title/content, image manage, delete flow
       reactions.cy.ts     # Post like toggle API behavior
       comments.cy.ts      # Post comments CRUD on Home and My Posts
   support/
@@ -225,6 +226,7 @@ Currently covers:
 
 - **Feed**: Enriched author data, pagination, and filter behavior
 - **Create Post**: Form validation, submit UX, and visibility in Home/My Posts
+- **Manage Post**: Edit title/content, add/remove/reorder images, and delete own post
 - **Reactions**: Toggle like flow and feed reaction summaries
 - **Comments**: Create/edit/delete own comments and ownership restrictions across Home/My Posts
 

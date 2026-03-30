@@ -1,5 +1,6 @@
 import type {
   Comment,
+  PostImage,
   GetPostsRequest,
   GetPostsResponse,
   GetFeedRequest,
@@ -11,6 +12,9 @@ import type {
   CreateCommentResponse,
   GetCommentsRequest,
   GetCommentsResponse,
+  UpdatePostRequest,
+  UpdatePostResponse,
+  DeletePostResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   DeleteCommentResponse,
@@ -26,6 +30,10 @@ export type PostComment = Comment;
 
 export interface CreatePostInput extends CreatePostRequest {
   images?: File[];
+}
+
+export interface ReorderPostImagesRequest {
+  imageOrder: string[];
 }
 
 export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
@@ -111,6 +119,144 @@ export async function createPost(data: CreatePostInput): Promise<CreatePostRespo
   }
 
   return response.json();
+}
+
+export async function updatePost(
+  postId: string,
+  data: UpdatePostRequest
+): Promise<UpdatePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update post');
+  }
+
+  return response.json();
+}
+
+export async function deletePost(postId: string): Promise<DeletePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to delete post');
+  }
+
+  return response.json();
+}
+
+export async function addPostImages(postId: string, images: File[]): Promise<UpdatePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const formData = new FormData();
+  images.forEach((file) => {
+    formData.append('images', file);
+  });
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/images`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add post images');
+    }
+    throw new Error('Failed to add post images');
+  }
+
+  return response.json();
+}
+
+export async function removePostImage(
+  postId: string,
+  imageId: string
+): Promise<UpdatePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/images/${imageId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to remove post image');
+  }
+
+  return response.json();
+}
+
+export async function reorderPostImages(
+  postId: string,
+  data: ReorderPostImagesRequest
+): Promise<UpdatePostResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/posts/${postId}/images/reorder`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to reorder post images');
+  }
+
+  return response.json();
+}
+
+export function sortPostImages(images: PostImage[] | undefined): PostImage[] {
+  if (!images) {
+    return [];
+  }
+
+  return [...images].sort((a, b) => a.orderIndex - b.orderIndex);
 }
 
 export async function togglePostReaction(
