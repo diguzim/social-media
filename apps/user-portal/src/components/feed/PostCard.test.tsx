@@ -57,6 +57,7 @@ describe('PostCard', () => {
           author: {
             id: 'user-1',
             name: 'Alice',
+            username: 'alice',
             avatarUrl: 'http://localhost:4000/users/user-1/avatar',
           },
           createdAt: '2026-03-07T10:00:00.000Z',
@@ -79,7 +80,7 @@ describe('PostCard', () => {
           title: 'Enriched post',
           content: 'With author details',
           authorId: 'user-2',
-          author: { id: 'user-2', name: 'Bob' },
+          author: { id: 'user-2', name: 'Bob', username: 'bob' },
           createdAt: '2026-03-07T10:00:00.000Z',
         }}
       />
@@ -98,7 +99,7 @@ describe('PostCard', () => {
             title: 'Owner post',
             content: 'Owner content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />
@@ -116,7 +117,7 @@ describe('PostCard', () => {
             title: 'Not mine',
             content: 'Other user content',
             authorId: 'user-2',
-            author: { id: 'user-2', name: 'Bob' },
+            author: { id: 'user-2', name: 'Bob', username: 'bob' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />
@@ -145,7 +146,7 @@ describe('PostCard', () => {
             title: 'Original title',
             content: 'Original content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
           onReactionChange={onReactionChange}
@@ -186,7 +187,7 @@ describe('PostCard', () => {
             title: 'Delete me',
             content: 'Delete content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />
@@ -250,7 +251,7 @@ describe('PostCard', () => {
             title: 'Image post',
             content: 'Image content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
             images: [
               {
@@ -336,7 +337,7 @@ describe('PostCard', () => {
             title: 'Image order',
             content: 'Image order content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
             images: [
               {
@@ -386,7 +387,7 @@ describe('PostCard', () => {
             title: 'Likeable post',
             content: 'Like me!',
             authorId: 'user-3',
-            author: { id: 'user-3', name: 'Charlie' },
+            author: { id: 'user-3', name: 'Charlie', username: 'charlie' },
             createdAt: '2026-03-07T10:00:00.000Z',
             reactions: { likeCount: 2, likedByMe: false },
           }}
@@ -406,7 +407,7 @@ describe('PostCard', () => {
             title: 'Already liked',
             content: 'I liked this',
             authorId: 'user-4',
-            author: { id: 'user-4', name: 'Diana' },
+            author: { id: 'user-4', name: 'Diana', username: 'diana' },
             createdAt: '2026-03-07T10:00:00.000Z',
             reactions: { likeCount: 5, likedByMe: true },
           }}
@@ -434,7 +435,7 @@ describe('PostCard', () => {
             title: 'Click me',
             content: 'Likeable',
             authorId: 'user-5',
-            author: { id: 'user-5', name: 'Eve' },
+            author: { id: 'user-5', name: 'Eve', username: 'eve' },
             createdAt: '2026-03-07T10:00:00.000Z',
             reactions: { likeCount: 0, likedByMe: false },
           }}
@@ -476,7 +477,7 @@ describe('PostCard', () => {
             title: 'Slow network',
             content: 'Test pending state',
             authorId: 'user-6',
-            author: { id: 'user-6', name: 'Frank' },
+            author: { id: 'user-6', name: 'Frank', username: 'frank' },
             createdAt: '2026-03-07T10:00:00.000Z',
             reactions: { likeCount: 3, likedByMe: false },
           }}
@@ -529,7 +530,7 @@ describe('PostCard', () => {
             title: 'Post with callback',
             content: 'Test callback',
             authorId: 'user-7',
-            author: { id: 'user-7', name: 'Grace' },
+            author: { id: 'user-7', name: 'Grace', username: 'grace' },
             createdAt: '2026-03-07T10:00:00.000Z',
             reactions: { likeCount: 0, likedByMe: false },
           }}
@@ -572,7 +573,7 @@ describe('PostCard', () => {
             title: 'Post with comments',
             content: 'Content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />
@@ -633,7 +634,7 @@ describe('PostCard', () => {
             title: 'Post with create comment',
             content: 'Content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />
@@ -715,7 +716,7 @@ describe('PostCard', () => {
             title: 'Post with owner comment actions',
             content: 'Content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-07T10:00:00.000Z',
           }}
         />

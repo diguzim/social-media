@@ -333,6 +333,7 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
       <PostCardHeader
         postId={managedPost.id}
         authorId={managedPost.author.id}
+        authorUsername={managedPost.author.username}
         authorLabel={authorLabel}
         authorInitial={authorInitial}
         authorAvatarUrl={hasAvatar ? managedPost.author.avatarUrl : undefined}

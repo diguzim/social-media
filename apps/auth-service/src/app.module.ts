@@ -8,6 +8,7 @@ import { DatabaseModule } from './infra/database/database.module';
 import { RegisterUseCase } from './core/application/authentication/register.use-case';
 import { LoginUseCase } from './core/application/authentication/login.use-case';
 import { GetProfileUseCase } from './core/application/authentication/get-profile.use-case';
+import { GetProfileByUsernameUseCase } from './core/application/authentication/get-profile-by-username.use-case';
 import { RabbitMqEventPublisher } from './infra/events/rabbitmq-event.publisher';
 import { CreateEmailVerificationTokenUseCase } from './core/application/email-verification/create-email-verification-token.use-case';
 import { ConfirmEmailVerificationUseCase } from './core/application/email-verification/confirm-email-verification.use-case';
@@ -73,6 +74,7 @@ const lokiTransport = logsToLokiEnabled
     RegisterUseCase,
     LoginUseCase,
     GetProfileUseCase,
+    GetProfileByUsernameUseCase,
     RabbitMqEventPublisher,
     CreateEmailVerificationTokenUseCase,
     ConfirmEmailVerificationUseCase,

@@ -39,6 +39,11 @@ API Gateway (Port 4000)
   - Returns: `{ id, name, username, email, emailVerifiedAt, avatarUrl? }`
   - Guards: **JwtAuthGuard** (requires valid JWT)
 
+- `GET /users/:username/profile` - Get public user profile by username
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ id, name, username, emailVerifiedAt, avatarUrl? }`
+  - Guards: **JwtAuthGuard** (requires valid JWT)
+
 - `POST /users/avatar` - Upload current user's profile avatar
   - Content-Type: `multipart/form-data` with `file` field
   - Headers: `Authorization: Bearer {token}`

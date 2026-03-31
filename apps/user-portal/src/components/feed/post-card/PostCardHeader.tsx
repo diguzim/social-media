@@ -4,6 +4,7 @@ import { PendingButton } from '../../loading/PendingButton';
 interface PostCardHeaderProps {
   postId: string;
   authorId: string;
+  authorUsername: string;
   authorLabel: string;
   authorInitial: string;
   authorAvatarUrl?: string;
@@ -25,6 +26,7 @@ interface PostCardHeaderProps {
 export function PostCardHeader({
   postId,
   authorId,
+  authorUsername,
   authorLabel,
   authorInitial,
   authorAvatarUrl,
@@ -67,7 +69,7 @@ export function PostCardHeader({
         <div className="min-w-0">
           <Link
             data-testid={`post-author-link-${postId}`}
-            to={`/users/${authorId}`}
+            to={`/users/${authorUsername}`}
             className="line-clamp-1 text-sm font-semibold text-slate-900 hover:text-blue-700 hover:underline"
           >
             {authorLabel}

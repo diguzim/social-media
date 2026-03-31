@@ -48,7 +48,7 @@ describe('MyPosts', () => {
             title: 'My post',
             content: 'Content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Alice' },
+            author: { id: 'user-1', name: 'Alice', username: 'alice' },
             createdAt: '2026-03-10T10:00:00.000Z',
           },
         ],

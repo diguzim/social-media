@@ -5,8 +5,9 @@ import { usePaginatedFeedPosts } from '../../../../hooks/usePaginatedFeedPosts';
 import type { UserProfileStateContract } from '../../user-profile-state.contract';
 
 export function useUserProfileStatePresenter(): UserProfileStateContract {
-  const { userId } = useParams<{ userId: string }>();
+  const { username } = useParams<{ username: string }>();
   const [profile, setProfile] = useState<UserProfileStateContract['state']['profile']>(null);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { state: postsState, actions: postsActions } = usePaginatedFeedPosts({
@@ -18,8 +19,9 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
   });
 
   const fetchUserProfile = useCallback(async () => {
-    if (!userId) {
+    if (!username) {
       setProfile(null);
+      setUserId(undefined);
       setError('Invalid user profile route');
       setIsLoading(false);
       return;
@@ -29,15 +31,17 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
     setIsLoading(true);
 
     try {
-      const response = await getPublicProfile(userId);
+      const response = await getPublicProfile(username);
       setProfile(response);
+      setUserId(response.id);
     } catch (err) {
       setProfile(null);
+      setUserId(undefined);
       setError(err instanceof Error ? err.message : 'Failed to load user profile');
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [username]);
 
   const refreshPosts = useCallback(async () => {
     if (!userId) {

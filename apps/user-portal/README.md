@@ -9,7 +9,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Email verification flow (verify link + resend banner)
 - Modern own-profile header (avatar, name, username, stats) with secondary account details
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
-- Modern public profile page (avatar, name, username, stats) for viewing other users by id
+- Modern public profile page (avatar, name, username, stats) for viewing other users by username
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
 - Progressive loading UX with persistent shell + Home page islands
@@ -26,7 +26,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/register` - User registration form
 - `/login` - User login form
 - `/profile` - Protected own-profile page with modern header + account details + posts
-- `/users/:userId` - Protected public profile page with modern header + posts
+- `/users/:username` - Protected public profile page with modern header + posts
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
 
@@ -88,7 +88,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users (register)
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
-- GET /users/:userId/profile (requires Authorization: Bearer {token})
+- GET /users/:username/profile (requires Authorization: Bearer {token})
 - POST /users/avatar (requires auth; multipart image upload)
 - GET /users/:userId/avatar (public image stream)
 - GET /posts?page=1&limit=10&sortOrder=desc

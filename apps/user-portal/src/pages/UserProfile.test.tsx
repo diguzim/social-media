@@ -57,7 +57,7 @@ describe('UserProfile', () => {
             title: 'Post by Eve',
             content: 'Content',
             authorId: 'user-5',
-            author: { id: 'user-5', name: 'Eve' },
+            author: { id: 'user-5', name: 'Eve', username: 'eve' },
             createdAt: '2026-03-10T10:00:00.000Z',
           },
         ],

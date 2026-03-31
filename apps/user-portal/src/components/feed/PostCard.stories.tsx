@@ -20,7 +20,12 @@ export const NotLiked: Story = {
       content:
         'TypeScript is a powerful tool for building large-scale JavaScript applications with type safety.',
       authorId: '1',
-      author: { id: '1', name: 'Alice', avatarUrl: 'http://localhost:4000/users/1/avatar' },
+      author: {
+        id: '1',
+        name: 'Alice',
+        username: 'alice',
+        avatarUrl: 'http://localhost:4000/users/1/avatar',
+      },
       createdAt: '2025-01-10T08:00:00.000Z',
       reactions: { likeCount: 3, likedByMe: false },
     },
@@ -34,7 +39,12 @@ export const Liked: Story = {
       title: 'Understanding Async/Await',
       content: 'Async/await makes asynchronous code much more readable and easier to reason about.',
       authorId: '1',
-      author: { id: '1', name: 'Alice', avatarUrl: 'http://localhost:4000/users/1/avatar' },
+      author: {
+        id: '1',
+        name: 'Alice',
+        username: 'alice',
+        avatarUrl: 'http://localhost:4000/users/1/avatar',
+      },
       createdAt: '2025-01-11T09:30:00.000Z',
       reactions: { likeCount: 8, likedByMe: true },
     },
@@ -49,7 +59,7 @@ export const NoReactions: Story = {
       content:
         'Learn how to structure your NestJS applications for scalability and maintainability.',
       authorId: '1',
-      author: { id: '1', name: 'Alice' },
+      author: { id: '1', name: 'Alice', username: 'alice' },
       createdAt: '2025-01-12T14:15:00.000Z',
     },
   },
@@ -63,7 +73,12 @@ export const ManyLikes: Story = {
       content:
         'Docker containers help ensure consistency between development and production environments.',
       authorId: '2',
-      author: { id: '2', name: 'Bob', avatarUrl: 'http://localhost:4000/users/2/avatar' },
+      author: {
+        id: '2',
+        name: 'Bob',
+        username: 'bob',
+        avatarUrl: 'http://localhost:4000/users/2/avatar',
+      },
       createdAt: '2025-01-13T10:45:00.000Z',
       reactions: { likeCount: 42, likedByMe: false },
     },
@@ -78,7 +93,12 @@ export const LikedWithManyLikes: Story = {
       content:
         'Breaking down applications into microservices provides flexibility and independent scaling.',
       authorId: '2',
-      author: { id: '2', name: 'Bob', avatarUrl: 'http://localhost:4000/users/2/avatar' },
+      author: {
+        id: '2',
+        name: 'Bob',
+        username: 'bob',
+        avatarUrl: 'http://localhost:4000/users/2/avatar',
+      },
       createdAt: '2025-01-14T11:20:00.000Z',
       reactions: { likeCount: 128, likedByMe: true },
     },
@@ -92,7 +112,12 @@ export const WithImagesCarousel: Story = {
       title: 'Photo dump from the weekend',
       content: 'Swipe through the highlights ✨',
       authorId: '3',
-      author: { id: '3', name: 'Charlie', avatarUrl: 'http://localhost:4000/users/3/avatar' },
+      author: {
+        id: '3',
+        name: 'Charlie',
+        username: 'charlie',
+        avatarUrl: 'http://localhost:4000/users/3/avatar',
+      },
       createdAt: '2025-01-15T08:30:00.000Z',
       reactions: { likeCount: 17, likedByMe: false },
       images: [

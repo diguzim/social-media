@@ -32,7 +32,7 @@ export function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/users/:userId" element={<UserProfile />} />
+            <Route path="/users/:username" element={<UserProfile />} />
             <Route path="/my-posts" element={<MyPosts />} />
           </Route>
 

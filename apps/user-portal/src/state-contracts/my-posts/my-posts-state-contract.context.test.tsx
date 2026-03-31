@@ -37,7 +37,7 @@ describe('MyPostsStateContractProvider', () => {
             title: 'Injected Post',
             content: 'Injected content',
             authorId: 'user-1',
-            author: { id: 'user-1', name: 'Injected User' },
+            author: { id: 'user-1', name: 'Injected User', username: 'injected' },
             createdAt: '2026-03-01T00:00:00.000Z',
           },
         ],

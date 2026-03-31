@@ -26,9 +26,12 @@ import { firstValueFrom } from 'rxjs';
 import { RegisterBodyDto } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { UserIdParamDto } from './dto/user-id-param.dto';
+import { UsernameParamDto } from './dto/username-param.dto';
 import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
 import { IMAGE_SERVICE } from 'src/images/image.client';
 import type { Express, Response } from 'express';
+
+const GET_PROFILE_BY_USERNAME_CMD = 'auth.getProfileByUsername';
 
 @Controller('users')
 export class UsersController {
@@ -139,28 +142,28 @@ export class UsersController {
     };
   }
 
-  @Get(':userId/profile')
+  @Get(':username/profile')
   @UseGuards(JwtAuthGuard)
   async getPublicProfile(
-    @Param() params: UserIdParamDto,
+    @Param() params: UsernameParamDto,
   ): Promise<API.GetPublicProfileResponse> {
-    const { userId } = params;
+    const { username } = params;
 
     this.logger.debug(
       'API Gateway: forwarding getPublicProfile to auth service',
-      { userId },
+      { username },
     );
 
-    const rpcRequest: RPC.GetProfileRequest = {
-      userId,
+    const rpcRequest: RPC.GetProfileByUsernameRequest = {
+      username,
       correlationId: getCorrelationId(),
     };
 
     const rpcReply = await firstValueFrom(
-      this.authClient.send<RPC.GetProfileReply, RPC.GetProfileRequest>(
-        { cmd: AUTH_COMMANDS.getProfile },
-        rpcRequest,
-      ),
+      this.authClient.send<
+        RPC.GetProfileByUsernameReply,
+        RPC.GetProfileByUsernameRequest
+      >({ cmd: GET_PROFILE_BY_USERNAME_CMD }, rpcRequest),
     );
 
     const avatarUrl = await this.tryBuildAvatarUrl(rpcReply.id);

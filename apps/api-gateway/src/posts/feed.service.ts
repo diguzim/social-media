@@ -76,6 +76,7 @@ export class FeedService {
           authorMap.set(userId, {
             id: profile.id,
             name: profile.name,
+            username: profile.username,
             avatarUrl,
           });
         } catch (
@@ -85,7 +86,11 @@ export class FeedService {
           this.logger.warn(
             `FeedService: could not fetch profile for userId=${userId}, using fallback`,
           );
-          authorMap.set(userId, { id: userId, name: 'Unknown User' });
+          authorMap.set(userId, {
+            id: userId,
+            name: 'Unknown User',
+            username: 'unknown',
+          });
         }
       }),
     );
@@ -142,6 +147,7 @@ export class FeedService {
         author: authorMap.get(post.authorId) ?? {
           id: post.authorId,
           name: 'Unknown User',
+          username: 'unknown',
         },
         createdAt: post.createdAt,
         reactions: reactionMap.get(post.id) ?? {

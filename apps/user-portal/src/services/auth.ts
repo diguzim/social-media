@@ -100,13 +100,13 @@ export async function getProfile(): Promise<UserProfile> {
   return profile;
 }
 
-export async function getPublicProfile(userId: string): Promise<PublicUserProfile> {
+export async function getPublicProfile(username: string): Promise<PublicUserProfile> {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
     throw new Error('No authentication token found');
   }
 
-  const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+  const response = await fetch(`${API_BASE_URL}/users/${username}/profile`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

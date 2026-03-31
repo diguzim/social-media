@@ -3,10 +3,13 @@ import { MessagePattern } from '@nestjs/microservices';
 import { RegisterUseCase } from 'src/core/application/authentication/register.use-case';
 import { LoginUseCase } from 'src/core/application/authentication/login.use-case';
 import { GetProfileUseCase } from 'src/core/application/authentication/get-profile.use-case';
+import { GetProfileByUsernameUseCase } from 'src/core/application/authentication/get-profile-by-username.use-case';
 import { CreateEmailVerificationTokenUseCase } from 'src/core/application/email-verification/create-email-verification-token.use-case';
 import { ConfirmEmailVerificationUseCase } from 'src/core/application/email-verification/confirm-email-verification.use-case';
 import { RequestEmailVerificationUseCase } from 'src/core/application/email-verification/request-email-verification.use-case';
 import { AUTH_COMMANDS, RPC } from '@repo/contracts';
+
+const GET_PROFILE_BY_USERNAME_CMD = 'auth.getProfileByUsername';
 
 @Controller()
 export class AuthController {
@@ -16,6 +19,7 @@ export class AuthController {
     private registerUseCase: RegisterUseCase,
     private loginUseCase: LoginUseCase,
     private getProfileUseCase: GetProfileUseCase,
+    private getProfileByUsernameUseCase: GetProfileByUsernameUseCase,
     private createEmailVerificationTokenUseCase: CreateEmailVerificationTokenUseCase,
     private confirmEmailVerificationUseCase: ConfirmEmailVerificationUseCase,
     private requestEmailVerificationUseCase: RequestEmailVerificationUseCase,
@@ -59,6 +63,28 @@ export class AuthController {
 
     const result = await this.getProfileUseCase.execute({
       userId: request.userId,
+    });
+
+    return {
+      id: result.id,
+      name: result.name,
+      username: result.username,
+      email: result.email,
+      emailVerifiedAt: result.emailVerifiedAt,
+    };
+  }
+
+  @MessagePattern({ cmd: GET_PROFILE_BY_USERNAME_CMD })
+  async handleGetProfileByUsername(
+    request: RPC.GetProfileByUsernameRequest,
+  ): Promise<RPC.GetProfileByUsernameReply> {
+    this.logger.debug(
+      'Auth service: handling getProfileByUsername command',
+      request,
+    );
+
+    const result = await this.getProfileByUsernameUseCase.execute({
+      username: request.username,
     });
 
     return {
