@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_PORTS="3000 4000 4001 4002 4003 4004"
+APP_PORTS="3000 4000 4001 4002 4003 4004 4005"
 
 collect_listener_pids() {
   local port="$1"

@@ -17,6 +17,9 @@ describe('UserProfile', () => {
         profile: null,
         error: '',
         isLoading: true,
+        friendshipStatus: 'none',
+        friendshipError: '',
+        isFriendshipActionPending: false,
         posts: [],
         isPostsLoading: true,
         isLoadingMorePosts: false,
@@ -27,6 +30,7 @@ describe('UserProfile', () => {
       actions: {
         refresh: vi.fn().mockResolvedValue(undefined),
         refreshPosts: vi.fn().mockResolvedValue(undefined),
+        sendFriendRequest: vi.fn().mockResolvedValue(undefined),
         loadNextPostsPage: vi.fn().mockResolvedValue(undefined),
       },
     });
@@ -51,6 +55,9 @@ describe('UserProfile', () => {
         },
         error: '',
         isLoading: false,
+        friendshipStatus: 'none',
+        friendshipError: '',
+        isFriendshipActionPending: false,
         posts: [
           {
             id: 'post-1',
@@ -70,6 +77,7 @@ describe('UserProfile', () => {
       actions: {
         refresh: vi.fn().mockResolvedValue(undefined),
         refreshPosts: vi.fn().mockResolvedValue(undefined),
+        sendFriendRequest: vi.fn().mockResolvedValue(undefined),
         loadNextPostsPage: vi.fn().mockResolvedValue(undefined),
       },
     });

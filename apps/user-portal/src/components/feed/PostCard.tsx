@@ -332,7 +332,6 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
     <article data-testid={`post-card-${managedPost.id}`} className="card p-4">
       <PostCardHeader
         postId={managedPost.id}
-        authorId={managedPost.author.id}
         authorUsername={managedPost.author.username}
         authorLabel={authorLabel}
         authorInitial={authorInitial}

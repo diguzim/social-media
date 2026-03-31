@@ -5,6 +5,9 @@ export interface UserProfileState {
   profile: PublicUserProfile | null;
   error: string;
   isLoading: boolean;
+  friendshipStatus: 'none' | 'pending_outgoing' | 'pending_incoming' | 'friends' | 'self';
+  friendshipError: string;
+  isFriendshipActionPending: boolean;
   posts: FeedPost[];
   isPostsLoading: boolean;
   isLoadingMorePosts: boolean;
@@ -16,6 +19,7 @@ export interface UserProfileState {
 export interface UserProfileStateActions {
   refresh: () => Promise<void>;
   refreshPosts: () => Promise<void>;
+  sendFriendRequest: () => Promise<void>;
   loadNextPostsPage: () => Promise<void>;
 }
 

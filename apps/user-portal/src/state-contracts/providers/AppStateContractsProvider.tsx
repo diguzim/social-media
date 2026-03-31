@@ -5,6 +5,7 @@ import { LoginStateContractProvider } from '../login';
 import { MyPostsStateContractProvider } from '../my-posts';
 import { ProfileStateContractProvider } from '../profile';
 import { UserProfileStateContractProvider } from '../user-profile';
+import { FriendsStateContractProvider } from '../friends';
 
 type ProviderComponent = ComponentType<{ children: ReactNode }>;
 
@@ -15,6 +16,7 @@ const STATE_CONTRACT_PROVIDERS: ProviderComponent[] = [
   MyPostsStateContractProvider,
   ProfileStateContractProvider,
   UserProfileStateContractProvider,
+  FriendsStateContractProvider,
 ];
 
 interface AppStateContractsProviderProps {

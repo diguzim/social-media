@@ -2,6 +2,7 @@ import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
+import { PendingButton } from '../components/loading/PendingButton';
 
 export function UserProfile() {
   const { state, actions } = useUserProfileStateContract();
@@ -9,6 +10,9 @@ export function UserProfile() {
     profile,
     error,
     isLoading,
+    friendshipStatus,
+    friendshipError,
+    isFriendshipActionPending,
     posts,
     isPostsLoading,
     isLoadingMorePosts,
@@ -74,6 +78,39 @@ export function UserProfile() {
             ⚠ Email not verified yet
           </p>
         )}
+
+        <div data-testid="user-profile-friendship-section" className="mt-3 space-y-2">
+          <p data-testid="user-profile-friendship-status" className="text-sm text-slate-700">
+            {friendshipStatus === 'self'
+              ? 'This is your profile.'
+              : friendshipStatus === 'friends'
+                ? 'You are friends.'
+                : friendshipStatus === 'pending_outgoing'
+                  ? 'Friend request pending approval.'
+                  : friendshipStatus === 'pending_incoming'
+                    ? 'This user sent you a friend request.'
+                    : 'You are not friends yet.'}
+          </p>
+
+          {friendshipStatus === 'none' ? (
+            <PendingButton
+              data-testid="user-profile-send-friend-request"
+              isPending={isFriendshipActionPending}
+              idleText="Add friend"
+              pendingText="Sending..."
+              onClick={() => {
+                void actions.sendFriendRequest();
+              }}
+              className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700"
+            />
+          ) : null}
+
+          {friendshipError ? (
+            <p data-testid="user-profile-friendship-error" className="text-sm text-danger-600">
+              {friendshipError}
+            </p>
+          ) : null}
+        </div>
       </section>
 
       <section data-testid="user-profile-posts-section" className="mt-6">

@@ -9,9 +9,11 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { UsersController } from './users/users.controller';
 import { PostsController } from './posts/posts.controller';
+import { FriendsController } from './friends/friends.controller';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { ImagesModule } from './images/images.module';
+import { FriendsModule } from './friends/friends.module';
 import {
   LogContextMiddleware,
   getCorrelationId,
@@ -62,8 +64,9 @@ const lokiTransport = logsToLokiEnabled
     AuthModule,
     PostsModule,
     ImagesModule,
+    FriendsModule,
   ],
-  controllers: [UsersController, PostsController],
+  controllers: [UsersController, PostsController, FriendsController],
   providers: [
     {
       provide: APP_PIPE,

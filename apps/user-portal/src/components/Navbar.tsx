@@ -31,6 +31,13 @@ export function Navbar() {
         >
           My Posts
         </Link>
+        <Link
+          data-testid="navbar-friends-link"
+          to="/friends"
+          className="text-lg font-semibold text-white no-underline transition hover:text-primary-100"
+        >
+          Friends
+        </Link>
       </div>
 
       <h1 data-testid="navbar-title" className="text-xl font-bold sm:text-2xl">

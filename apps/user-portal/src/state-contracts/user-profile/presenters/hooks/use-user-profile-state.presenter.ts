@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getPublicProfile } from '../../../../services/auth';
+import { getPublicProfile, getUserProfile } from '../../../../services/auth';
+import { getFriendshipStatus, sendFriendRequest } from '../../../../services/friends';
 import { usePaginatedFeedPosts } from '../../../../hooks/usePaginatedFeedPosts';
 import type { UserProfileStateContract } from '../../user-profile-state.contract';
 
@@ -9,6 +10,10 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
   const [profile, setProfile] = useState<UserProfileStateContract['state']['profile']>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [error, setError] = useState('');
+  const [friendshipStatus, setFriendshipStatus] =
+    useState<UserProfileStateContract['state']['friendshipStatus']>('none');
+  const [friendshipError, setFriendshipError] = useState('');
+  const [isFriendshipActionPending, setIsFriendshipActionPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { state: postsState, actions: postsActions } = usePaginatedFeedPosts({
     authorId: userId,
@@ -34,14 +39,43 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
       const response = await getPublicProfile(username);
       setProfile(response);
       setUserId(response.id);
+
+      const currentUser = getUserProfile();
+      if (currentUser?.username === response.username) {
+        setFriendshipStatus('self');
+      } else {
+        const friendship = await getFriendshipStatus(response.username);
+        setFriendshipStatus(friendship.status);
+      }
+      setFriendshipError('');
     } catch (err) {
       setProfile(null);
       setUserId(undefined);
       setError(err instanceof Error ? err.message : 'Failed to load user profile');
+      setFriendshipStatus('none');
+      setFriendshipError('');
     } finally {
       setIsLoading(false);
     }
   }, [username]);
+
+  const sendRequest = useCallback(async () => {
+    if (!profile) {
+      return;
+    }
+
+    setFriendshipError('');
+    setIsFriendshipActionPending(true);
+
+    try {
+      await sendFriendRequest({ targetUsername: profile.username });
+      setFriendshipStatus('pending_outgoing');
+    } catch (err) {
+      setFriendshipError(err instanceof Error ? err.message : 'Failed to send friend request');
+    } finally {
+      setIsFriendshipActionPending(false);
+    }
+  }, [profile]);
 
   const refreshPosts = useCallback(async () => {
     if (!userId) {
@@ -63,6 +97,9 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
       profile,
       error,
       isLoading,
+      friendshipStatus,
+      friendshipError,
+      isFriendshipActionPending,
       posts: postsState.posts,
       isPostsLoading: postsState.isLoading,
       isLoadingMorePosts: postsState.isLoadingMore,
@@ -75,6 +112,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
     actions: {
       refresh,
       refreshPosts,
+      sendFriendRequest: sendRequest,
       loadNextPostsPage: postsActions.loadNextPage,
     },
   };

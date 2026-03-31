@@ -10,6 +10,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Modern own-profile header (avatar, name, username, stats) with secondary account details
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - Modern public profile page (avatar, name, username, stats) for viewing other users by username
+- Friends page for accepted friends plus incoming/outgoing pending requests
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
 - Progressive loading UX with persistent shell + Home page islands
@@ -27,6 +28,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/login` - User login form
 - `/profile` - Protected own-profile page with modern header + account details + posts
 - `/users/:username` - Protected public profile page with modern header + posts
+- `/friends` - Protected friendship management page (friends + pending requests)
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
 
@@ -89,6 +91,13 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
 - GET /users/:username/profile (requires Authorization: Bearer {token})
+- POST /friends/requests (requires auth)
+- POST /friends/requests/:requestId/accept (requires auth)
+- POST /friends/requests/:requestId/reject (requires auth)
+- GET /friends (requires auth)
+- GET /friends/requests/incoming (requires auth)
+- GET /friends/requests/outgoing (requires auth)
+- GET /friends/status/:username (requires auth)
 - POST /users/avatar (requires auth; multipart image upload)
 - GET /users/:userId/avatar (public image stream)
 - GET /posts?page=1&limit=10&sortOrder=desc
@@ -129,12 +138,12 @@ pnpm build
 ```
 src/
   app/            - Application root and routing
-  pages/          - Page components (Home, Register, Login, Profile)
+  pages/          - Page components (Home, Register, Login, Profile, Friends)
   components/     - Reusable UI components (e.g., Navbar, Feed, PostCard)
   components/loading/ - Shared loading primitives (skeletons, pending buttons, inline status)
   components/home/ - Home page island components
   state-contracts/ - Frontend state contracts, presenters, and providers (replaceable state management)
-  services/       - API clients (auth.ts and posts.ts)
+  services/       - API clients (auth.ts, posts.ts, friends.ts)
   hooks/          - Custom React hooks (placeholder)
 ```
 
@@ -155,6 +164,7 @@ Current rollout:
 - MyPosts page uses `MyPostsStateContractProvider` + `useMyPostsStateContract()`
 - Profile page uses `ProfileStateContractProvider` + `useProfileStateContract()`
 - UserProfile page uses `UserProfileStateContractProvider` + `useUserProfileStateContract()`
+- Friends page uses `FriendsStateContractProvider` + `useFriendsStateContract()`
 - Default presenter is `useHomeStatePresenter` under the hooks approach folder
 - Default register presenter is `useRegisterStatePresenter` under the hooks approach folder
 - Default login presenter is `useLoginStatePresenter` under the hooks approach folder

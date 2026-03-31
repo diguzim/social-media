@@ -5,6 +5,7 @@ import { Login } from '../pages/Login';
 import { Profile } from '../pages/Profile';
 import { UserProfile } from '../pages/UserProfile';
 import { MyPosts } from '../pages/MyPosts';
+import { Friends } from '../pages/Friends';
 import { VerifyEmail } from '../pages/VerifyEmail';
 import { NotFound } from '../pages/NotFound';
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout';
@@ -34,6 +35,7 @@ export function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/users/:username" element={<UserProfile />} />
             <Route path="/my-posts" element={<MyPosts />} />
+            <Route path="/friends" element={<Friends />} />
           </Route>
 
           {/* Catch-all */}

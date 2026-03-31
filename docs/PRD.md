@@ -45,17 +45,26 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 
 ### Planned
 
-| Feature                 | Priority | Notes                                            |
-| ----------------------- | -------- | ------------------------------------------------ |
-| PostgreSQL persistence  | High     | Replace in-memory repos in auth + posts services |
-| MongoDB persistence     | High     | Explore NoSQL fit for posts                      |
-| Like / reaction system  | Medium   | Event-driven via event-handler-service           |
-| Comments                | Medium   | Flat comments CRUD in posts-service (initial)    |
-| Follow / unfollow users | Medium   | Graph-like data                                  |
-| Notifications           | Low      | WebSocket or polling                             |
-| Media uploads           | ✅ Done  | Optional post images (JPG/PNG/GIF, up to 10)    |
-| OAuth / social login    | Low      | Google, GitHub                                   |
-| Public guest feed       | Low      | No auth required                                 |
+| Feature                 | Priority | Notes                                                |
+| ----------------------- | -------- | ---------------------------------------------------- |
+| PostgreSQL persistence  | High     | Replace in-memory repos in auth + posts services     |
+| MongoDB persistence     | High     | Explore NoSQL fit for posts                          |
+| Friendship requests     | High     | Dedicated friendship-service (pending/accept/reject) |
+| Like / reaction system  | Medium   | Event-driven via event-handler-service               |
+| Comments                | Medium   | Flat comments CRUD in posts-service (initial)        |
+| Follow / unfollow users | Medium   | Graph-like data                                      |
+| Notifications           | Low      | WebSocket or polling                                 |
+| Media uploads           | ✅ Done  | Optional post images (JPG/PNG/GIF, up to 10)         |
+| OAuth / social login    | Low      | Google, GitHub                                       |
+| Public guest feed       | Low      | No auth required                                     |
+
+### Social Graph Backlog (TODO)
+
+- Blocking users (`UserBlock`) to prevent requests/interactions
+- Friendship suggestions (people you may know)
+- Mutual friends computation and display
+- Relationship privacy controls (who can send/view)
+- Notification events for friend request accepted/rejected
 
 ---
 

@@ -7,7 +7,7 @@ HTTP entrypoint for the social media platform. Routes HTTP requests from clients
 - Single entry point for frontend clients
 - CORS enabled for cross-origin requests from React SPA
 - JWT verification for protected endpoints
-- Request routing to auth-service and posts-service microservices
+- Request routing to auth-service, posts-service, image-service, and friendship-service microservices
 - Translation layer between `API` (public HTTP) and `RPC` (internal TCP) contracts
 - Exception serialization and HTTP response mapping
 
@@ -19,7 +19,8 @@ Client (Browser)
 API Gateway (Port 4000)
   ├─→ Auth Service (TCP Port 4001)  [register, login, getProfile]
   ├─→ Posts Service (TCP Port 4002) [create, read, update, delete posts]
-  └─→ Image Service (TCP Port 4004) [profile avatar + post image upload/lookup]
+  ├─→ Image Service (TCP Port 4004) [profile avatar + post image upload/lookup]
+  └─→ Friendship Service (TCP Port 4005) [friend requests + relationship status]
 ```
 
 ## Endpoints
@@ -53,6 +54,37 @@ API Gateway (Port 4000)
 - `GET /users/:userId/avatar` - Retrieve profile avatar image bytes
   - Returns: image stream with proper `Content-Type`
   - Implementation note: gateway streams bytes returned by image-service RPC (no shared filesystem path dependency)
+
+### Friends
+
+- `POST /friends/requests` - Send friend request
+  - Headers: `Authorization: Bearer {token}`
+  - Body: `{ targetUsername }`
+  - Returns: `{ request }`
+
+- `POST /friends/requests/:requestId/accept` - Accept pending request
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ request }`
+
+- `POST /friends/requests/:requestId/reject` - Reject pending request
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ request }`
+
+- `GET /friends` - List accepted friends of current user
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ data: FriendUserSummary[] }`
+
+- `GET /friends/requests/incoming` - List incoming pending requests
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ data: FriendRequestItem[] }`
+
+- `GET /friends/requests/outgoing` - List outgoing pending requests
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ data: FriendRequestItem[] }`
+
+- `GET /friends/status/:username` - Relationship status with a user
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ status: 'none' | 'pending_outgoing' | 'pending_incoming' | 'friends' }`
 
 ### Posts
 
@@ -146,6 +178,9 @@ POSTS_SERVICE_PORT=4002
 
 IMAGE_SERVICE_HOST=localhost
 IMAGE_SERVICE_PORT=4004
+
+FRIENDSHIP_SERVICE_HOST=localhost
+FRIENDSHIP_SERVICE_PORT=4005
 
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost

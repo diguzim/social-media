@@ -23,6 +23,12 @@ function TestConsumer() {
         refresh-posts
       </button>
       <button
+        data-testid="user-profile-send-friend-request-btn"
+        onClick={() => actions.sendFriendRequest()}
+      >
+        send-friend-request
+      </button>
+      <button
         data-testid="user-profile-load-next-posts-btn"
         onClick={() => actions.loadNextPostsPage()}
       >
@@ -36,6 +42,7 @@ describe('UserProfileStateContractProvider', () => {
   it('injects a custom UserProfileStateContract implementation', () => {
     const refresh = vi.fn().mockResolvedValue(undefined);
     const refreshPosts = vi.fn().mockResolvedValue(undefined);
+    const sendFriendRequest = vi.fn().mockResolvedValue(undefined);
     const loadNextPostsPage = vi.fn().mockResolvedValue(undefined);
 
     const useFakeUserProfileStateContract: UseUserProfileStateContract = () => ({
@@ -48,6 +55,9 @@ describe('UserProfileStateContractProvider', () => {
         },
         error: '',
         isLoading: false,
+        friendshipStatus: 'none',
+        friendshipError: '',
+        isFriendshipActionPending: false,
         posts: [],
         isPostsLoading: false,
         isLoadingMorePosts: false,
@@ -58,6 +68,7 @@ describe('UserProfileStateContractProvider', () => {
       actions: {
         refresh,
         refreshPosts,
+        sendFriendRequest,
         loadNextPostsPage,
       },
     });
@@ -79,6 +90,9 @@ describe('UserProfileStateContractProvider', () => {
 
     screen.getByTestId('user-profile-refresh-posts-btn').click();
     expect(refreshPosts).toHaveBeenCalledTimes(1);
+
+    screen.getByTestId('user-profile-send-friend-request-btn').click();
+    expect(sendFriendRequest).toHaveBeenCalledTimes(1);
 
     screen.getByTestId('user-profile-load-next-posts-btn').click();
     expect(loadNextPostsPage).toHaveBeenCalledTimes(1);

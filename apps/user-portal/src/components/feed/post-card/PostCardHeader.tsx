@@ -3,7 +3,6 @@ import { PendingButton } from '../../loading/PendingButton';
 
 interface PostCardHeaderProps {
   postId: string;
-  authorId: string;
   authorUsername: string;
   authorLabel: string;
   authorInitial: string;
@@ -25,7 +24,6 @@ interface PostCardHeaderProps {
 
 export function PostCardHeader({
   postId,
-  authorId,
   authorUsername,
   authorLabel,
   authorInitial,
