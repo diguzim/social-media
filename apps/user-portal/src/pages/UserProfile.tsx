@@ -1,6 +1,7 @@
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
+import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
 
 export function UserProfile() {
   const { state, actions } = useUserProfileStateContract();
@@ -47,46 +48,33 @@ export function UserProfile() {
   return (
     <div data-testid="user-profile-page" className="page-container max-w-5xl">
       <h1 data-testid="user-profile-page-title" className="section-title">
-        User Profile
+        Profile
       </h1>
 
-      <div data-testid="user-profile-card" className="card mt-5 p-6">
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-semibold text-slate-700">User ID:</label>
-          <p data-testid="user-profile-id" className="text-slate-500">
-            {profile.id}
-          </p>
-        </div>
+      <ProfileHeaderCard
+        cardTestId="user-profile-card"
+        avatarTestId="user-profile-avatar-image"
+        nameTestId="user-profile-name"
+        usernameTestId="user-profile-username"
+        statsTestId="user-profile-stats"
+        comingSoonTestId="user-profile-stats-coming-soon"
+        name={profile.name}
+        username={profile.username}
+        avatarUrl={profile.avatarUrl}
+        postsCount={posts.length}
+      />
 
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-semibold text-slate-700">Name:</label>
-          <p data-testid="user-profile-name" className="text-slate-700">
-            {profile.name}
+      <section data-testid="user-profile-meta" className="mt-4">
+        {profile.emailVerifiedAt ? (
+          <p data-testid="user-profile-email-verified" className="text-sm text-green-600">
+            ✓ Verified account
           </p>
-        </div>
-
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-semibold text-slate-700">Username:</label>
-          <p data-testid="user-profile-username" className="text-slate-700">
-            @{profile.username}
+        ) : (
+          <p data-testid="user-profile-email-unverified" className="text-sm text-yellow-600">
+            ⚠ Email not verified yet
           </p>
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-semibold text-slate-700">
-            Email verification:
-          </label>
-          {profile.emailVerifiedAt ? (
-            <p data-testid="user-profile-email-verified" className="text-green-600">
-              ✓ Verified
-            </p>
-          ) : (
-            <p data-testid="user-profile-email-unverified" className="text-yellow-600">
-              ⚠ Not yet verified
-            </p>
-          )}
-        </div>
-      </div>
+        )}
+      </section>
 
       <section data-testid="user-profile-posts-section" className="mt-6">
         <h2 className="mb-3 text-2xl font-semibold text-slate-900">Posts</h2>

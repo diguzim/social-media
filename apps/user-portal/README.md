@@ -7,9 +7,9 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - User registration with name, username, email, and password
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
-- User profile page with email verification status
+- Modern own-profile header (avatar, name, username, stats) with secondary account details
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
-- User public profile page for viewing other users by id
+- Modern public profile page (avatar, name, username, stats) for viewing other users by id
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
 - Progressive loading UX with persistent shell + Home page islands
@@ -25,8 +25,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/` - Protected home page showing user data
 - `/register` - User registration form
 - `/login` - User login form
-- `/profile` - Protected profile page with verification status
-- `/users/:userId` - Protected public profile page for another user
+- `/profile` - Protected own-profile page with modern header + account details + posts
+- `/users/:userId` - Protected public profile page with modern header + posts
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
 
@@ -73,8 +73,10 @@ Examples:
 
 - Login: `login-email-input`, `login-password-input`, `login-submit-button`
 - Register: `register-name-input`, `register-username-input`, `register-email-input`, `register-submit-button`
-- Home: `home-welcome-title`, `home-profile-card`, `home-logout-button`
+- Home: `home-page`, `home-create-post-section`, `home-feed-section`
 - Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
+- Profile: `profile-user-card`, `profile-user-stats`, `profile-posts-list`
+- UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
 
 These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
 
@@ -307,5 +309,6 @@ The app communicates with the API Gateway which routes requests to microservices
 - Home feed, My Posts, Profile, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
 - Profile and user-profile routes render post lists with the same reusable list UI component
 - Feed, My Posts, Profile, and User Profile share a common paginated posts data hook for refresh/load-more behavior
+- Profile and UserProfile headers include placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary

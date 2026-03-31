@@ -82,6 +82,10 @@ describe('UserProfile', () => {
 
     expect(screen.getByTestId('user-profile-card')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-name')).toHaveTextContent('Eve');
+    expect(screen.getByTestId('user-profile-username')).toHaveTextContent('@eve');
+    expect(screen.getByTestId('user-profile-avatar-image')).toBeInTheDocument();
+    expect(screen.getByTestId('user-profile-stats')).toHaveTextContent('Posts');
+    expect(screen.getByTestId('user-profile-stats-coming-soon')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-posts-list')).toBeInTheDocument();
     expect(screen.getByTestId('post-title-post-1')).toHaveTextContent('Post by Eve');
     expect(screen.getByTestId('user-profile-posts-infinite-sentinel')).toBeInTheDocument();
