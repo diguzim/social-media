@@ -13,8 +13,12 @@ function TestConsumer() {
     <div>
       <span data-testid="my-posts-state-count">{state.posts.length}</span>
       <span data-testid="my-posts-state-loading">{String(state.isLoading)}</span>
+      <span data-testid="my-posts-state-has-more">{String(state.hasMore)}</span>
       <button data-testid="my-posts-refresh-btn" onClick={() => void actions.refresh()}>
         refresh
+      </button>
+      <button data-testid="my-posts-load-next-btn" onClick={() => void actions.loadNextPage()}>
+        load-next
       </button>
     </div>
   );
@@ -23,6 +27,7 @@ function TestConsumer() {
 describe('MyPostsStateContractProvider', () => {
   it('injects a custom MyPostsStateContract implementation', () => {
     const refresh = vi.fn().mockResolvedValue(undefined);
+    const loadNextPage = vi.fn().mockResolvedValue(undefined);
 
     const useFakeMyPostsStateContract: UseMyPostsStateContract = () => ({
       state: {
@@ -37,10 +42,14 @@ describe('MyPostsStateContractProvider', () => {
           },
         ],
         isLoading: false,
+        isLoadingMore: false,
+        hasMore: true,
         error: '',
+        loadMoreError: '',
       },
       actions: {
         refresh,
+        loadNextPage,
       },
     });
 
@@ -52,8 +61,12 @@ describe('MyPostsStateContractProvider', () => {
 
     expect(screen.getByTestId('my-posts-state-count')).toHaveTextContent('1');
     expect(screen.getByTestId('my-posts-state-loading')).toHaveTextContent('false');
+    expect(screen.getByTestId('my-posts-state-has-more')).toHaveTextContent('true');
 
     screen.getByTestId('my-posts-refresh-btn').click();
     expect(refresh).toHaveBeenCalledTimes(1);
+
+    screen.getByTestId('my-posts-load-next-btn').click();
+    expect(loadNextPage).toHaveBeenCalledTimes(1);
   });
 });

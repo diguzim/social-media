@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactElement } from 'react';
@@ -10,6 +10,24 @@ vi.mock('../../services/posts', () => ({
 }));
 
 const mockedGetFeed = vi.mocked(getFeed);
+
+let intersectionCallback: ((entries: Array<{ isIntersecting: boolean }>) => void) | null = null;
+
+class MockIntersectionObserver {
+  constructor(callback: (entries: Array<{ isIntersecting: boolean }>) => void) {
+    intersectionCallback = callback;
+  }
+
+  observe() {
+    return undefined;
+  }
+
+  disconnect() {
+    return undefined;
+  }
+}
+
+vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
 
 function renderWithRouter(ui: ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -145,5 +163,60 @@ describe('Feed', () => {
     await waitFor(() => {
       expect(screen.getByTestId('post-title-p2')).toHaveTextContent('Refreshed post');
     });
+  });
+
+  it('loads next page when infinite-scroll sentinel intersects', async () => {
+    mockedGetFeed
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 'p1',
+            title: 'First page post',
+            content: 'Content A',
+            authorId: 'u1',
+            author: { id: 'u1', name: 'Alice' },
+            createdAt: '2026-03-07T10:00:00.000Z',
+          },
+        ],
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 2,
+      })
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 'p2',
+            title: 'Second page post',
+            content: 'Content B',
+            authorId: 'u2',
+            author: { id: 'u2', name: 'Bob' },
+            createdAt: '2026-03-08T10:00:00.000Z',
+          },
+        ],
+        total: 2,
+        page: 2,
+        limit: 10,
+        totalPages: 2,
+      });
+
+    renderWithRouter(<Feed />);
+
+    expect(await screen.findByTestId('feed-section')).toBeInTheDocument();
+    expect(screen.getByTestId('post-title-p1')).toHaveTextContent('First page post');
+
+    await act(async () => {
+      intersectionCallback?.([{ isIntersecting: true }]);
+    });
+
+    await waitFor(() => {
+      expect(mockedGetFeed).toHaveBeenLastCalledWith({
+        page: 2,
+        limit: 10,
+        sortOrder: 'desc',
+      });
+    });
+
+    expect(await screen.findByTestId('post-title-p2')).toHaveTextContent('Second page post');
   });
 });

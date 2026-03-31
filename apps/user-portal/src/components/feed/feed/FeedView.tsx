@@ -1,4 +1,5 @@
 import type { FeedPost } from '../../../services/posts';
+import type { RefObject } from 'react';
 import { InlineStatus } from '../../loading/InlineStatus';
 import { SectionSkeleton } from '../../loading/SectionSkeleton';
 import { PostCard } from '../PostCard';
@@ -7,18 +8,26 @@ interface FeedViewProps {
   posts: FeedPost[];
   loading: boolean;
   isRefreshing: boolean;
+  isLoadingMore: boolean;
   error: string;
   refreshError: string;
+  loadMoreError: string;
+  hasMore: boolean;
   onReactionChange: () => void;
+  sentinelRef: RefObject<HTMLDivElement | null>;
 }
 
 export function FeedView({
   posts,
   loading,
   isRefreshing,
+  isLoadingMore,
   error,
   refreshError,
+  loadMoreError,
+  hasMore,
   onReactionChange,
+  sentinelRef,
 }: FeedViewProps) {
   if (loading && posts.length === 0) {
     return (
@@ -75,6 +84,31 @@ export function FeedView({
           <PostCard key={post.id} post={post} onReactionChange={onReactionChange} />
         ))}
       </div>
+
+      {loadMoreError && (
+        <InlineStatus
+          dataTestId="feed-load-more-error"
+          tone="warning"
+          message={`Could not load more posts. ${loadMoreError}`}
+          className="mt-3"
+        />
+      )}
+
+      {isLoadingMore && (
+        <InlineStatus
+          dataTestId="feed-loading-more-status"
+          message="Loading more posts..."
+          className="mt-3"
+        />
+      )}
+
+      {hasMore ? (
+        <div data-testid="feed-infinite-sentinel" ref={sentinelRef} className="h-2 w-full" />
+      ) : (
+        <p data-testid="feed-end-of-list" className="mt-3 text-center text-xs text-slate-500">
+          You&apos;ve reached the end of the feed.
+        </p>
+      )}
     </section>
   );
 }
