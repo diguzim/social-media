@@ -1,8 +1,27 @@
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
+import { PostCard } from '../components/feed/PostCard';
+import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 
 export function UserProfile() {
-  const { state } = useUserProfileStateContract();
-  const { profile, error, isLoading } = state;
+  const { state, actions } = useUserProfileStateContract();
+  const {
+    profile,
+    error,
+    isLoading,
+    posts,
+    isPostsLoading,
+    isLoadingMorePosts,
+    hasMorePosts,
+    postsError,
+    postsLoadMoreError,
+  } = state;
+
+  const sentinelRef = useInfiniteScrollObserver({
+    enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
+    onIntersect: () => {
+      void actions.loadNextPostsPage();
+    },
+  });
 
   if (isLoading) {
     return (
@@ -26,7 +45,7 @@ export function UserProfile() {
   }
 
   return (
-    <div data-testid="user-profile-page" className="page-container max-w-3xl">
+    <div data-testid="user-profile-page" className="page-container max-w-5xl">
       <h1 data-testid="user-profile-page-title" className="section-title">
         User Profile
       </h1>
@@ -68,6 +87,71 @@ export function UserProfile() {
           )}
         </div>
       </div>
+
+      <section data-testid="user-profile-posts-section" className="mt-6">
+        <h2 className="mb-3 text-2xl font-semibold text-slate-900">Posts</h2>
+
+        {isPostsLoading ? (
+          <p data-testid="user-profile-posts-loading" className="text-sm text-slate-600">
+            Loading posts...
+          </p>
+        ) : postsError && posts.length === 0 ? (
+          <p data-testid="user-profile-posts-error" className="text-sm text-danger-600">
+            {postsError}
+          </p>
+        ) : posts.length === 0 ? (
+          <p data-testid="user-profile-posts-empty" className="text-sm text-slate-600">
+            This user has not posted yet.
+          </p>
+        ) : (
+          <>
+            <div data-testid="user-profile-posts-list" className="grid gap-3">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onReactionChange={() => {
+                    void actions.refreshPosts();
+                  }}
+                />
+              ))}
+            </div>
+
+            {postsLoadMoreError && (
+              <p
+                data-testid="user-profile-posts-load-more-error"
+                className="mt-3 text-sm text-danger-600"
+              >
+                {postsLoadMoreError}
+              </p>
+            )}
+
+            {isLoadingMorePosts && (
+              <p
+                data-testid="user-profile-posts-loading-more"
+                className="mt-3 text-sm text-slate-600"
+              >
+                Loading more posts...
+              </p>
+            )}
+
+            {hasMorePosts ? (
+              <div
+                data-testid="user-profile-posts-infinite-sentinel"
+                ref={sentinelRef}
+                className="h-2 w-full"
+              />
+            ) : (
+              <p
+                data-testid="user-profile-posts-end"
+                className="mt-3 text-center text-xs text-slate-500"
+              >
+                You&apos;ve reached the end of this user&apos;s posts.
+              </p>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }
