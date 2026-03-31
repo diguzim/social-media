@@ -177,9 +177,9 @@ describe("Create Post Flow", () => {
       .should("be.visible")
       .and("contain.text", postTitle);
 
-    // Verify post author is current user (by checking authorId matches)
+    // Verify user's post card is present in My Posts list
     cy.getByTestId("my-posts-list").within(() => {
-      cy.contains(`Author: ${testUser.name}`).should("exist");
+      cy.contains('[data-testid^="post-title-"]', postTitle).should("exist");
     });
   });
 

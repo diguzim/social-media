@@ -4,6 +4,7 @@ import { jest } from '@jest/globals';
 import { PostsController } from './posts.controller';
 import { FeedService } from './feed.service';
 import { POSTS_SERVICE } from './posts.client';
+import { IMAGE_SERVICE } from '../images/image.client';
 import type { API } from '@repo/contracts';
 import { COMMENT_COMMANDS } from '@repo/contracts';
 import { of } from 'rxjs';
@@ -12,6 +13,9 @@ const mockFeedService = {
   getFeed: jest.fn(),
 } as FeedService;
 const mockPostsClient = {
+  send: jest.fn(),
+} as any;
+const mockImageClient = {
   send: jest.fn(),
 } as any;
 
@@ -41,6 +45,7 @@ describe('PostsController – GET /posts/feed', () => {
       controllers: [PostsController],
       providers: [
         { provide: POSTS_SERVICE, useValue: mockPostsClient },
+        { provide: IMAGE_SERVICE, useValue: mockImageClient },
         { provide: FeedService, useValue: mockFeedService },
       ],
     }).compile();
@@ -52,22 +57,41 @@ describe('PostsController – GET /posts/feed', () => {
     const feedResponse = makeFeedResponse();
     mockFeedService.getFeed.mockResolvedValue(feedResponse);
 
-    const result = await controller.getFeed('2', '5', 'u1', 'desc');
+    const result = await controller.getFeed(
+      { user: { userId: 'current-user' } },
+      '2',
+      '5',
+      'u1',
+      'desc',
+    );
 
-    expect(mockFeedService.getFeed).toHaveBeenCalledWith(2, 5, 'u1', 'desc');
+    expect(mockFeedService.getFeed).toHaveBeenCalledWith(
+      2,
+      5,
+      'u1',
+      'desc',
+      'current-user',
+    );
     expect(result).toBe(feedResponse);
   });
 
   it('passes undefined when query params are absent', async () => {
     mockFeedService.getFeed.mockResolvedValue(makeFeedResponse());
 
-    await controller.getFeed(undefined, undefined, undefined, undefined);
+    await controller.getFeed(
+      { user: { userId: 'current-user' } },
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    );
 
     expect(mockFeedService.getFeed).toHaveBeenCalledWith(
       undefined,
       undefined,
       undefined,
       undefined,
+      'current-user',
     );
   });
 
@@ -75,7 +99,13 @@ describe('PostsController – GET /posts/feed', () => {
     const feedResponse = makeFeedResponse();
     mockFeedService.getFeed.mockResolvedValue(feedResponse);
 
-    const result = await controller.getFeed();
+    const result = await controller.getFeed(
+      { user: { userId: 'current-user' } },
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    );
 
     expect(result.data[0]?.author).toEqual({ id: 'u1', name: 'Alice' });
     expect(result.data[0]?.authorId).toBe('u1');
@@ -91,6 +121,7 @@ describe('PostsController – comments endpoints', () => {
       controllers: [PostsController],
       providers: [
         { provide: POSTS_SERVICE, useValue: mockPostsClient },
+        { provide: IMAGE_SERVICE, useValue: mockImageClient },
         { provide: FeedService, useValue: mockFeedService },
       ],
     }).compile();

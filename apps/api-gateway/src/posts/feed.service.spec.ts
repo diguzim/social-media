@@ -6,11 +6,15 @@ import type { ClientProxy } from '@nestjs/microservices';
 import { FeedService } from './feed.service';
 import { POSTS_SERVICE } from './posts.client';
 import { AUTH_SERVICE } from '../auth/auth.client';
+import { IMAGE_SERVICE } from '../images/image.client';
 
 const mockPostsClient = {
   send: jest.fn(),
 } as ClientProxy;
 const mockAuthClient = {
+  send: jest.fn(),
+} as ClientProxy;
+const mockImageClient = {
   send: jest.fn(),
 } as ClientProxy;
 
@@ -45,11 +49,16 @@ describe('FeedService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockImageClient.send.mockReturnValue(
+      throwError(() => new Error('no avatar image')),
+    );
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FeedService,
         { provide: POSTS_SERVICE, useValue: mockPostsClient },
         { provide: AUTH_SERVICE, useValue: mockAuthClient },
+        { provide: IMAGE_SERVICE, useValue: mockImageClient },
       ],
     }).compile();
 

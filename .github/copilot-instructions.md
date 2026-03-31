@@ -95,6 +95,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - All commands/queries go through use cases — no business logic in controllers
 - Inject `ClientProxy` with `@Inject(TOKEN)` — never use `new`
 - Always add `correlationId` to RPC requests (use `getCorrelationId()` from `@repo/log-context`)
+- When a controller/service constructor gains a new injected dependency, update unit test modules (`Test.createTestingModule`) in the same task to include the new provider token/mocks (for example `IMAGE_SERVICE`) to avoid Nest DI failures
 
 ### Contracts (`@repo/contracts`)
 
@@ -150,14 +151,18 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 ### Testing
 
 - **E2E tests use programmatic auth** via `cy.authenticateViaApi()` — never use UI forms for setup
+- Treat `GET /posts/feed` as **protected** in E2E/API tests: requests must include `Authorization: Bearer <jwtToken>`
 - Use `faker-js` for synthetic test data
 - All fake test data must include a `Fake E2E` prefix in names
 - Assert stable end-states, not transient loading states
+- Prefer resilient E2E selectors based on `data-testid`; avoid brittle chains that depend on transient text/DOM ancestry (`contains(...).closest(...)`) when a deterministic test id can be used
+- Keep E2E assertions aligned with current UI islands/composition. Do not assert removed Home profile-summary elements if Home renders create-post + feed islands instead
 - Unit tests live alongside the code they test (`*.spec.ts`)
 - For state-contract architecture, add tests that validate provider injection and custom presenter behavior (pages should work with swapped implementations)
 - If tests or new behavior depend on baseline users/posts, update in-memory repository seed data in the same task (and keep test assertions aligned with the new seeded values)
 - For progressive loading UX, assert that already-loaded regions remain visible while only pending islands show fallback UI
 - For interaction-pending UX, test disabled submit controls, duplicate-submit prevention, and visible pending indicators
+- In `apps/user-portal`, use `pnpm test`/`pnpm test:run` for one-shot runs and `pnpm test:watch` for interactive watch mode
 
 ### Documentation Maintenance
 
@@ -191,13 +196,13 @@ pnpm build
 
 ## Commonly Used Commands
 
-| Command                             | What it does                 |
-| ----------------------------------- | ---------------------------- |
-| `pnpm dev`                          | Starts all apps in dev mode  |
-| `pnpm build`                        | Builds all packages and apps |
-| `pnpm test`                         | Runs all unit tests          |
-| `pnpm lint`                         | Lints all workspaces         |
-| `cd apps/e2e && pnpm test:electron` | Runs Cypress E2E in electron |
+| Command                             | What it does                                     |
+| ----------------------------------- | ------------------------------------------------ |
+| `pnpm dev`                          | Starts all apps in dev mode                      |
+| `pnpm build`                        | Builds all packages and apps                     |
+| `pnpm test`                         | Runs all workspace tests (including Cypress E2E) |
+| `pnpm lint`                         | Lints all workspaces                             |
+| `cd apps/e2e && pnpm test:electron` | Runs Cypress E2E in electron                     |
 
 ## Ports
 

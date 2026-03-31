@@ -39,10 +39,9 @@ describe("User Login Flow", () => {
       cy.get("@loginSubmitButton").should("be.visible").click();
 
       // Should be redirected to home page
-      cy.getByTestId("home-welcome-title").should(
-        "contain.text",
-        `Welcome ${testUser.name}!`,
-      );
+      cy.url().should("include", "/");
+      cy.getByTestId("home-page").should("be.visible");
+      cy.getByTestId("home-create-post-section").should("be.visible");
     });
   });
 

@@ -1,50 +1,22 @@
-import type { TestUser } from "../../support/test-data";
-
 describe("Home Page Flow", () => {
-  let testUser: TestUser;
-
   beforeEach(() => {
-    cy.authenticateViaApi({ password: "WelcomePass123!" }).then((user) => {
-      testUser = user;
-
-      // Set up aliases for page elements
-      cy.getByTestId("home-welcome-title").as("homeWelcomeTitle");
-      cy.getByTestId("home-user-email").as("homeUserEmail");
-      cy.getByTestId("home-profile-card").as("homeProfileCard");
+    cy.authenticateViaApi({ password: "WelcomePass123!" }).then(() => {
+      cy.getByTestId("home-page").as("homePage");
+      cy.getByTestId("home-create-post-section").as("homeCreatePostSection");
+      cy.getByTestId("home-feed-section").as("homeFeedSection");
       cy.getByTestId("feed-section").as("feedSection");
       cy.getByTestId("navbar-menu-button").as("navbarMenuButton");
     });
   });
 
-  it.only("should display welcome page with loading state initially", () => {
-    // Page may show loading first, then welcome heading after profile is loaded
-    cy.get("@homeWelcomeTitle").should(
-      "contain.text",
-      `Welcome ${testUser.name}!`,
-    );
+  it("should display home page islands", () => {
+    cy.get("@homePage").should("be.visible");
+    cy.get("@homeCreatePostSection").should("be.visible");
+    cy.get("@homeFeedSection").should("be.visible");
   });
 
-  it("should fetch and display user profile on welcome page", () => {
-    // Should be on home page after programmatic login
+  it("should stay on home page after programmatic authentication", () => {
     cy.url().should("include", "/");
-
-    // Should display welcome message with user name
-    cy.get("@homeWelcomeTitle").should(
-      "contain.text",
-      `Welcome ${testUser.name}!`,
-    );
-
-    // Should display user details
-    cy.get("@homeUserEmail").should("contain.text", testUser.email);
-  });
-
-  it("should display user information in profile section", () => {
-    // Wait for profile fetch
-    cy.url().should("include", "/");
-
-    // Should show email (from the fetched profile)
-    cy.get("@homeProfileCard").should("be.visible");
-    cy.get("@homeUserEmail").should("contain.text", testUser.email);
   });
 
   it("should display feed section on welcome page", () => {

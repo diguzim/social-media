@@ -35,8 +35,12 @@ describe("Manage Post Flow", () => {
     cy.getByTestId("create-post-success-message").should("be.visible");
 
     cy.contains('[data-testid^="post-title-"]', originalTitle)
-      .closest('[data-testid^="post-card-"]')
-      .as("postCard");
+      .should("be.visible")
+      .invoke("attr", "data-testid")
+      .then((titleTestId) => {
+        const postId = String(titleTestId).replace("post-title-", "");
+        cy.getByTestId(`post-card-${postId}`).as("postCard");
+      });
 
     cy.get("@postCard").within(() => {
       cy.contains("button", "Edit").click();
@@ -97,8 +101,12 @@ describe("Manage Post Flow", () => {
     cy.getByTestId("my-posts-page").should("be.visible");
 
     cy.contains('[data-testid^="post-title-"]', initialTitle)
-      .closest('[data-testid^="post-card-"]')
-      .as("myPostCard");
+      .should("be.visible")
+      .invoke("attr", "data-testid")
+      .then((titleTestId) => {
+        const postId = String(titleTestId).replace("post-title-", "");
+        cy.getByTestId(`post-card-${postId}`).as("myPostCard");
+      });
 
     cy.get("@myPostCard").within(() => {
       cy.contains("button", "Edit").click();
@@ -115,10 +123,17 @@ describe("Manage Post Flow", () => {
     cy.on("window:confirm", () => true);
 
     cy.contains('[data-testid^="post-title-"]', finalTitle)
-      .closest('[data-testid^="post-card-"]')
-      .within(() => {
-        cy.contains("button", "Delete").click();
-        cy.get('[data-testid^="post-deleted-"]').should("be.visible");
+      .should("be.visible")
+      .invoke("attr", "data-testid")
+      .then((titleTestId) => {
+        const postId = String(titleTestId).replace("post-title-", "");
+        cy.getByTestId(`post-card-${postId}`).within(() => {
+          cy.contains("button", "Delete").click();
+        });
+
+        cy.contains('[data-testid^="post-title-"]', finalTitle).should(
+          "not.exist",
+        );
       });
   });
 });
