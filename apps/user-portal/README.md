@@ -304,7 +304,8 @@ The app communicates with the API Gateway which routes requests to microservices
 - Error states display user-friendly error messages
 - Home uses cached-first rendering for profile data and refreshes in the background when possible
 - Feed refreshes preserve already rendered posts and show local refresh feedback instead of blanking the page
-- Home feed and My Posts use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
-- User profile route (`/users/:userId`) also renders that account's posts with PostCard interactions
+- Home feed, My Posts, Profile, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
+- Profile and user-profile routes render post lists with the same reusable list UI component
+- Feed, My Posts, Profile, and User Profile share a common paginated posts data hook for refresh/load-more behavior
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary

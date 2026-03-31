@@ -1,6 +1,6 @@
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
-import { PostCard } from '../components/feed/PostCard';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
+import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 
 export function UserProfile() {
   const { state, actions } = useUserProfileStateContract();
@@ -104,52 +104,26 @@ export function UserProfile() {
             This user has not posted yet.
           </p>
         ) : (
-          <>
-            <div data-testid="user-profile-posts-list" className="grid gap-3">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onReactionChange={() => {
-                    void actions.refreshPosts();
-                  }}
-                />
-              ))}
-            </div>
-
-            {postsLoadMoreError && (
-              <p
-                data-testid="user-profile-posts-load-more-error"
-                className="mt-3 text-sm text-danger-600"
-              >
-                {postsLoadMoreError}
-              </p>
-            )}
-
-            {isLoadingMorePosts && (
-              <p
-                data-testid="user-profile-posts-loading-more"
-                className="mt-3 text-sm text-slate-600"
-              >
-                Loading more posts...
-              </p>
-            )}
-
-            {hasMorePosts ? (
-              <div
-                data-testid="user-profile-posts-infinite-sentinel"
-                ref={sentinelRef}
-                className="h-2 w-full"
-              />
-            ) : (
-              <p
-                data-testid="user-profile-posts-end"
-                className="mt-3 text-center text-xs text-slate-500"
-              >
-                You&apos;ve reached the end of this user&apos;s posts.
-              </p>
-            )}
-          </>
+          <PostCardsInfiniteList
+            posts={posts}
+            onReactionChange={() => {
+              void actions.refreshPosts();
+            }}
+            listTestId="user-profile-posts-list"
+            className="grid gap-3"
+            loadMoreError={postsLoadMoreError}
+            loadMoreErrorMessage={(currentError) => currentError}
+            loadMoreErrorTestId="user-profile-posts-load-more-error"
+            isLoadingMore={isLoadingMorePosts}
+            loadingMoreMessage="Loading more posts..."
+            loadingMoreTestId="user-profile-posts-loading-more"
+            hasMore={hasMorePosts}
+            sentinelRef={sentinelRef}
+            sentinelTestId="user-profile-posts-infinite-sentinel"
+            sentinelClassName="h-2 w-full"
+            endMessage="You've reached the end of this user's posts."
+            endTestId="user-profile-posts-end"
+          />
         )}
       </section>
     </div>

@@ -2,7 +2,7 @@ import type { FeedPost } from '../../../services/posts';
 import type { RefObject } from 'react';
 import { InlineStatus } from '../../loading/InlineStatus';
 import { SectionSkeleton } from '../../loading/SectionSkeleton';
-import { PostCard } from '../PostCard';
+import { PostCardsInfiniteList } from '../../post-list/PostCardsInfiniteList';
 
 interface FeedViewProps {
   posts: FeedPost[];
@@ -14,7 +14,7 @@ interface FeedViewProps {
   loadMoreError: string;
   hasMore: boolean;
   onReactionChange: () => void;
-  sentinelRef: RefObject<HTMLDivElement | null>;
+  sentinelRef: RefObject<HTMLDivElement>;
 }
 
 export function FeedView({
@@ -79,36 +79,24 @@ export function FeedView({
         />
       )}
 
-      <div className="grid gap-3">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} onReactionChange={onReactionChange} />
-        ))}
-      </div>
-
-      {loadMoreError && (
-        <InlineStatus
-          dataTestId="feed-load-more-error"
-          tone="warning"
-          message={`Could not load more posts. ${loadMoreError}`}
-          className="mt-3"
-        />
-      )}
-
-      {isLoadingMore && (
-        <InlineStatus
-          dataTestId="feed-loading-more-status"
-          message="Loading more posts..."
-          className="mt-3"
-        />
-      )}
-
-      {hasMore ? (
-        <div data-testid="feed-infinite-sentinel" ref={sentinelRef} className="h-2 w-full" />
-      ) : (
-        <p data-testid="feed-end-of-list" className="mt-3 text-center text-xs text-slate-500">
-          You&apos;ve reached the end of the feed.
-        </p>
-      )}
+      <PostCardsInfiniteList
+        posts={posts}
+        onReactionChange={onReactionChange}
+        listTestId="feed-post-list"
+        className="grid gap-3"
+        loadMoreError={loadMoreError}
+        loadMoreErrorMessage={(currentError) => `Could not load more posts. ${currentError}`}
+        loadMoreErrorTestId="feed-load-more-error"
+        isLoadingMore={isLoadingMore}
+        loadingMoreMessage="Loading more posts..."
+        loadingMoreTestId="feed-loading-more-status"
+        hasMore={hasMore}
+        sentinelRef={sentinelRef}
+        sentinelTestId="feed-infinite-sentinel"
+        sentinelClassName="h-2 w-full"
+        endMessage="You've reached the end of the feed."
+        endTestId="feed-end-of-list"
+      />
     </section>
   );
 }

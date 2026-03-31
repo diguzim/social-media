@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getProfile, getUserProfile, uploadProfileAvatar } from '../../../../services/auth';
+import { usePaginatedFeedPosts } from '../../../../hooks/usePaginatedFeedPosts';
 import type { ProfileStateContract } from '../../profile-state.contract';
 
 export function useProfileStatePresenter(): ProfileStateContract {
@@ -8,6 +9,13 @@ export function useProfileStatePresenter(): ProfileStateContract {
   const [isLoading, setIsLoading] = useState(true);
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState('');
+  const { state: postsState, actions: postsActions } = usePaginatedFeedPosts({
+    authorId: user?.id,
+    pageSize: 10,
+    sortOrder: 'desc',
+    enabled: Boolean(user?.id),
+    reloadToken: user?.id ?? 'no-profile-user',
+  });
 
   const fetchProfile = useCallback(async () => {
     setError('');
@@ -35,7 +43,18 @@ export function useProfileStatePresenter(): ProfileStateContract {
 
   const refresh = useCallback(async () => {
     await fetchProfile();
-  }, [fetchProfile]);
+    if (user?.id) {
+      await postsActions.refresh();
+    }
+  }, [fetchProfile, postsActions, user?.id]);
+
+  const refreshPosts = useCallback(async () => {
+    if (!user?.id) {
+      return;
+    }
+
+    await postsActions.refresh();
+  }, [postsActions, user?.id]);
 
   const uploadAvatar = useCallback(
     async (file: File) => {
@@ -62,10 +81,18 @@ export function useProfileStatePresenter(): ProfileStateContract {
       isLoading,
       isAvatarUploading,
       avatarUploadError,
+      posts: postsState.posts,
+      isPostsLoading: postsState.isLoading,
+      isLoadingMorePosts: postsState.isLoadingMore,
+      hasMorePosts: postsState.hasMore,
+      postsError: postsState.error || postsState.refreshError,
+      postsLoadMoreError: postsState.loadMoreError,
     },
     actions: {
       refresh,
       uploadAvatar,
+      refreshPosts,
+      loadNextPostsPage: postsActions.loadNextPage,
     },
   };
 }

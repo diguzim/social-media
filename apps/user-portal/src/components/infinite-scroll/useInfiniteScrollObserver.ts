@@ -13,7 +13,7 @@ export function useInfiniteScrollObserver({
   rootMargin = '200px 0px',
   threshold = 0,
 }: UseInfiniteScrollObserverParams) {
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!enabled || typeof IntersectionObserver === 'undefined') {

@@ -33,6 +33,8 @@ describe('ProfileStateContractProvider', () => {
   it('injects a custom ProfileStateContract implementation', async () => {
     const refresh = vi.fn().mockResolvedValue(undefined);
     const uploadAvatar = vi.fn().mockResolvedValue(undefined);
+    const refreshPosts = vi.fn().mockResolvedValue(undefined);
+    const loadNextPostsPage = vi.fn().mockResolvedValue(undefined);
 
     const useFakeProfileStateContract: UseProfileStateContract = () => ({
       state: {
@@ -47,10 +49,18 @@ describe('ProfileStateContractProvider', () => {
         isLoading: false,
         isAvatarUploading: false,
         avatarUploadError: '',
+        posts: [],
+        isPostsLoading: false,
+        isLoadingMorePosts: false,
+        hasMorePosts: false,
+        postsError: '',
+        postsLoadMoreError: '',
       },
       actions: {
         refresh,
         uploadAvatar,
+        refreshPosts,
+        loadNextPostsPage,
       },
     });
 

@@ -1,5 +1,5 @@
-import { PostCard } from '../components/feed/PostCard';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
+import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { useMyPostsStateContract } from '../state-contracts/my-posts';
 
 export function MyPosts() {
@@ -54,37 +54,26 @@ export function MyPosts() {
       <div data-testid="my-posts-count" className="mb-4 text-sm text-slate-600">
         {state.posts.length} {state.posts.length === 1 ? 'post' : 'posts'}
       </div>
-      <div data-testid="my-posts-list" className="grid gap-3">
-        {state.posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onReactionChange={() => {
-              void actions.refresh();
-            }}
-          />
-        ))}
-      </div>
-
-      {state.loadMoreError && (
-        <p data-testid="my-posts-load-more-error" className="mt-3 text-sm text-danger-600">
-          {state.loadMoreError}
-        </p>
-      )}
-
-      {state.isLoadingMore && (
-        <p data-testid="my-posts-loading-more" className="mt-3 text-sm text-slate-600">
-          Loading more posts...
-        </p>
-      )}
-
-      {state.hasMore ? (
-        <div data-testid="my-posts-infinite-sentinel" ref={sentinelRef} className="h-2 w-full" />
-      ) : (
-        <p data-testid="my-posts-end-of-list" className="mt-3 text-center text-xs text-slate-500">
-          You&apos;ve reached the end of your posts.
-        </p>
-      )}
+      <PostCardsInfiniteList
+        posts={state.posts}
+        onReactionChange={() => {
+          void actions.refresh();
+        }}
+        listTestId="my-posts-list"
+        className="grid gap-3"
+        loadMoreError={state.loadMoreError}
+        loadMoreErrorMessage={(currentError) => currentError}
+        loadMoreErrorTestId="my-posts-load-more-error"
+        isLoadingMore={state.isLoadingMore}
+        loadingMoreMessage="Loading more posts..."
+        loadingMoreTestId="my-posts-loading-more"
+        hasMore={state.hasMore}
+        sentinelRef={sentinelRef}
+        sentinelTestId="my-posts-infinite-sentinel"
+        sentinelClassName="h-2 w-full"
+        endMessage="You've reached the end of your posts."
+        endTestId="my-posts-end-of-list"
+      />
     </div>
   );
 }

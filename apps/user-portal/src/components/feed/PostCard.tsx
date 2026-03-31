@@ -95,7 +95,7 @@ export function PostCard({ post, onReactionChange }: PostCardProps) {
 
   const updateManagedPost = (
     updates: Pick<FeedPost, 'title' | 'content' | 'createdAt' | 'authorId'> & {
-      images?: PostImage[];
+      images?: FeedPost['images'];
     }
   ) => {
     setManagedPost((current) => ({
