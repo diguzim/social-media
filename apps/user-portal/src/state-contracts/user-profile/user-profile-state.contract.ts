@@ -1,5 +1,6 @@
 import type { PublicUserProfile } from '../../services/auth';
 import type { FeedPost } from '../../services/posts';
+import type { FriendUserSummary } from '@repo/contracts/api';
 
 export interface UserProfileState {
   profile: PublicUserProfile | null;
@@ -14,6 +15,10 @@ export interface UserProfileState {
   hasMorePosts: boolean;
   postsError: string;
   postsLoadMoreError: string;
+  friends: FriendUserSummary[];
+  isFriendsLoading: boolean;
+  friendsError: string;
+  canViewAcceptedFriends: boolean;
 }
 
 export interface UserProfileStateActions {

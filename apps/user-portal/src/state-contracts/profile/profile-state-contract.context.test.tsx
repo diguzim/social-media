@@ -55,6 +55,9 @@ describe('ProfileStateContractProvider', () => {
         hasMorePosts: false,
         postsError: '',
         postsLoadMoreError: '',
+        friends: [],
+        isFriendsLoading: false,
+        friendsError: '',
       },
       actions: {
         refresh,

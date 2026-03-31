@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getProfile, getUserProfile, uploadProfileAvatar } from '../../../../services/auth';
 import { usePaginatedFeedPosts } from '../../../../hooks/usePaginatedFeedPosts';
+import { listFriends } from '../../../../services/friends';
 import type { ProfileStateContract } from '../../profile-state.contract';
 
 export function useProfileStatePresenter(): ProfileStateContract {
@@ -9,6 +10,9 @@ export function useProfileStatePresenter(): ProfileStateContract {
   const [isLoading, setIsLoading] = useState(true);
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState('');
+  const [friends, setFriends] = useState<ProfileStateContract['state']['friends']>([]);
+  const [isFriendsLoading, setIsFriendsLoading] = useState(true);
+  const [friendsError, setFriendsError] = useState('');
   const { state: postsState, actions: postsActions } = usePaginatedFeedPosts({
     authorId: user?.id,
     pageSize: 10,
@@ -40,6 +44,24 @@ export function useProfileStatePresenter(): ProfileStateContract {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  useEffect(() => {
+    const loadFriends = async () => {
+      setFriendsError('');
+      setIsFriendsLoading(true);
+
+      try {
+        const response = await listFriends();
+        setFriends(response.data);
+      } catch (err) {
+        setFriendsError(err instanceof Error ? err.message : 'Failed to load friends');
+      } finally {
+        setIsFriendsLoading(false);
+      }
+    };
+
+    void loadFriends();
+  }, []);
 
   const refresh = useCallback(async () => {
     await fetchProfile();
@@ -87,6 +109,9 @@ export function useProfileStatePresenter(): ProfileStateContract {
       hasMorePosts: postsState.hasMore,
       postsError: postsState.error || postsState.refreshError,
       postsLoadMoreError: postsState.loadMoreError,
+      friends,
+      isFriendsLoading,
+      friendsError,
     },
     actions: {
       refresh,

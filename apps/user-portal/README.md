@@ -10,6 +10,9 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Modern own-profile header (avatar, name, username, stats) with secondary account details
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - Modern public profile page (avatar, name, username, stats) for viewing other users by username
+- URL-driven tabbed profile sections on both Profile and UserProfile: Timeline, Photos, About, Friends, Personal Data
+- Owner-aware profile actions (edit/add placeholders only shown on own profile)
+- Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
 - Client-side routing with React Router v6
 - JWT token storage in localStorage
@@ -26,8 +29,10 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/` - Protected home page showing user data
 - `/register` - User registration form
 - `/login` - User login form
-- `/profile` - Protected own-profile page with modern header + account details + posts
-- `/users/:username` - Protected public profile page with modern header + posts
+- `/profile` - Protected own-profile page (defaults to Timeline)
+- `/profile/:section` - Protected own-profile section route (`timeline|photos|about|friends|personal`)
+- `/users/:username` - Protected public profile page (defaults to Timeline)
+- `/users/:username/:section` - Protected public profile section route (`timeline|photos|about|friends|personal`)
 - `/friends` - Protected friendship management page (friends + pending requests)
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
@@ -79,6 +84,8 @@ Examples:
 - Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
 - Profile: `profile-user-card`, `profile-user-stats`, `profile-posts-list`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
+- Profile tabs: `profile-sections-tab-*`, `profile-photos-section`, `profile-about-section`, `profile-friends-section`, `profile-personal-section`
+- UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
 
 These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
 
@@ -320,5 +327,7 @@ The app communicates with the API Gateway which routes requests to microservices
 - Profile and user-profile routes render post lists with the same reusable list UI component
 - Feed, My Posts, Profile, and User Profile share a common paginated posts data hook for refresh/load-more behavior
 - Profile and UserProfile headers include placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
+- Photos, About, and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
+- UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary

@@ -33,7 +33,9 @@ export function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:section" element={<Profile />} />
             <Route path="/users/:username" element={<UserProfile />} />
+            <Route path="/users/:username/:section" element={<UserProfile />} />
             <Route path="/my-posts" element={<MyPosts />} />
             <Route path="/friends" element={<Friends />} />
           </Route>

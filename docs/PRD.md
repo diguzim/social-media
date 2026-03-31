@@ -66,6 +66,15 @@ Build a full-featured social media platform from scratch as a learning vehicle f
 - Relationship privacy controls (who can send/view)
 - Notification events for friend request accepted/rejected
 
+### Profile Sections Backlog (TODO)
+
+- Albums domain model + API contracts (create/update/delete albums)
+- Standalone profile photo uploads (not attached to posts or albums)
+- Public accepted-friends listing endpoint by username/userId
+- About section fields in auth profile model (bio, headline, links)
+- Personal data fields in profile model (location, birth date, gender, work, education)
+- Privacy controls per profile field (public/friends/private visibility)
+
 ---
 
 ## 4. Non-Functional Requirements

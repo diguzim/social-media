@@ -62,11 +62,12 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - User profile fetched via GET `/users/me` and cached as `user`
    - User redirected to home page
 
-3. **Protected Pages** (`/`, `/profile`, `/users/:username`, `/friends`) - Authenticated user area
+3. **Protected Pages** (`/`, `/profile`, `/profile/:section`, `/users/:username`, `/users/:username/:section`, `/friends`) - Authenticated user area
    - Route guard requires both `jwtToken` and `user` in localStorage
    - Home (`/`) shows "Welcome {name}!" and user summary
-   - Profile (`/profile`) shows dedicated profile details
-   - UserProfile (`/users/:username`) shows another user's public profile details
+   - Profile (`/profile`) shows URL-driven tabbed sections: Timeline, Photos, About, Friends, Personal Data
+   - UserProfile (`/users/:username`) shows the same tabbed layout with owner-aware actions
+   - Photos/About/Personal Data render placeholders until backend support is implemented
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`

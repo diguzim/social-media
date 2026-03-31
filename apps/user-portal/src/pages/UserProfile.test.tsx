@@ -26,6 +26,10 @@ describe('UserProfile', () => {
         hasMorePosts: false,
         postsError: '',
         postsLoadMoreError: '',
+        friends: [],
+        isFriendsLoading: false,
+        friendsError: '',
+        canViewAcceptedFriends: false,
       },
       actions: {
         refresh: vi.fn().mockResolvedValue(undefined),
@@ -73,6 +77,10 @@ describe('UserProfile', () => {
         hasMorePosts: true,
         postsError: '',
         postsLoadMoreError: '',
+        friends: [],
+        isFriendsLoading: false,
+        friendsError: '',
+        canViewAcceptedFriends: false,
       },
       actions: {
         refresh: vi.fn().mockResolvedValue(undefined),
@@ -94,6 +102,10 @@ describe('UserProfile', () => {
     expect(screen.getByTestId('user-profile-avatar-image')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-stats')).toHaveTextContent('Posts');
     expect(screen.getByTestId('user-profile-stats-coming-soon')).toBeInTheDocument();
+    expect(screen.getByTestId('user-profile-sections-tabs')).toBeInTheDocument();
+    expect(screen.getByTestId('user-profile-sections-tab-timeline')).toBeInTheDocument();
+    expect(screen.getByTestId('user-profile-sections-tab-photos')).toBeInTheDocument();
+    expect(screen.getByTestId('user-profile-sections-tab-friends')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-posts-list')).toBeInTheDocument();
     expect(screen.getByTestId('post-title-post-1')).toHaveTextContent('Post by Eve');
     expect(screen.getByTestId('user-profile-posts-infinite-sentinel')).toBeInTheDocument();
