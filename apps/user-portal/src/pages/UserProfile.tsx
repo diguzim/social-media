@@ -69,6 +69,7 @@ export function UserProfile() {
     profile,
     error,
     isLoading,
+    isOwnProfile,
     friendshipStatus,
     friendshipError,
     isFriendshipActionPending,
@@ -231,7 +232,7 @@ export function UserProfile() {
       <section data-testid="user-profile-meta" className="mt-4">
         <div data-testid="user-profile-friendship-section" className="space-y-2">
           <p data-testid="user-profile-friendship-status" className="text-sm text-slate-700">
-            {friendshipStatus === 'self'
+            {isOwnProfile
               ? 'This is your profile.'
               : friendshipStatus === 'friends'
                 ? 'You are friends.'
@@ -242,7 +243,7 @@ export function UserProfile() {
                     : 'You are not friends yet.'}
           </p>
 
-          {friendshipStatus === 'none' ? (
+          {!isOwnProfile && friendshipStatus === 'none' ? (
             <PendingButton
               data-testid="user-profile-send-friend-request"
               isPending={isFriendshipActionPending}

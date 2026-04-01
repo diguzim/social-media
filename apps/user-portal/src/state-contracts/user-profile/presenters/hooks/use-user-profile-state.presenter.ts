@@ -10,6 +10,8 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
   const [profile, setProfile] = useState<UserProfileStateContract['state']['profile']>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [error, setError] = useState('');
+  const [isOwnProfile, setIsOwnProfile] =
+    useState<UserProfileStateContract['state']['isOwnProfile']>(false);
   const [friendshipStatus, setFriendshipStatus] =
     useState<UserProfileStateContract['state']['friendshipStatus']>('none');
   const [friendshipError, setFriendshipError] = useState('');
@@ -31,6 +33,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
     if (!username) {
       setProfile(null);
       setUserId(undefined);
+      setIsOwnProfile(false);
       setError('Invalid user profile route');
       setIsLoading(false);
       return;
@@ -45,7 +48,10 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
       setUserId(response.id);
 
       const currentUser = getUserProfile();
-      if (currentUser?.username === response.username) {
+      const isCurrentUserProfile = currentUser?.username === response.username;
+      setIsOwnProfile(isCurrentUserProfile);
+
+      if (isCurrentUserProfile) {
         setFriendshipStatus('self');
         setCanViewAcceptedFriends(true);
         setFriendsError('');
@@ -73,6 +79,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
     } catch (err) {
       setProfile(null);
       setUserId(undefined);
+      setIsOwnProfile(false);
       setError(err instanceof Error ? err.message : 'Failed to load user profile');
       setFriendshipStatus('none');
       setFriendshipError('');
@@ -123,6 +130,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
       profile,
       error,
       isLoading,
+      isOwnProfile,
       friendshipStatus,
       friendshipError,
       isFriendshipActionPending,

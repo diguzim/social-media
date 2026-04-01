@@ -69,6 +69,14 @@ export function Navbar() {
             >
               Profile
             </Link>
+            <Link
+              data-testid="navbar-account-settings-link"
+              to="/account/personal-data"
+              onClick={() => setIsDropdownOpen(false)}
+              className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
+            >
+              Account settings
+            </Link>
             <button
               data-testid="navbar-logout-button"
               onClick={() => {

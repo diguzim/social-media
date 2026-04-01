@@ -27,7 +27,18 @@ describe("Home Page Flow", () => {
   it("should have Logout button on welcome page", () => {
     // Click navbar menu to reveal logout button
     cy.get("@navbarMenuButton").should("be.visible").click();
+    cy.getByTestId("navbar-account-settings-link").should("be.visible");
     cy.getByTestId("navbar-logout-button").should("be.visible");
+  });
+
+  it("should open account settings from navbar menu", () => {
+    cy.get("@navbarMenuButton").click();
+    cy.getByTestId("navbar-account-settings-link").click();
+
+    cy.url().should("include", "/account/personal-data");
+    cy.getByTestId("account-settings-page").should("be.visible");
+    cy.getByTestId("account-settings-navigation").should("be.visible");
+    cy.getByTestId("account-settings-personal-data").should("be.visible");
   });
 
   it("should logout and clear tokens when logout button is clicked", () => {

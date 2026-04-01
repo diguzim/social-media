@@ -6,6 +6,7 @@ export interface UserProfileState {
   profile: PublicUserProfile | null;
   error: string;
   isLoading: boolean;
+  isOwnProfile: boolean;
   friendshipStatus: 'none' | 'pending_outgoing' | 'pending_incoming' | 'friends' | 'self';
   friendshipError: string;
   isFriendshipActionPending: boolean;

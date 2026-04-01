@@ -8,8 +8,10 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
 - Unified profile page (avatar, name, username, stats) served by `/users/:username` for both self and public views
+- Ownership differentiation is explicit on `/users/:username`: route username is compared with authenticated user username to drive self/public behavior
 - URL-driven tabbed profile sections: Timeline, Photos, About, Friends, Personal Data
 - Photos tab supports an albums-first experience (horizontal album cards + drill-in gallery) and photo modal viewing
+- Dedicated account-management area with left-side vertical navigation and URL subroutes under `/account/*`
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
 - Client-side routing with React Router v6
@@ -29,6 +31,13 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/login` - User login form
 - `/users/:username` - Protected public profile page (defaults to Timeline)
 - `/users/:username/:section` - Protected public profile section route (`timeline|photos|about|friends|personal`)
+- `/account` - Protected account settings root (redirects to `/account/personal-data`)
+- `/account/personal-data` - Personal data settings section (default)
+- `/account/privacy` - Privacy settings section (mock)
+- `/account/security` - Security settings section (mock)
+- `/account/notifications` - Notifications settings section (mock)
+- `/account/configurations` - Configurations settings section (mock)
+- `/account/help-support` - Help and support section (mock)
 - `/friends` - Protected friendship management page (friends + pending requests)
 - `/verify-email?token=...` - Public email confirmation page
 - `*` - 404 Not Found page (any unmatched route)
@@ -78,8 +87,10 @@ Examples:
 - Register: `register-name-input`, `register-username-input`, `register-email-input`, `register-submit-button`
 - Home: `home-page`, `home-create-post-section`, `home-feed-section`
 - Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
+- Navbar account settings: `navbar-account-settings-link`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
+- Account settings: `account-settings-page`, `account-settings-navigation`, `account-settings-nav-*`
 
 These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
 

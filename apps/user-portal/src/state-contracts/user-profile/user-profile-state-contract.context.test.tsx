@@ -55,6 +55,7 @@ describe('UserProfileStateContractProvider', () => {
         },
         error: '',
         isLoading: false,
+        isOwnProfile: false,
         friendshipStatus: 'none',
         friendshipError: '',
         isFriendshipActionPending: false,
