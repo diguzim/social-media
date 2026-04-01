@@ -76,13 +76,14 @@ export class InMemoryUserPhotoRepository implements UserPhotoRepository {
     return photo;
   }
 
-  async clearAlbumByAlbumId(albumId: string): Promise<void> {
-    this.photos.forEach((photo) => {
-      if (photo.albumId === albumId) {
-        photo.albumId = null;
-        photo.updatedAt = new Date();
-      }
-    });
+  async listByAlbumId(albumId: string): Promise<UserPhoto[]> {
+    return this.photos
+      .filter((photo) => photo.albumId === albumId)
+      .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+  }
+
+  async deleteByAlbumId(albumId: string): Promise<void> {
+    this.photos = this.photos.filter((photo) => photo.albumId !== albumId);
   }
 
   async deleteById(photoId: string): Promise<void> {

@@ -1,7 +1,10 @@
 import type {
   CreateUserAlbumBody,
   CreateUserAlbumResponse,
+  DeleteUserAlbumResponse,
   GetUserPhotosResponse,
+  UpdateUserAlbumBody,
+  UpdateUserAlbumResponse,
   UploadUserPhotoResponse,
 } from '@repo/contracts/api';
 
@@ -50,6 +53,47 @@ export async function createMyAlbum(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to create album');
+  }
+
+  return response.json();
+}
+
+export async function updateMyAlbum(
+  albumId: string,
+  payload: UpdateUserAlbumBody
+): Promise<UpdateUserAlbumResponse> {
+  const token = getTokenOrThrow();
+
+  const response = await fetch(`${API_BASE_URL}/users/me/albums/${albumId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update album');
+  }
+
+  return response.json();
+}
+
+export async function deleteMyAlbum(albumId: string): Promise<DeleteUserAlbumResponse> {
+  const token = getTokenOrThrow();
+
+  const response = await fetch(`${API_BASE_URL}/users/me/albums/${albumId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to delete album');
   }
 
   return response.json();

@@ -12,7 +12,13 @@ import {
   normalizeProfileSection,
   type ProfileSectionKey,
 } from '../components/profile/ProfileSectionsTabs';
-import { createMyAlbum, getUserPhotos, uploadMyPhoto } from '../services/photos';
+import {
+  createMyAlbum,
+  deleteMyAlbum,
+  getUserPhotos,
+  updateMyAlbum,
+  uploadMyPhoto,
+} from '../services/photos';
 
 function ProfileFriendItem({
   id,
@@ -93,6 +99,9 @@ export function Profile() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadDescription, setUploadDescription] = useState('');
   const [uploadAlbumId, setUploadAlbumId] = useState<string>('');
+  const [editingAlbumId, setEditingAlbumId] = useState<string | null>(null);
+  const [editingAlbumName, setEditingAlbumName] = useState('');
+  const [editingAlbumDescription, setEditingAlbumDescription] = useState('');
 
   const sentinelRef = useInfiniteScrollObserver({
     enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
@@ -198,6 +207,57 @@ export function Profile() {
       await reloadPhotos();
     } catch (err) {
       setPhotosError(err instanceof Error ? err.message : 'Failed to upload photo');
+    }
+  };
+
+  const startAlbumEdit = (album: API.UserAlbumItem) => {
+    setEditingAlbumId(album.id);
+    setEditingAlbumName(album.name);
+    setEditingAlbumDescription(album.description ?? '');
+  };
+
+  const cancelAlbumEdit = () => {
+    setEditingAlbumId(null);
+    setEditingAlbumName('');
+    setEditingAlbumDescription('');
+  };
+
+  const handleSaveAlbum = async (albumId: string) => {
+    if (!editingAlbumName.trim()) {
+      setPhotosError('Album name is required');
+      return;
+    }
+
+    try {
+      setPhotosError('');
+      await updateMyAlbum(albumId, {
+        name: editingAlbumName.trim(),
+        description: editingAlbumDescription.trim() ? editingAlbumDescription.trim() : null,
+      });
+      cancelAlbumEdit();
+      await reloadPhotos();
+    } catch (err) {
+      setPhotosError(err instanceof Error ? err.message : 'Failed to update album');
+    }
+  };
+
+  const handleDeleteAlbum = async (albumId: string) => {
+    const shouldDelete = window.confirm(
+      'Delete this album and all photos inside it? This action cannot be undone.'
+    );
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      setPhotosError('');
+      await deleteMyAlbum(albumId);
+      if (editingAlbumId === albumId) {
+        cancelAlbumEdit();
+      }
+      await reloadPhotos();
+    } catch (err) {
+      setPhotosError(err instanceof Error ? err.message : 'Failed to delete album');
     }
   };
 
@@ -467,10 +527,81 @@ export function Profile() {
                   <div className="space-y-4">
                     {photosData.albums.map((album) => (
                       <article key={album.id} data-testid={`profile-photos-album-${album.id}`}>
-                        <h4 className="text-sm font-semibold text-slate-900">{album.name}</h4>
-                        {album.description ? (
-                          <p className="text-xs text-slate-500">{album.description}</p>
-                        ) : null}
+                        {editingAlbumId === album.id ? (
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                            <input
+                              data-testid={`profile-photos-album-name-input-${album.id}`}
+                              value={editingAlbumName}
+                              onChange={(event) => {
+                                setEditingAlbumName(event.target.value);
+                              }}
+                              placeholder="Album name"
+                              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            />
+                            <input
+                              data-testid={`profile-photos-album-description-input-${album.id}`}
+                              value={editingAlbumDescription}
+                              onChange={(event) => {
+                                setEditingAlbumDescription(event.target.value);
+                              }}
+                              placeholder="Description (optional)"
+                              className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            />
+                            <div className="mt-2 flex gap-2">
+                              <button
+                                type="button"
+                                data-testid={`profile-photos-album-save-button-${album.id}`}
+                                onClick={() => {
+                                  void handleSaveAlbum(album.id);
+                                }}
+                                className="rounded-md bg-primary-600 px-3 py-2 text-xs font-semibold text-white"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                data-testid={`profile-photos-album-cancel-button-${album.id}`}
+                                onClick={cancelAlbumEdit}
+                                className="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <h4 className="text-sm font-semibold text-slate-900">{album.name}</h4>
+                              {album.description ? (
+                                <p className="text-xs text-slate-500">{album.description}</p>
+                              ) : null}
+                            </div>
+
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                data-testid={`profile-photos-album-edit-button-${album.id}`}
+                                onClick={() => {
+                                  startAlbumEdit(album);
+                                }}
+                                className="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                data-testid={`profile-photos-album-delete-button-${album.id}`}
+                                onClick={() => {
+                                  void handleDeleteAlbum(album.id);
+                                }}
+                                className="rounded-md border border-danger-300 px-2 py-1 text-xs font-semibold text-danger-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                         {album.photos.length === 0 ? (
                           <p className="mt-1 text-sm text-slate-600">Album is empty.</p>
                         ) : (

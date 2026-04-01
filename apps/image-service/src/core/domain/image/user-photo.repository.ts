@@ -25,6 +25,7 @@ export abstract class UserPhotoRepository {
     photoId: string,
     data: UpdateUserPhotoData,
   ): Promise<UserPhoto>;
-  abstract clearAlbumByAlbumId(albumId: string): Promise<void>;
+  abstract listByAlbumId(albumId: string): Promise<UserPhoto[]>;
+  abstract deleteByAlbumId(albumId: string): Promise<void>;
   abstract deleteById(photoId: string): Promise<void>;
 }

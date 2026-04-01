@@ -61,6 +61,7 @@ Image Service (Port 4004)
 - `IMAGE_COMMANDS.deleteUserAlbum`
   - Input: `{ ownerUserId, albumId }`
   - Output: `{ success }`
+  - Behavior: deletes the album and deletes photos that belong to that album
 
 - `IMAGE_COMMANDS.listUserPhotos`
   - Input: `{ ownerUserId }`

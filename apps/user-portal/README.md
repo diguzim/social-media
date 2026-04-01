@@ -11,7 +11,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - Modern public profile page (avatar, name, username, stats) for viewing other users by username
 - URL-driven tabbed profile sections on both Profile and UserProfile: Timeline, Photos, About, Friends, Personal Data
-- Photos tab supports albums and unsorted photos (create album, upload photo, public read-only gallery)
+- Photos tab supports albums and unsorted photos with full album CRUD on own profile (create/edit/delete album, upload photo, public read-only gallery)
 - Owner-aware profile actions (edit/add placeholders only shown on own profile)
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests

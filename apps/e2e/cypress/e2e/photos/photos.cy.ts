@@ -63,6 +63,75 @@ describe("Photos feature", () => {
       .its("length")
       .should("be.greaterThan", 0);
   });
+
+  it("updates and deletes an album from the own profile photos page", () => {
+    const albumName = `Fake E2E Album CRUD ${Date.now()}`;
+    const updatedAlbumName = `${albumName} Updated`;
+    const photoDescription = "Fake E2E Album Photo To Delete";
+
+    cy.visit("/profile/photos");
+
+    cy.getByTestId("profile-photos-album-name-input").type(albumName);
+    cy.getByTestId("profile-photos-album-description-input").type(
+      "Fake E2E Album Description",
+    );
+    cy.getByTestId("profile-photos-create-button").click();
+    cy.contains(albumName).should("be.visible");
+
+    cy.getByTestId("profile-photos-file-input").selectFile({
+      contents: Cypress.Buffer.from(tinyPngBase64, "base64"),
+      fileName: "fake-e2e-album-photo.png",
+      mimeType: "image/png",
+      lastModified: Date.now(),
+    });
+    cy.getByTestId("profile-photos-album-select").select(albumName);
+    cy.getByTestId("profile-photos-photo-description-input").type(
+      photoDescription,
+    );
+    cy.getByTestId("profile-photos-upload-button").click();
+
+    cy.contains('article[data-testid^="profile-photos-album-"]', albumName)
+      .invoke("attr", "data-testid")
+      .then((albumTestId) => {
+        const albumId = (albumTestId ?? "").replace(
+          "profile-photos-album-",
+          "",
+        );
+        expect(albumId).to.not.equal("");
+
+        cy.getByTestId(`profile-photos-album-edit-button-${albumId}`).click();
+        cy.getByTestId(`profile-photos-album-name-input-${albumId}`)
+          .clear()
+          .type(updatedAlbumName);
+        cy.getByTestId(`profile-photos-album-description-input-${albumId}`)
+          .clear()
+          .type("Fake E2E Album Description Updated");
+        cy.getByTestId(`profile-photos-album-save-button-${albumId}`).click();
+      });
+
+    cy.contains(updatedAlbumName).should("be.visible");
+
+    cy.on("window:confirm", () => true);
+    cy.contains(
+      'article[data-testid^="profile-photos-album-"]',
+      updatedAlbumName,
+    )
+      .invoke("attr", "data-testid")
+      .then((updatedAlbumTestId) => {
+        const updatedAlbumId = (updatedAlbumTestId ?? "").replace(
+          "profile-photos-album-",
+          "",
+        );
+        expect(updatedAlbumId).to.not.equal("");
+
+        cy.getByTestId(
+          `profile-photos-album-delete-button-${updatedAlbumId}`,
+        ).click();
+      });
+
+    cy.contains(updatedAlbumName).should("not.exist");
+    cy.get(`img[alt="${photoDescription}"]`).should("not.exist");
+  });
 });
 
 describe("Photos auth regression (alice)", () => {

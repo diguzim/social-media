@@ -43,6 +43,7 @@ describe("User photos + albums use cases", () => {
   const deleteAlbumUseCase = new DeleteUserAlbumUseCase(
     albumRepository,
     photoRepository,
+    imageStorageProvider,
   );
   const deleteUserPhotoUseCase = new DeleteUserPhotoUseCase(
     photoRepository,
@@ -125,7 +126,7 @@ describe("User photos + albums use cases", () => {
     expect(updated.description).toBe("now unsorted");
   });
 
-  it("clears album reference for photos after album deletion", async () => {
+  it("deletes album photos after album deletion", async () => {
     const album = await createAlbumUseCase.execute({
       ownerUserId: "u3",
       name: "Nature",
@@ -143,7 +144,8 @@ describe("User photos + albums use cases", () => {
     await deleteAlbumUseCase.execute({ ownerUserId: "u3", albumId: album.id });
 
     const after = await photoRepository.findById(photo.id);
-    expect(after?.albumId).toBeNull();
+    expect(after).toBeNull();
+    expect(imageStorageProvider.deleteFile).toHaveBeenCalled();
   });
 
   it("deletes photo metadata and storage file", async () => {

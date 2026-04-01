@@ -234,7 +234,7 @@ Currently covers:
 
 ### Photos
 
-- **Photos/Albums**: Create album, upload unsorted photo, and verify public profile photos rendering
+- **Photos/Albums**: Create/update/delete album, upload photos, verify album delete behavior, and verify public profile photos rendering
 
 ## Best Practices
 
