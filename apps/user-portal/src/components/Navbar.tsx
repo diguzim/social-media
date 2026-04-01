@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { clearAuth } from '../utils/auth';
+import { getUserProfile } from '../services/auth';
 
 export function Navbar() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const cachedUser = getUserProfile();
+  const profilePath = cachedUser?.username ? `/users/${cachedUser.username}` : '/';
 
   const handleLogout = () => {
     clearAuth();
@@ -60,7 +63,7 @@ export function Navbar() {
           >
             <Link
               data-testid="navbar-profile-link"
-              to="/profile"
+              to={profilePath}
               onClick={() => setIsDropdownOpen(false)}
               className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
             >

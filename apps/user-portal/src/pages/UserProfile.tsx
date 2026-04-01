@@ -84,7 +84,6 @@ export function UserProfile() {
     canViewAcceptedFriends,
   } = state;
 
-  const isOwnProfile = friendshipStatus === 'self';
   const [photosData, setPhotosData] = useState<API.GetUserPhotosResponse>({
     albums: [],
     unsortedPhotos: [],
@@ -214,35 +213,23 @@ export function UserProfile() {
 
   return (
     <div data-testid="user-profile-page" className="page-container max-w-5xl">
-      <h1 data-testid="user-profile-page-title" className="section-title">
-        Profile
-      </h1>
-
       <ProfileHeaderCard
         cardTestId="user-profile-card"
         avatarTestId="user-profile-avatar-image"
         nameTestId="user-profile-name"
         usernameTestId="user-profile-username"
+        verifiedBadgeTestId="user-profile-verified-badge"
         statsTestId="user-profile-stats"
         comingSoonTestId="user-profile-stats-coming-soon"
         name={profile.name}
         username={profile.username}
         avatarUrl={profile.avatarUrl}
         postsCount={posts.length}
+        isVerified={Boolean(profile.emailVerifiedAt)}
       />
 
       <section data-testid="user-profile-meta" className="mt-4">
-        {profile.emailVerifiedAt ? (
-          <p data-testid="user-profile-email-verified" className="text-sm text-green-600">
-            ✓ Verified account
-          </p>
-        ) : (
-          <p data-testid="user-profile-email-unverified" className="text-sm text-yellow-600">
-            ⚠ Email not verified yet
-          </p>
-        )}
-
-        <div data-testid="user-profile-friendship-section" className="mt-3 space-y-2">
+        <div data-testid="user-profile-friendship-section" className="space-y-2">
           <p data-testid="user-profile-friendship-status" className="text-sm text-slate-700">
             {friendshipStatus === 'self'
               ? 'This is your profile.'
@@ -514,20 +501,9 @@ export function UserProfile() {
 
       {activeSection === 'about' ? (
         <section data-testid="user-profile-about-section" className="mt-6 card p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">About</h2>
-              <p className="mt-1 text-sm text-slate-600">Public bio and profile summary.</p>
-            </div>
-            {isOwnProfile ? (
-              <button
-                type="button"
-                data-testid="user-profile-about-edit-button"
-                className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
-              >
-                Edit about (soon)
-              </button>
-            ) : null}
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">About</h2>
+            <p className="mt-1 text-sm text-slate-600">Public bio and profile summary.</p>
           </div>
 
           <p data-testid="user-profile-about-placeholder" className="mt-4 text-sm text-slate-600">
@@ -574,22 +550,11 @@ export function UserProfile() {
 
       {activeSection === 'personal' ? (
         <section data-testid="user-profile-personal-section" className="mt-6 card p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Personal Data</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Location, birth date, gender, work, and education.
-              </p>
-            </div>
-            {isOwnProfile ? (
-              <button
-                type="button"
-                data-testid="user-profile-personal-edit-button"
-                className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
-              >
-                Edit personal data (soon)
-              </button>
-            ) : null}
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Personal Data</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Location, birth date, gender, work, and education.
+            </p>
           </div>
 
           <div

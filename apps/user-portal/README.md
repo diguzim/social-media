@@ -7,12 +7,9 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - User registration with name, username, email, and password
 - JWT-based login and authentication
 - Email verification flow (verify link + resend banner)
-- Modern own-profile header (avatar, name, username, stats) with secondary account details
-- Profile picture upload on Profile page (JPG/PNG up to 2MB)
-- Modern public profile page (avatar, name, username, stats) for viewing other users by username
-- URL-driven tabbed profile sections on both Profile and UserProfile: Timeline, Photos, About, Friends, Personal Data
-- Photos tab supports an albums-first experience (horizontal album cards + drill-in gallery), photo modal viewing, and full album CRUD on own profile (create/edit/delete + manual cover selection)
-- Owner-aware profile actions (edit/add placeholders only shown on own profile)
+- Unified profile page (avatar, name, username, stats) served by `/users/:username` for both self and public views
+- URL-driven tabbed profile sections: Timeline, Photos, About, Friends, Personal Data
+- Photos tab supports an albums-first experience (horizontal album cards + drill-in gallery) and photo modal viewing
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
 - Client-side routing with React Router v6
@@ -30,8 +27,6 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/` - Protected home page showing user data
 - `/register` - User registration form
 - `/login` - User login form
-- `/profile` - Protected own-profile page (defaults to Timeline)
-- `/profile/:section` - Protected own-profile section route (`timeline|photos|about|friends|personal`)
 - `/users/:username` - Protected public profile page (defaults to Timeline)
 - `/users/:username/:section` - Protected public profile section route (`timeline|photos|about|friends|personal`)
 - `/friends` - Protected friendship management page (friends + pending requests)
@@ -53,11 +48,11 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - User profile fetched from `GET /users/me` and cached in localStorage (`user`)
 - Redirects to Home page
 
-3. **Protected Area** (`/`, `/profile`)
+3. **Protected Area** (`/`, `/users/:username`)
 
 - Protected by route guard (requires `jwtToken` + `user` in localStorage)
 - Home shows welcome + user info
-- Profile shows dedicated profile view with `emailVerifiedAt` status
+- Unified user profile shows dedicated profile view with a verified badge in the header card when applicable
 - Logout clears auth data and redirects to login
 - Unverified users see a yellow banner with a "Resend verification email" button
 
@@ -65,7 +60,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - Clicking the link in the verification email loads `/verify-email?token=...`
 - Page calls `POST /users/email-verification/confirm` and shows success/already-verified/error state
-- Profile page shows "Verified on {date}" or "Not yet verified"
+- Verified accounts show a badge in the profile card
 
 ## Data Storage
 
@@ -83,9 +78,7 @@ Examples:
 - Register: `register-name-input`, `register-username-input`, `register-email-input`, `register-submit-button`
 - Home: `home-page`, `home-create-post-section`, `home-feed-section`
 - Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
-- Profile: `profile-user-card`, `profile-user-stats`, `profile-posts-list`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
-- Profile tabs: `profile-sections-tab-*`, `profile-photos-section`, `profile-about-section`, `profile-friends-section`, `profile-personal-section`
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
 
 These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
@@ -332,11 +325,14 @@ The app communicates with the API Gateway which routes requests to microservices
 - Error states display user-friendly error messages
 - Home uses cached-first rendering for profile data and refreshes in the background when possible
 - Feed refreshes preserve already rendered posts and show local refresh feedback instead of blanking the page
-- Home feed, My Posts, Profile, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
-- Profile and user-profile routes render post lists with the same reusable list UI component
-- Feed, My Posts, Profile, and User Profile share a common paginated posts data hook for refresh/load-more behavior
-- Profile and UserProfile headers include placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
+- Home feed, My Posts, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
+- Feed, My Posts, and User Profile share a common paginated posts data hook for refresh/load-more behavior
+- UserProfile header includes placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
 - About and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
 - UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary
+
+## TODO
+
+- [ ] Reintroduce own-profile management actions in unified user profile (`/users/:username`) when product flow is defined (avatar upload, album/photo CRUD, About/Personal edit actions)

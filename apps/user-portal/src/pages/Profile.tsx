@@ -331,9 +331,6 @@ export function Profile() {
 
   return (
     <div data-testid="profile-page" className="page-container max-w-5xl">
-      <h1 data-testid="profile-page-title" className="section-title">
-        My Profile
-      </h1>
       {user && (
         <>
           <ProfileHeaderCard
@@ -347,6 +344,8 @@ export function Profile() {
             username={user.username}
             avatarUrl={user.avatarUrl}
             postsCount={posts.length}
+            isVerified={Boolean(user.emailVerifiedAt)}
+            verifiedBadgeTestId="profile-user-verified-badge"
           />
 
           <section data-testid="profile-user-details-card" className="card mt-4 p-6">
@@ -363,20 +362,13 @@ export function Profile() {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">User ID</p>
-                <p data-testid="profile-user-id" className="text-sm text-slate-700">
-                  {user.id}
-                </p>
-              </div>
-
-              <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Email</p>
                 <p data-testid="profile-user-email" className="text-sm text-slate-700">
                   {user.email}
                 </p>
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">Email verification</p>
                 {user.emailVerifiedAt ? (
                   <p data-testid="profile-email-verified" className="text-sm text-green-600">

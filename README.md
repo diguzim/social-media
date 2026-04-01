@@ -62,12 +62,12 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - User profile fetched via GET `/users/me` and cached as `user`
    - User redirected to home page
 
-3. **Protected Pages** (`/`, `/profile`, `/profile/:section`, `/users/:username`, `/users/:username/:section`, `/friends`) - Authenticated user area
+3. **Protected Pages** (`/`, `/users/:username`, `/users/:username/:section`, `/friends`) - Authenticated user area
    - Route guard requires both `jwtToken` and `user` in localStorage
    - Home (`/`) shows "Welcome {name}!" and user summary
-   - Profile (`/profile`) shows URL-driven tabbed sections: Timeline, Photos, About, Friends, Personal Data
-   - UserProfile (`/users/:username`) shows the same tabbed layout with owner-aware actions
-   - Photos tab is backend-driven with horizontal album cards, album drill-in, and photo modal viewing; own profile supports full album CRUD while public profile is read-only
+   - User profile (`/users/:username`) is the single profile route for both self and other users
+   - Profile sections are URL-driven tabs: Timeline, Photos, About, Friends, Personal Data
+   - Photos tab is backend-driven with horizontal album cards, album drill-in, and photo modal viewing (read-only in the unified profile UI)
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`
@@ -275,6 +275,7 @@ Each service has a production Dockerfile for deployment:
 - [ ] Friends/followers graph (follow/unfollow + follower/following lists)
 - [ ] Notifications center (in-app + delivery channels)
 - [ ] Privacy controls (public/private profiles and visibility rules)
+- [ ] Reintroduce own-profile management UI on `/users/:username` (avatar upload + album/photo CRUD/edit placeholders)
 
 ## Notes
 

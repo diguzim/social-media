@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from '../pages/Home';
 import { Register } from '../pages/Register';
 import { Login } from '../pages/Login';
-import { Profile } from '../pages/Profile';
 import { UserProfile } from '../pages/UserProfile';
 import { MyPosts } from '../pages/MyPosts';
 import { Friends } from '../pages/Friends';
@@ -32,8 +31,6 @@ export function App() {
           {/* Protected routes with navbar */}
           <Route element={<ProtectedRoutes />}>
             <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/:section" element={<Profile />} />
             <Route path="/users/:username" element={<UserProfile />} />
             <Route path="/users/:username/:section" element={<UserProfile />} />
             <Route path="/my-posts" element={<MyPosts />} />

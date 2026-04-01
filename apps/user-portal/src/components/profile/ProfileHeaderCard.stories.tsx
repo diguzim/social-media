@@ -27,3 +27,10 @@ export const WithoutAvatar: Story = {
     avatarUrl: undefined,
   },
 };
+
+export const Verified: Story = {
+  args: {
+    isVerified: true,
+    verifiedBadgeTestId: 'storybook-profile-verified-badge',
+  },
+};

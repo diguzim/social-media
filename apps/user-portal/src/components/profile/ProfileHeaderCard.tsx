@@ -3,12 +3,14 @@ interface ProfileHeaderCardProps {
   avatarTestId: string;
   nameTestId: string;
   usernameTestId: string;
+  verifiedBadgeTestId?: string;
   statsTestId: string;
   comingSoonTestId: string;
   name: string;
   username: string;
   avatarUrl?: string;
   postsCount: number;
+  isVerified?: boolean;
 }
 
 const DEFAULT_AVATAR_DATA_URL =
@@ -19,12 +21,14 @@ export function ProfileHeaderCard({
   avatarTestId,
   nameTestId,
   usernameTestId,
+  verifiedBadgeTestId,
   statsTestId,
   comingSoonTestId,
   name,
   username,
   avatarUrl,
   postsCount,
+  isVerified,
 }: ProfileHeaderCardProps) {
   return (
     <section data-testid={cardTestId} className="card mt-5 p-6">
@@ -38,9 +42,19 @@ export function ProfileHeaderCard({
           />
 
           <div>
-            <h2 data-testid={nameTestId} className="text-2xl font-semibold text-slate-900">
-              {name}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 data-testid={nameTestId} className="text-2xl font-semibold text-slate-900">
+                {name}
+              </h2>
+              {isVerified ? (
+                <span
+                  data-testid={verifiedBadgeTestId}
+                  className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700"
+                >
+                  Verified
+                </span>
+              ) : null}
+            </div>
             <p data-testid={usernameTestId} className="text-sm text-slate-500">
               @{username}
             </p>
