@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import type { API } from '@repo/contracts';
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
@@ -11,6 +12,7 @@ import {
   normalizeProfileSection,
   type ProfileSectionKey,
 } from '../components/profile/ProfileSectionsTabs';
+import { getUserPhotos } from '../services/photos';
 
 function UserFriendItem({
   id,
@@ -82,6 +84,12 @@ export function UserProfile() {
   } = state;
 
   const isOwnProfile = friendshipStatus === 'self';
+  const [photosData, setPhotosData] = useState<API.GetUserPhotosResponse>({
+    albums: [],
+    unsortedPhotos: [],
+  });
+  const [isPhotosLoading, setIsPhotosLoading] = useState(false);
+  const [photosError, setPhotosError] = useState('');
 
   const sentinelRef = useInfiniteScrollObserver({
     enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
@@ -99,6 +107,40 @@ export function UserProfile() {
       navigate(`/users/${username}/photos`, { replace: true });
     }
   }, [navigate, section, username]);
+
+  useEffect(() => {
+    if (activeSection !== 'photos' || !profile?.username) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const loadPhotos = async () => {
+      setIsPhotosLoading(true);
+      setPhotosError('');
+
+      try {
+        const response = await getUserPhotos(profile.username);
+        if (!isCancelled) {
+          setPhotosData(response);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setPhotosError(err instanceof Error ? err.message : 'Failed to load photos');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsPhotosLoading(false);
+        }
+      }
+    };
+
+    void loadPhotos();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeSection, profile?.username]);
 
   const onSectionChange = (nextSection: ProfileSectionKey) => {
     if (!username) {
@@ -248,29 +290,84 @@ export function UserProfile() {
 
       {activeSection === 'photos' ? (
         <section data-testid="user-profile-photos-section" className="mt-6 card p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Photos</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Photo albums and standalone uploads are coming soon.
-              </p>
-            </div>
-            {isOwnProfile ? (
-              <button
-                type="button"
-                data-testid="user-profile-photos-create-button"
-                className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white"
-              >
-                Create album (soon)
-              </button>
-            ) : null}
-          </div>
+          <h2 className="text-2xl font-semibold text-slate-900">Photos</h2>
+          <p className="mt-1 text-sm text-slate-600">Albums and standalone (unsorted) photos.</p>
 
-          <p data-testid="user-profile-photos-placeholder" className="mt-4 text-sm text-slate-600">
-            {isOwnProfile
-              ? 'You will be able to organize photos into albums and upload profile photos without albums.'
-              : 'This user has no public albums yet.'}
-          </p>
+          {photosError ? (
+            <p data-testid="user-profile-photos-error" className="mt-4 text-sm text-danger-600">
+              {photosError}
+            </p>
+          ) : null}
+
+          {isPhotosLoading ? (
+            <p data-testid="user-profile-photos-loading" className="mt-4 text-sm text-slate-600">
+              Loading photos...
+            </p>
+          ) : (
+            <div className="mt-5 space-y-5">
+              <section data-testid="user-profile-photos-unsorted-section">
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">Unsorted Photos</h3>
+                {photosData.unsortedPhotos.length === 0 ? (
+                  <p
+                    data-testid="user-profile-photos-unsorted-empty"
+                    className="text-sm text-slate-600"
+                  >
+                    No unsorted photos yet.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    {photosData.unsortedPhotos.map((photo) => (
+                      <img
+                        key={photo.id}
+                        data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
+                        src={photo.imageUrl}
+                        alt={photo.description ?? 'Photo'}
+                        className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section data-testid="user-profile-photos-albums-section">
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">Albums</h3>
+                {photosData.albums.length === 0 ? (
+                  <p
+                    data-testid="user-profile-photos-albums-empty"
+                    className="text-sm text-slate-600"
+                  >
+                    No albums yet.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {photosData.albums.map((album) => (
+                      <article key={album.id} data-testid={`user-profile-photos-album-${album.id}`}>
+                        <h4 className="text-sm font-semibold text-slate-900">{album.name}</h4>
+                        {album.description ? (
+                          <p className="text-xs text-slate-500">{album.description}</p>
+                        ) : null}
+                        {album.photos.length === 0 ? (
+                          <p className="mt-1 text-sm text-slate-600">Album is empty.</p>
+                        ) : (
+                          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                            {album.photos.map((photo) => (
+                              <img
+                                key={photo.id}
+                                data-testid={`user-profile-photos-album-image-${photo.id}`}
+                                src={photo.imageUrl}
+                                alt={photo.description ?? `${album.name} photo`}
+                                className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
         </section>
       ) : null}
 

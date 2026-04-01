@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import type { API } from '@repo/contracts';
 import { useProfileStateContract } from '../state-contracts/profile';
 import { AvatarUpload } from '../components/avatar/AvatarUpload';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
@@ -11,6 +12,7 @@ import {
   normalizeProfileSection,
   type ProfileSectionKey,
 } from '../components/profile/ProfileSectionsTabs';
+import { createMyAlbum, getUserPhotos, uploadMyPhoto } from '../services/photos';
 
 function ProfileFriendItem({
   id,
@@ -80,6 +82,17 @@ export function Profile() {
     isFriendsLoading,
     friendsError,
   } = state;
+  const [photosData, setPhotosData] = useState<API.GetUserPhotosResponse>({
+    albums: [],
+    unsortedPhotos: [],
+  });
+  const [isPhotosLoading, setIsPhotosLoading] = useState(false);
+  const [photosError, setPhotosError] = useState('');
+  const [albumName, setAlbumName] = useState('');
+  const [albumDescription, setAlbumDescription] = useState('');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadDescription, setUploadDescription] = useState('');
+  const [uploadAlbumId, setUploadAlbumId] = useState<string>('');
 
   const sentinelRef = useInfiniteScrollObserver({
     enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
@@ -101,6 +114,91 @@ export function Profile() {
     }
 
     navigate(`/profile/${nextSection}`);
+  };
+
+  useEffect(() => {
+    if (activeSection !== 'photos' || !user?.username) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const loadPhotos = async () => {
+      setIsPhotosLoading(true);
+      setPhotosError('');
+
+      try {
+        const response = await getUserPhotos(user.username);
+        if (!isCancelled) {
+          setPhotosData(response);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setPhotosError(err instanceof Error ? err.message : 'Failed to load photos');
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsPhotosLoading(false);
+        }
+      }
+    };
+
+    void loadPhotos();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeSection, user?.username]);
+
+  const reloadPhotos = async () => {
+    if (!user?.username) {
+      return;
+    }
+
+    const response = await getUserPhotos(user.username);
+    setPhotosData(response);
+  };
+
+  const handleCreateAlbum = async () => {
+    if (!albumName.trim()) {
+      setPhotosError('Album name is required');
+      return;
+    }
+
+    try {
+      setPhotosError('');
+      await createMyAlbum({
+        name: albumName,
+        description: albumDescription || undefined,
+      });
+      setAlbumName('');
+      setAlbumDescription('');
+      await reloadPhotos();
+    } catch (err) {
+      setPhotosError(err instanceof Error ? err.message : 'Failed to create album');
+    }
+  };
+
+  const handleUploadPhoto = async () => {
+    if (!uploadFile) {
+      setPhotosError('Select a photo to upload');
+      return;
+    }
+
+    try {
+      setPhotosError('');
+      await uploadMyPhoto({
+        file: uploadFile,
+        albumId: uploadAlbumId || null,
+        description: uploadDescription || undefined,
+      });
+      setUploadFile(null);
+      setUploadDescription('');
+      setUploadAlbumId('');
+      await reloadPhotos();
+    } catch (err) {
+      setPhotosError(err instanceof Error ? err.message : 'Failed to upload photo');
+    }
   };
 
   if (isLoading) {
@@ -235,26 +333,166 @@ export function Profile() {
 
       {activeSection === 'photos' ? (
         <section data-testid="profile-photos-section" className="mt-6 card p-6">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
             <div>
               <h2 className="text-2xl font-semibold text-slate-900">Photos</h2>
               <p className="mt-1 text-sm text-slate-600">
                 Group pictures into albums, or upload photos without an album.
               </p>
             </div>
-            <button
-              type="button"
-              data-testid="profile-photos-create-button"
-              className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white"
-            >
-              Create album (soon)
-            </button>
           </div>
 
-          <p data-testid="profile-photos-placeholder" className="mt-4 text-sm text-slate-600">
-            Photo library management (with albums) and standalone uploads are not wired in backend
-            yet.
-          </p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Create album</h3>
+              <input
+                data-testid="profile-photos-album-name-input"
+                value={albumName}
+                onChange={(event) => {
+                  setAlbumName(event.target.value);
+                }}
+                placeholder="Album name"
+                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              />
+              <input
+                data-testid="profile-photos-album-description-input"
+                value={albumDescription}
+                onChange={(event) => {
+                  setAlbumDescription(event.target.value);
+                }}
+                placeholder="Description (optional)"
+                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                data-testid="profile-photos-create-button"
+                onClick={() => {
+                  void handleCreateAlbum();
+                }}
+                className="mt-3 rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white"
+              >
+                Create album
+              </button>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Upload photo</h3>
+              <input
+                data-testid="profile-photos-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/gif"
+                onChange={(event) => {
+                  const selectedFile = event.target.files?.[0] ?? null;
+                  setUploadFile(selectedFile);
+                }}
+                className="mt-2 block w-full text-sm"
+              />
+              <select
+                data-testid="profile-photos-album-select"
+                value={uploadAlbumId}
+                onChange={(event) => {
+                  setUploadAlbumId(event.target.value);
+                }}
+                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              >
+                <option value="">Unsorted Photos</option>
+                {photosData.albums.map((album) => (
+                  <option key={album.id} value={album.id}>
+                    {album.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                data-testid="profile-photos-photo-description-input"
+                value={uploadDescription}
+                onChange={(event) => {
+                  setUploadDescription(event.target.value);
+                }}
+                placeholder="Photo description (optional)"
+                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                data-testid="profile-photos-upload-button"
+                onClick={() => {
+                  void handleUploadPhoto();
+                }}
+                className="mt-3 rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white"
+              >
+                Upload photo
+              </button>
+            </div>
+          </div>
+
+          {photosError ? (
+            <p data-testid="profile-photos-error" className="mt-4 text-sm text-danger-600">
+              {photosError}
+            </p>
+          ) : null}
+
+          {isPhotosLoading ? (
+            <p data-testid="profile-photos-loading" className="mt-4 text-sm text-slate-600">
+              Loading photos...
+            </p>
+          ) : (
+            <div className="mt-6 space-y-5">
+              <section data-testid="profile-photos-unsorted-section">
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">Unsorted Photos</h3>
+                {photosData.unsortedPhotos.length === 0 ? (
+                  <p data-testid="profile-photos-unsorted-empty" className="text-sm text-slate-600">
+                    No unsorted photos yet.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    {photosData.unsortedPhotos.map((photo) => (
+                      <img
+                        key={photo.id}
+                        data-testid={`profile-photos-unsorted-image-${photo.id}`}
+                        src={photo.imageUrl}
+                        alt={photo.description ?? 'Photo'}
+                        className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section data-testid="profile-photos-albums-section">
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">Albums</h3>
+                {photosData.albums.length === 0 ? (
+                  <p data-testid="profile-photos-albums-empty" className="text-sm text-slate-600">
+                    No albums yet.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {photosData.albums.map((album) => (
+                      <article key={album.id} data-testid={`profile-photos-album-${album.id}`}>
+                        <h4 className="text-sm font-semibold text-slate-900">{album.name}</h4>
+                        {album.description ? (
+                          <p className="text-xs text-slate-500">{album.description}</p>
+                        ) : null}
+                        {album.photos.length === 0 ? (
+                          <p className="mt-1 text-sm text-slate-600">Album is empty.</p>
+                        ) : (
+                          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                            {album.photos.map((photo) => (
+                              <img
+                                key={photo.id}
+                                data-testid={`profile-photos-album-image-${photo.id}`}
+                                src={photo.imageUrl}
+                                alt={photo.description ?? `${album.name} photo`}
+                                className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
         </section>
       ) : null}
 

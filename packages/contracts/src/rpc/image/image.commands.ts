@@ -5,4 +5,12 @@ export const IMAGE_COMMANDS = {
   getPostImage: "image.getPostImage",
   deletePostImage: "image.deletePostImage",
   reorderPostImages: "image.reorderPostImages",
+  createUserAlbum: "image.createUserAlbum",
+  updateUserAlbum: "image.updateUserAlbum",
+  deleteUserAlbum: "image.deleteUserAlbum",
+  listUserPhotos: "image.listUserPhotos",
+  uploadUserPhoto: "image.uploadUserPhoto",
+  updateUserPhoto: "image.updateUserPhoto",
+  deleteUserPhoto: "image.deleteUserPhoto",
+  getUserPhoto: "image.getUserPhoto",
 } as const;

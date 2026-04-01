@@ -11,6 +11,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - Modern public profile page (avatar, name, username, stats) for viewing other users by username
 - URL-driven tabbed profile sections on both Profile and UserProfile: Timeline, Photos, About, Friends, Personal Data
+- Photos tab supports albums and unsorted photos (create album, upload photo, public read-only gallery)
 - Owner-aware profile actions (edit/add placeholders only shown on own profile)
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
@@ -107,6 +108,14 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - GET /friends/status/:username (requires auth)
 - POST /users/avatar (requires auth; multipart image upload)
 - GET /users/:userId/avatar (public image stream)
+- GET /users/:username/photos (requires auth)
+- GET /users/:userId/photos/:photoId (public image stream used by profile photos galleries)
+- POST /users/me/albums (requires auth)
+- PATCH /users/me/albums/:albumId (requires auth)
+- DELETE /users/me/albums/:albumId (requires auth)
+- POST /users/me/photos (requires auth; multipart image upload)
+- PATCH /users/me/photos/:photoId (requires auth)
+- DELETE /users/me/photos/:photoId (requires auth)
 - GET /posts?page=1&limit=10&sortOrder=desc
 - GET /posts/feed (requires auth; feed with author enrichment, optional author avatarUrl, like counts + likedByMe)
 - POST /posts/:id/reactions (like/unlike a post)
@@ -327,7 +336,7 @@ The app communicates with the API Gateway which routes requests to microservices
 - Profile and user-profile routes render post lists with the same reusable list UI component
 - Feed, My Posts, Profile, and User Profile share a common paginated posts data hook for refresh/load-more behavior
 - Profile and UserProfile headers include placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
-- Photos, About, and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
+- About and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
 - UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary

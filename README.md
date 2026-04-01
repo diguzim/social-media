@@ -67,7 +67,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - Home (`/`) shows "Welcome {name}!" and user summary
    - Profile (`/profile`) shows URL-driven tabbed sections: Timeline, Photos, About, Friends, Personal Data
    - UserProfile (`/users/:username`) shows the same tabbed layout with owner-aware actions
-   - Photos/About/Personal Data render placeholders until backend support is implemented
+   - Photos tab is backend-driven (albums + unsorted photos) on own and public profile routes
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`
@@ -275,7 +275,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] Friends/followers graph (follow/unfollow + follower/following lists)
 - [ ] Notifications center (in-app + delivery channels)
 - [ ] Privacy controls (public/private profiles and visibility rules)
-- [ ] Albums and grouped media management
 
 ## Notes
 

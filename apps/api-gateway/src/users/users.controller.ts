@@ -2,11 +2,13 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Logger,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Request,
   Res,
@@ -28,6 +30,11 @@ import { LoginBodyDto } from './dto/login-body.dto';
 import { UserIdParamDto } from './dto/user-id-param.dto';
 import { UsernameParamDto } from './dto/username-param.dto';
 import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
+import { CreateUserAlbumBodyDto } from './dto/create-user-album-body.dto';
+import { UpdateUserAlbumBodyDto } from './dto/update-user-album-body.dto';
+import { UpdateUserPhotoBodyDto } from './dto/update-user-photo-body.dto';
+import { AlbumIdParamDto } from './dto/album-id-param.dto';
+import { PhotoIdParamDto } from './dto/photo-id-param.dto';
 import { IMAGE_SERVICE } from 'src/images/image.client';
 import type { Express, Response } from 'express';
 
@@ -40,6 +47,12 @@ export class UsersController {
   private static readonly ALLOWED_MIME_TYPES = new Set([
     'image/jpeg',
     'image/png',
+  ]);
+  private static readonly MAX_USER_PHOTO_BYTES = 10 * 1024 * 1024;
+  private static readonly ALLOWED_USER_PHOTO_MIME_TYPES = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/gif',
   ]);
 
   constructor(
@@ -175,6 +188,272 @@ export class UsersController {
       emailVerifiedAt: rpcReply.emailVerifiedAt,
       avatarUrl,
     };
+  }
+
+  @Get(':username/photos')
+  @UseGuards(JwtAuthGuard)
+  async getUserPhotos(
+    @Param() params: UsernameParamDto,
+  ): Promise<API.GetUserPhotosResponse> {
+    const profile = await firstValueFrom(
+      this.authClient.send<
+        RPC.GetProfileByUsernameReply,
+        RPC.GetProfileByUsernameRequest
+      >(
+        { cmd: GET_PROFILE_BY_USERNAME_CMD },
+        {
+          username: params.username,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    const rpcReply = await firstValueFrom(
+      this.imageClient.send<RPC.ListUserPhotosReply, RPC.ListUserPhotosRequest>(
+        { cmd: IMAGE_COMMANDS.listUserPhotos },
+        {
+          ownerUserId: profile.id,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      albums: rpcReply.albums.map((album) => ({
+        id: album.id,
+        name: album.name,
+        description: album.description,
+        createdAt: album.createdAt,
+        updatedAt: album.updatedAt,
+        photos: album.photos.map((photo) =>
+          this.mapUserPhotoItem(profile.id, photo),
+        ),
+      })),
+      unsortedPhotos: rpcReply.unsortedPhotos.map((photo) =>
+        this.mapUserPhotoItem(profile.id, photo),
+      ),
+    };
+  }
+
+  @Post('me/albums')
+  @UseGuards(JwtAuthGuard)
+  async createUserAlbum(
+    @Body() body: CreateUserAlbumBodyDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.CreateUserAlbumResponse> {
+    const rpcReply = await firstValueFrom(
+      this.imageClient.send<
+        RPC.CreateUserAlbumReply,
+        RPC.CreateUserAlbumRequest
+      >(
+        { cmd: IMAGE_COMMANDS.createUserAlbum },
+        {
+          ownerUserId: req.user.userId,
+          name: body.name,
+          description: body.description,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      album: {
+        id: rpcReply.album.id,
+        name: rpcReply.album.name,
+        description: rpcReply.album.description,
+        createdAt: rpcReply.album.createdAt,
+        updatedAt: rpcReply.album.updatedAt,
+        photos: [],
+      },
+    };
+  }
+
+  @Patch('me/albums/:albumId')
+  @UseGuards(JwtAuthGuard)
+  async updateUserAlbum(
+    @Param() params: AlbumIdParamDto,
+    @Body() body: UpdateUserAlbumBodyDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.UpdateUserAlbumResponse> {
+    const rpcReply = await firstValueFrom(
+      this.imageClient.send<
+        RPC.UpdateUserAlbumReply,
+        RPC.UpdateUserAlbumRequest
+      >(
+        { cmd: IMAGE_COMMANDS.updateUserAlbum },
+        {
+          ownerUserId: req.user.userId,
+          albumId: params.albumId,
+          name: body.name,
+          description: body.description,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      album: {
+        id: rpcReply.album.id,
+        name: rpcReply.album.name,
+        description: rpcReply.album.description,
+        createdAt: rpcReply.album.createdAt,
+        updatedAt: rpcReply.album.updatedAt,
+        photos: [],
+      },
+    };
+  }
+
+  @Delete('me/albums/:albumId')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserAlbum(
+    @Param() params: AlbumIdParamDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.DeleteUserAlbumResponse> {
+    await firstValueFrom(
+      this.imageClient.send<
+        RPC.DeleteUserAlbumReply,
+        RPC.DeleteUserAlbumRequest
+      >(
+        { cmd: IMAGE_COMMANDS.deleteUserAlbum },
+        {
+          ownerUserId: req.user.userId,
+          albumId: params.albumId,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return { success: true };
+  }
+
+  @Post('me/photos')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadUserPhoto(
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Body() body: { albumId?: string; description?: string },
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.UploadUserPhotoResponse> {
+    if (!file) {
+      throw new BadRequestException('Image file is required');
+    }
+
+    if (!UsersController.ALLOWED_USER_PHOTO_MIME_TYPES.has(file.mimetype)) {
+      throw new BadRequestException('Only JPG, PNG and GIF images are allowed');
+    }
+
+    if (file.size > UsersController.MAX_USER_PHOTO_BYTES) {
+      throw new BadRequestException('Image must be 10MB or smaller');
+    }
+
+    const rpcReply = await firstValueFrom(
+      this.imageClient.send<
+        RPC.UploadUserPhotoReply,
+        RPC.UploadUserPhotoRequest
+      >(
+        { cmd: IMAGE_COMMANDS.uploadUserPhoto },
+        {
+          ownerUserId: req.user.userId,
+          albumId: body.albumId || null,
+          description: body.description,
+          fileBase64: file.buffer.toString('base64'),
+          mimeType: file.mimetype,
+          originalName: file.originalname,
+          fileSize: file.size,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      photo: this.mapUserPhotoItem(req.user.userId, rpcReply.photo),
+    };
+  }
+
+  @Patch('me/photos/:photoId')
+  @UseGuards(JwtAuthGuard)
+  async updateUserPhoto(
+    @Param() params: PhotoIdParamDto,
+    @Body() body: UpdateUserPhotoBodyDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.UpdateUserPhotoResponse> {
+    const rpcReply = await firstValueFrom(
+      this.imageClient.send<
+        RPC.UpdateUserPhotoReply,
+        RPC.UpdateUserPhotoRequest
+      >(
+        { cmd: IMAGE_COMMANDS.updateUserPhoto },
+        {
+          ownerUserId: req.user.userId,
+          photoId: params.photoId,
+          albumId: body.albumId,
+          description: body.description,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      photo: this.mapUserPhotoItem(req.user.userId, rpcReply.photo),
+    };
+  }
+
+  @Delete('me/photos/:photoId')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserPhoto(
+    @Param() params: PhotoIdParamDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.DeleteUserPhotoResponse> {
+    await firstValueFrom(
+      this.imageClient.send<
+        RPC.DeleteUserPhotoReply,
+        RPC.DeleteUserPhotoRequest
+      >(
+        { cmd: IMAGE_COMMANDS.deleteUserPhoto },
+        {
+          ownerUserId: req.user.userId,
+          photoId: params.photoId,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return { success: true };
+  }
+
+  @Get(':userId/photos/:photoId')
+  async getUserPhoto(
+    @Param('userId') userId: string,
+    @Param('photoId') photoId: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    let rpcReply: RPC.GetUserPhotoReply;
+
+    try {
+      rpcReply = await firstValueFrom(
+        this.imageClient.send<RPC.GetUserPhotoReply, RPC.GetUserPhotoRequest>(
+          { cmd: IMAGE_COMMANDS.getUserPhoto },
+          {
+            ownerUserId: userId,
+            photoId,
+            correlationId: getCorrelationId(),
+          },
+        ),
+      );
+    } catch {
+      throw new NotFoundException('Photo not found');
+    }
+
+    const fileBuffer = Buffer.from(rpcReply.fileBase64, 'base64');
+    if (fileBuffer.length === 0) {
+      throw new NotFoundException('Photo not found');
+    }
+
+    res.setHeader('Content-Type', rpcReply.mimeType);
+    res.setHeader('Content-Length', String(rpcReply.contentLength));
+    res.setHeader('Cache-Control', 'public, max-age=60');
+
+    return new StreamableFile(fileBuffer);
   }
 
   @Post('avatar')
@@ -336,5 +615,27 @@ export class UsersController {
       `http://localhost:${process.env.PORT ?? '4000'}`;
 
     return `${baseUrl}/users/${userId}/avatar`;
+  }
+
+  private buildUserPhotoUrl(userId: string, photoId: string): string {
+    const baseUrl =
+      process.env.API_PUBLIC_BASE_URL ??
+      `http://localhost:${process.env.PORT ?? '4000'}`;
+
+    return `${baseUrl}/users/${userId}/photos/${photoId}`;
+  }
+
+  private mapUserPhotoItem(
+    ownerUserId: string,
+    photo: RPC.RpcUserPhotoItem,
+  ): API.UserPhotoItem {
+    return {
+      id: photo.id,
+      imageUrl: this.buildUserPhotoUrl(ownerUserId, photo.id),
+      mimeType: photo.mimeType,
+      description: photo.description,
+      albumId: photo.albumId,
+      uploadedAt: photo.uploadedAt,
+    };
   }
 }

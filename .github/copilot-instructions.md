@@ -62,6 +62,8 @@ This avoids N+1 queries and keeps each microservice focused on its own domain.
 Auth, posts, and image services use **in-memory repositories** behind repository interfaces.
 When switching to real DBs, only the infra layer changes — domain and application layers are untouched.
 
+When introducing a new domain/entity that is backed by an in-memory repository, always add deterministic seed data in the same task so the feature is manually verifiable right after boot (do not rely only on runtime creation through UI/tests).
+
 ## Tech Stack
 
 | Layer                   | Technology                               |
@@ -160,6 +162,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
 - Unit tests live alongside the code they test (`*.spec.ts`)
 - For state-contract architecture, add tests that validate provider injection and custom presenter behavior (pages should work with swapped implementations)
 - If tests or new behavior depend on baseline users/posts, update in-memory repository seed data in the same task (and keep test assertions aligned with the new seeded values)
+- For each new in-memory domain/entity, seed at least one representative scenario set (for example: populated, empty, and ungrouped/unassigned when applicable) and add automated assertions (unit and/or E2E) that validate those seeded scenarios
 - For progressive loading UX, assert that already-loaded regions remain visible while only pending islands show fallback UI
 - For interaction-pending UX, test disabled submit controls, duplicate-submit prevention, and visible pending indicators
 - In `apps/user-portal`, use `pnpm test`/`pnpm test:run` for one-shot runs and `pnpm test:watch` for interactive watch mode
@@ -177,6 +180,7 @@ When switching to real DBs, only the infra layer changes — domain and applicat
   - Storybook stories in `apps/user-portal/src/**/*.stories.tsx` when frontend component behavior/states change
 - If no documentation change is needed, explicitly verify that the existing docs are still accurate before considering the task complete
 - Prefer small, precise documentation updates that stay aligned with the code instead of leaving stale or aspirational text
+- When updating TODO/checklist sections in docs, remove completed items instead of marking them as done (`[x]`); keep TODO lists focused on remaining work only
 
 ## Running the Project
 

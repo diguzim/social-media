@@ -22,6 +22,8 @@ cypress/
       login.cy.ts         # User login flow
       home.cy.ts          # Home page and profile/feed view
       verify-email.cy.ts  # Email verification page flow
+    photos/
+      photos.cy.ts        # Albums + unsorted photos on own/public profile routes
     posts/
       feed.cy.ts          # Feed API enrichment and pagination checks
       create-post.cy.ts   # Create post UI flow on Home/My Posts
@@ -229,6 +231,10 @@ Currently covers:
 - **Manage Post**: Edit title/content, add/remove/reorder images, and delete own post
 - **Reactions**: Toggle like flow and feed reaction summaries
 - **Comments**: Create/edit/delete own comments and ownership restrictions across Home/My Posts
+
+### Photos
+
+- **Photos/Albums**: Create album, upload unsorted photo, and verify public profile photos rendering
 
 ## Best Practices
 
