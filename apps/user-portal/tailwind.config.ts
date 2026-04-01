@@ -4,6 +4,19 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      spacing: {
+        1: 'var(--space-1)',
+        2: 'var(--space-2)',
+        3: 'var(--space-3)',
+        4: 'var(--space-4)',
+        6: 'var(--space-6)',
+        8: 'var(--space-8)',
+        10: 'var(--space-10)',
+        12: 'var(--space-12)',
+        16: 'var(--space-16)',
+        18: 'var(--space-20)' /* kept for backward compatibility */,
+        20: 'var(--space-20)',
+      },
       colors: {
         primary: {
           50: '#eff6ff',
@@ -29,15 +42,59 @@ export default {
           800: '#991b1b',
           900: '#7f1d1d',
         },
+        bg: {
+          primary: 'var(--color-bg-primary)',
+          secondary: 'var(--color-bg-secondary)',
+          tertiary: 'var(--color-bg-tertiary)',
+          accent: 'var(--color-bg-accent)',
+          danger: 'var(--color-bg-danger)',
+        },
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          tertiary: 'var(--color-text-tertiary)',
+          inverse: 'var(--color-text-inverse)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
+          light: 'var(--color-border-light)',
+        },
+      },
+      fontSize: {
+        xs: ['var(--type-xs)', { lineHeight: 'var(--type-line-height-tight)' }],
+        sm: ['var(--type-sm)', { lineHeight: 'var(--type-line-height-tight)' }],
+        base: ['var(--type-base)', { lineHeight: 'var(--type-line-height-normal)' }],
+        lg: ['var(--type-lg)', { lineHeight: 'var(--type-line-height-normal)' }],
+        xl: ['var(--type-xl)', { lineHeight: 'var(--type-line-height-normal)' }],
+        '2xl': ['var(--type-2xl)', { lineHeight: 'var(--type-line-height-snug)' }],
+        '3xl': ['var(--type-3xl)', { lineHeight: 'var(--type-line-height-snug)' }],
+      },
+      fontWeight: {
+        normal: 'var(--type-weight-normal)',
+        medium: 'var(--type-weight-medium)',
+        semibold: 'var(--type-weight-semibold)',
+        bold: 'var(--type-weight-bold)',
+      },
+      borderRadius: {
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)',
+      },
+      boxShadow: {
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        card: 'var(--shadow-card)',
+      },
+      screens: {
+        sm: 'var(--breakpoint-sm)',
+        md: 'var(--breakpoint-md)',
+        lg: 'var(--breakpoint-lg)',
+        xl: 'var(--breakpoint-xl)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-      },
-      spacing: {
-        18: '4.5rem',
-      },
-      boxShadow: {
-        card: '0 2px 8px rgba(15, 23, 42, 0.08)',
       },
     },
   },

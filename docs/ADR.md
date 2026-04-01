@@ -245,3 +245,134 @@ Complexity constraints are initially **soft limits** (warnings/guidance), not ha
 ✅ Safer incremental feature additions in complex UI islands  
 ⚠️ More files per feature and some prop-plumbing overhead  
 ⚠️ Teams must consistently apply the split to avoid drifting back to monolithic components
+
+---
+
+## ADR-009: Design System Architecture (Tokens, Primitives, Responsive Layout)
+
+**Date:** 2026-04  
+**Status:** Accepted
+
+### Context
+
+The `apps/user-portal` frontend currently styles UI via ad-hoc Tailwind utility classes and a small set of CSS classes (`.page-container`, `.card`, `.btn-*`) in `src/styles.css`. There is no formal:
+
+- **Design tokens** (spacing, colors, typography, breakpoints)
+- **Layout system** (primitives for responsive containers, stacks, grids, sections)
+- **Governance** (compliance rules, migration strategy, component contract stability)
+
+This lack of structure creates:
+
+- Inconsistent spacing and alignment across pages
+- Difficulty onboarding new contributors to responsive patterns
+- Risk of visual regressions when refactoring components (no predictable primitives to anchor on)
+- No single source of truth for breakpoints and responsive behavior
+- Scattered stories in Storybook without a cohesive token/primitive narrative
+
+### Decision
+
+Establish a **Design System for `apps/user-portal`** with four pillars:
+
+#### 1. Token System (CSS Variables + Tailwind Mapping)
+
+- Define design tokens as **CSS custom properties (variables)** in `apps/user-portal/src/styles.css`:
+  - `--space-*` for spacing (4px, 8px, 16px, 24px, 32px, 48px units)
+  - `--color-*` for brand colors and semantic roles (`--color-bg`, `--color-text`, `--color-accent`, `--color-border`, etc.)
+  - `--type-*` for typography (font sizes, weights, line heights)
+  - `--radius-*` for border radii (`--radius-sm`, `--radius-md`, `--radius-lg`)
+  - `--shadow-*` for elevation levels
+  - `--breakpoint-*` for responsive breakpoints (mobile-first: `--breakpoint-sm`, `--breakpoint-md`, `--breakpoint-lg`)
+
+- **Map tokens into Tailwind** via `tailwind.config.ts`:
+  - `spacing: { ... }` reads `--space-*` variables
+  - `colors: { ... }` reads `--color-*` variables
+  - `fontSize: { ... }` reads `--type-*` variables
+  - `borderRadius: { ... }` reads `--radius-*` variables
+  - `boxShadow: { ... }` reads `--shadow-*` variables
+  - `screens: { ... }` reads `--breakpoint-*` variables
+
+- **Token source of truth**: CSS variables (single file, easy audit)
+- **Scope**: **`apps/user-portal` only** in this ADR; future monorepo-wide extraction planned as a separate ADR
+
+#### 2. Layout Primitives
+
+Define explicit **layout building blocks** (as React components in `apps/user-portal/src/components/layout/`):
+
+- **`Container`** — full-width responsive wrapper with max-width and centered padding
+- **`Stack`** — vertical or horizontal flex layout with consistent gap (xy-axis direction, adjustable via props)
+- **`Grid`** — responsive multi-column layout with configurable columns per breakpoint
+- **`Section`** — semantic grouping with padding + optional background/border
+
+Each primitive:
+
+- Uses design tokens for spacing, gaps, and responsive breakpoints
+- Exposes props for common customizations (e.g., `gap`, `columns`, `align`, `justify`)
+- Accepts `className` for utility extensions (Tailwind fallback)
+- Includes Storybook stories showing all responsive breakpoints
+- Is testable via deterministic selectors (`data-testid`)
+
+Existing reusable components like `LoadingBlock`, `SectionSkeleton`, `PendingButton` integrate with primitives through consistent token usage.
+
+#### 3. Responsive Breakpoint Strategy
+
+- **Mobile-first approach**: base styles for mobile, then `@media (min-width: ...)` for larger screens
+- **Standard breakpoints** (aligned with Tailwind defaults but enforced via tokens):
+  - `sm: 640px` — tablet portrait
+  - `md: 768px` — small desktop
+  - `lg: 1024px` — desktop
+  - `xl: 1280px` — large desktop
+- **Usage pattern**: token-based breakpoints in Tailwind utilities + component props (e.g., `columns={{ sm: 1, md: 2, lg: 3 }}`)
+
+#### 4. Governance and Compliance
+
+**New/Changed UI Compliance:**
+
+- All new components or pages must use design primitives from `components/layout/` for major layouts
+- All new components must use design tokens for spacing, colors, and typography
+- Token usage validated via setup to warn (e.g., ESLint rule or TypeScript strict type checking based on accepted token exhaustive props)
+
+**Legacy Migration:**
+
+- Existing pages/components can use ad-hoc utilities during refactoring (no retrofit requirement)
+- When a page/component is actively being refactored or extended, migrate its layout patterns to use new primitives
+- Phased migration order (for consistency):
+  1. `Home` page (primary user journey, high visibility)
+  2. `Profile` / `UserProfile` page (user-facing identity surface)
+  3. `MyPosts` page (content management surface)
+  4. Account settings pages (admin surface)
+  5. Shared form components (reuse amplifier)
+  6. Other routes as needed
+
+**Component Contract Stability:**
+
+- Design primitives are **public contracts** — breaking changes require team discussion and Storybook story updates
+- Component selectors (`data-testid`) must remain stable across token/primitive updates
+- Storybook stories must be updated whenever a component's responsive behavior changes
+- E2E tests depend on `data-testid` selectors; ensure selectors are unaffected by style changes
+
+**Drift Detection:**
+
+- Quarterly audit: scan codebase for hardcoded spacing/colors outside token system (via ESLint or manual inspection)
+- Storybook serves as the visual contract — if a story looks different than design intent, re-align the token values or primitive logic
+- Design system README in `apps/user-portal` documents current tokens, primitives, and usage examples
+
+### Consequences
+
+✅ **Consistency:** All pages use the same spacing scales, colors, typography — improved visual coherence  
+✅ **Maintainability:** Tokens are centralized in one file — changes propagate automatically via Tailwind + CSS vars  
+✅ **Accessibility:** Semantic primitives (e.g., `role="region"` on `Section`) improve screen-reader support  
+✅ **Documentation:** Storybook stories + design system README make onboarding faster for new contributors  
+✅ **Refactoring safety:** Primitives and tokens act as anchors — CSS changes are less risky when styling is predictable  
+✅ **Responsive UX:** Explicit breakpoints and layout primitives reduce responsive layout bugs
+
+⚠️ **Adoption overhead:** Contributors must learn token naming and primitive APIs — initial slower iteration  
+⚠️ **CSS var overhead:** CSS variables add a small runtime layer (negligible for this app scale)  
+⚠️ **Legacy code:** Existing pages use ad-hoc utilities; design system doesn't enforce retrofit (intentionally lenient on legacy)  
+⚠️ **Future refactoring:** If later extracted to a shared monorepo package, token definitions may need restructuring
+
+### Adoption Sequence
+
+1. **Phase 1 (Week 1):** Define tokens in `src/styles.css`, map into `tailwind.config.ts`, create layout primitives (`Container`, `Stack`, `Grid`, `Section`), document in `apps/user-portal/README.md`
+2. **Phase 2 (Week 2–3):** Migrate `Home` page and update its Storybook stories to showcase responsive behavior
+3. **Phase 3 (Week 4+):** Iteratively migrate remaining high-value pages (Profile, MyPosts, Account settings); update E2E selectors if needed
+4. **Ongoing:** All new UI must comply; legacy migrates incrementally when touched

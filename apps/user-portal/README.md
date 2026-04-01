@@ -311,6 +311,244 @@ pnpm --filter user-portal build-storybook
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 
+## Design System
+
+The portal uses a formal **design system** based on design tokens (CSS variables) and layout primitives to ensure consistency and responsive behavior across all pages.
+
+### Design Tokens
+
+Design tokens are CSS custom properties defined in `src/styles.css` and mapped into Tailwind via `tailwind.config.ts`. They serve as the single source of truth for spacing, colors, typography, and responsive breakpoints.
+
+#### Spacing Scale
+
+Spacing follows a 4px base unit:
+
+```
+--space-1: 4px    (0.25rem)
+--space-2: 8px    (0.5rem)
+--space-3: 12px   (0.75rem)
+--space-4: 16px   (1rem)
+--space-6: 24px   (1.5rem)
+--space-8: 32px   (2rem)
+--space-10: 40px  (2.5rem)
+--space-12: 48px  (3rem)
+--space-16: 64px  (4rem)
+--space-20: 80px  (5rem)
+```
+
+Usage in Tailwind:
+
+```tsx
+<div className="p-4">Content</div>          {/* padding: 16px */}
+<div className="gap-6">Stack with gap</div> {/* gap: 24px */}
+<div className="mb-8">Margin bottom</div>   {/* margin-bottom: 32px */}
+```
+
+#### Color Tokens
+
+Semantic color roles:
+
+- **Background colors**: Primary (white), secondary (light gray), tertiary (medium gray), accent (light blue), danger (light red)
+- **Text colors**: Primary (dark), secondary (medium gray), tertiary (light gray), inverse (white)
+- **Accent colors**: Primary (blue), hover, and active shades
+- **Utility colors**: Border, danger, and shadow colors
+
+Example:
+
+```tsx
+<div className="bg-bg-primary text-text-primary">Styled with semantic tokens</div>
+```
+
+#### Typography Scale
+
+Font sizes aligned with common UI patterns:
+
+```
+--type-xs: 12px
+--type-sm: 14px
+--type-base: 16px
+--type-lg: 18px
+--type-xl: 20px
+--type-2xl: 24px
+--type-3xl: 30px
+```
+
+Font weights and line heights also tokenized for accessible reading.
+
+#### Border Radius & Shadows
+
+- **Radius**: `sm` (6px, compact), `md` (8px, default), `lg` (12px, elevated), `xl` (16px, prominent)
+- **Shadows**: `sm`, `md`, `lg`, `card` (predefined elevation levels)
+
+#### Responsive Breakpoints
+
+Mobile-first breakpoints (all values from CSS variables):
+
+- `sm: 640px` — tablet portrait
+- `md: 768px` — small desktop
+- `lg: 1024px` — desktop
+- `xl: 1280px` — large desktop
+
+### Layout Primitives
+
+**Layout primitives** are React components in `src/components/layout/` that encapsulate responsive design patterns and use tokens consistently.
+
+#### Container
+
+Responsive full-width wrapper with max-width, centered padding, and mobile-first breakpoints.
+
+```tsx
+import { Container } from '@/components/layout';
+
+<Container maxWidth="6xl" padding="px-4 py-10">
+  <h1>My Page</h1>
+  <p>Content centered and responsive</p>
+</Container>;
+```
+
+**Props:**
+
+- `maxWidth` - max-width constraint: `'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'full'` (default: `'6xl'`)
+- `padding` - override spacing (default: `'px-4 py-10'`)
+- `className` - additional tailwind utilities
+- `dataTestId` - test identifier
+
+#### Stack
+
+Flexible container for stacking items vertically or horizontally with consistent gaps.
+
+```tsx
+import { Stack } from '@/components/layout';
+
+{
+  /* Vertical stack (default) */
+}
+<Stack gap="gap-6">
+  <Header />
+  <Content />
+  <Footer />
+</Stack>;
+
+{
+  /* Horizontal stack with center alignment */
+}
+<Stack direction="horizontal" gap="gap-8" align="center" justify="between">
+  <Logo />
+  <Nav />
+  <UserMenu />
+</Stack>;
+```
+
+**Props:**
+
+- `direction` - `'vertical' | 'horizontal'` (default: `'vertical'`)
+- `gap` - spacing between items: `'gap-1' | 'gap-2' | 'gap-3' | 'gap-4' | 'gap-6' | 'gap-8' | 'gap-10' | 'gap-12'` (default: `'gap-4'`)
+- `align` - cross-axis alignment: `'start' | 'center' | 'end' | 'stretch'` (default: `'stretch'`)
+- `justify` - main-axis alignment: `'start' | 'center' | 'end' | 'between' | 'around'` (default: `'start'`)
+- `className` - additional tailwind utilities
+- `dataTestId` - test identifier
+
+#### Grid
+
+Responsive multi-column layout with mobile-first breakpoints.
+
+```tsx
+import { Grid } from '@/components/layout';
+
+{
+  /* 1 column on mobile, 2 on tablet, 3 on desktop */
+}
+<Grid columns={{ default: 1, sm: 2, md: 3 }} gap="gap-6">
+  <Card>Item 1</Card>
+  <Card>Item 2</Card>
+  <Card>Item 3</Card>
+</Grid>;
+
+{
+  /* Feed layout: 1 column on mobile, 2 on large desktop */
+}
+<Grid columns={{ default: 1, lg: 2 }} gap="gap-8">
+  <PostCard />
+  <PostCard />
+</Grid>;
+```
+
+**Props:**
+
+- `columns` - responsive column config: `{ default?, sm?, md?, lg?, xl? }` (each is `1..12`)
+- `gap` - spacing between items (default: `'gap-4'`)
+- `className` - additional tailwind utilities
+- `dataTestId` - test identifier
+
+#### Section
+
+Semantic grouping container with optional title, background, border, and padding. Renders as `<section>` element for proper document outline.
+
+```tsx
+import { Section } from '@/components/layout';
+
+<Section title="Personal Information">
+  <p>Your profile details go here.</p>
+</Section>
+
+<Section
+  title="Recent Posts"
+  subtitle="Your latest activity"
+  background="accent"
+  hasBorder
+>
+  <PostList />
+</Section>
+
+{/* Minimal section */}
+<Section background="transparent" padding="p-4">
+  Compact content area
+</Section>
+```
+
+**Props:**
+
+- `title` - optional h2 heading
+- `subtitle` - optional description below title
+- `background` - `'primary' | 'secondary' | 'accent' | 'danger' | 'transparent'` (default: `'primary'`)
+- `hasBorder` - include border (default: `false`)
+- `padding` - spacing inside (default: `'p-6'`)
+- `className` - additional tailwind utilities
+- `dataTestId` - test identifier
+
+### Design System Governance
+
+**New/Changed UI Compliance:**
+
+- All new components or pages must use design primitives from `src/components/layout/` for major layouts
+- All new components must use design tokens for spacing, colors, and typography
+- Existing pages/components use ad-hoc utilities during refactoring (no retrofit requirement)
+
+**Responsive Pattern:**
+
+Use mobile-first approach: base styles for mobile, then breakpoint utilities for larger screens.
+
+```tsx
+{
+  /* Good: mobile-first responsiveness via layout primitives */
+}
+<Grid columns={{ default: 1, sm: 2, md: 3, lg: 4 }} />;
+
+{
+  /* Acceptable: using Tailwind breakpoint utilities directly */
+}
+<div className="p-4 sm:p-6 md:p-8">Content</div>;
+
+{
+  /* Avoid: mixing units and ad-hoc sizing */
+}
+<div style={{ padding: '16px', gap: '8px' }}>Not recommended</div>;
+```
+
+**Testing Stability:**
+
+Component selectors (`data-testid`) remain stable across token/primitive updates. E2E tests depend on these selectors—ensure they're unaffected by style changes.
+
 ## Service Integration
 
 The app communicates with the API Gateway which routes requests to microservices:

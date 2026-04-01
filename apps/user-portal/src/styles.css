@@ -2,9 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design System Tokens */
 @layer base {
+	:root {
+		/* Spacing scale (4px base unit) */
+		--space-1: 0.25rem;     /* 4px  */
+		--space-2: 0.5rem;      /* 8px  */
+		--space-3: 0.75rem;     /* 12px */
+		--space-4: 1rem;        /* 16px */
+		--space-6: 1.5rem;      /* 24px */
+		--space-8: 2rem;        /* 32px */
+		--space-10: 2.5rem;     /* 40px */
+		--space-12: 3rem;       /* 48px */
+		--space-16: 4rem;       /* 64px */
+		--space-20: 5rem;       /* 80px */
+
+		/* Color tokens - Semantic roles */
+		--color-bg-primary: #ffffff;
+		--color-bg-secondary: #f1f5f9;
+		--color-bg-tertiary: #e2e8f0;
+		--color-bg-accent: #eff6ff;
+		--color-bg-danger: #fef2f2;
+
+		--color-text-primary: #0f172a;
+		--color-text-secondary: #475569;
+		--color-text-tertiary: #94a3b8;
+		--color-text-inverse: #ffffff;
+
+		--color-accent-primary: #2563eb;
+		--color-accent-hover: #1d4ed8;
+		--color-accent-active: #1e40af;
+
+		--color-danger-primary: #dc2626;
+		--color-danger-hover: #b91c1c;
+		--color-danger-light: #fee2e2;
+
+		--color-border: #cbd5e1;
+		--color-border-light: #e2e8f0;
+
+		--color-shadow: rgba(15, 23, 42, 0.08);
+
+		/* Typography scale */
+		--type-xs: 0.75rem;     /* 12px */
+		--type-sm: 0.875rem;    /* 14px */
+		--type-base: 1rem;      /* 16px */
+		--type-lg: 1.125rem;    /* 18px */
+		--type-xl: 1.25rem;     /* 20px */
+		--type-2xl: 1.5rem;     /* 24px */
+		--type-3xl: 1.875rem;   /* 30px */
+
+		--type-weight-normal: 400;
+		--type-weight-medium: 500;
+		--type-weight-semibold: 600;
+		--type-weight-bold: 700;
+
+		--type-line-height-tight: 1.25;
+		--type-line-height-snug: 1.375;
+		--type-line-height-normal: 1.5;
+		--type-line-height-relaxed: 1.625;
+
+		/* Border radius - elevation-based */
+		--radius-sm: 0.375rem;  /* 6px  - compact */
+		--radius-md: 0.5rem;    /* 8px  - default */
+		--radius-lg: 0.75rem;   /* 12px - elevated */
+		--radius-xl: 1rem;      /* 16px - prominent */
+
+		/* Shadows - elevation levels */
+		--shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+		--shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+		--shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+		--shadow-card: 0 2px 8px rgba(15, 23, 42, 0.08);
+
+		/* Responsive breakpoints (mobile-first) */
+		--breakpoint-sm: 40rem;  /* 640px - tablet */
+		--breakpoint-md: 48rem;  /* 768px - small desktop */
+		--breakpoint-lg: 64rem;  /* 1024px - desktop */
+		--breakpoint-xl: 80rem;  /* 1280px - large desktop */
+	}
+
 	body {
 		@apply bg-slate-50 text-slate-900 antialiased;
+		background-color: var(--color-bg-secondary);
+		color: var(--color-text-primary);
 	}
 }
 
