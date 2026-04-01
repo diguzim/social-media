@@ -55,7 +55,7 @@ Image Service (Port 4004)
   - Output: `{ album }`
 
 - `IMAGE_COMMANDS.updateUserAlbum`
-  - Input: `{ ownerUserId, albumId, name?, description? }`
+  - Input: `{ ownerUserId, albumId, name?, description?, coverPhotoId? }`
   - Output: `{ album }`
 
 - `IMAGE_COMMANDS.deleteUserAlbum`
@@ -65,7 +65,7 @@ Image Service (Port 4004)
 
 - `IMAGE_COMMANDS.listUserPhotos`
   - Input: `{ ownerUserId }`
-  - Output: `{ albums: [{ ...album, photos[] }], unsortedPhotos[] }`
+  - Output: `{ albums: [{ ...album, coverPhotoId, photos[] }], unsortedPhotos[] }`
 
 - `IMAGE_COMMANDS.uploadUserPhoto`
   - Input: `{ ownerUserId, albumId?, description?, fileBase64, mimeType, originalName, fileSize }`

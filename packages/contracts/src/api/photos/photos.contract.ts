@@ -11,6 +11,8 @@ export interface UserAlbumItem {
   id: string;
   name: string;
   description: string | null;
+  coverPhotoId: string | null;
+  coverImageUrl?: string;
   createdAt: string;
   updatedAt: string | null;
   photos: UserPhotoItem[];
@@ -33,6 +35,7 @@ export interface CreateUserAlbumResponse {
 export interface UpdateUserAlbumBody {
   name?: string;
   description?: string | null;
+  coverPhotoId?: string | null;
 }
 
 export interface UpdateUserAlbumResponse {

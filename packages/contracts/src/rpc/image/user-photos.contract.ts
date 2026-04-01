@@ -12,6 +12,7 @@ export interface RpcUserAlbumItem {
   ownerUserId: string;
   name: string;
   description: string | null;
+  coverPhotoId: string | null;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -32,6 +33,7 @@ export interface UpdateUserAlbumRequest {
   albumId: string;
   name?: string;
   description?: string | null;
+  coverPhotoId?: string | null;
   correlationId?: string;
 }
 

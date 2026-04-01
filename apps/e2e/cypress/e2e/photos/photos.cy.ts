@@ -42,7 +42,13 @@ describe("Photos feature", () => {
   });
 
   it("renders uploaded photos on public user profile photos route", function () {
+    const albumName = `Fake E2E Public Album ${Date.now()}`;
+
     cy.visit("/profile/photos");
+
+    cy.getByTestId("profile-photos-album-name-input").type(albumName);
+    cy.getByTestId("profile-photos-create-button").click();
+    cy.contains(albumName).should("be.visible");
 
     cy.getByTestId("profile-photos-file-input").selectFile({
       contents: Cypress.Buffer.from(tinyPngBase64, "base64"),
@@ -50,6 +56,7 @@ describe("Photos feature", () => {
       mimeType: "image/png",
       lastModified: Date.now(),
     });
+    cy.getByTestId("profile-photos-album-select").select(albumName);
     cy.getByTestId("profile-photos-photo-description-input").type(
       "Fake E2E Public Photo",
     );
@@ -58,8 +65,18 @@ describe("Photos feature", () => {
     cy.visit(`/users/${this.owner.username}/photos`);
 
     cy.getByTestId("user-profile-photos-section").should("be.visible");
-    cy.getByTestId("user-profile-photos-unsorted-section")
-      .find("img")
+    cy.getByTestId("user-profile-photos-albums-section")
+      .contains(albumName)
+      .should("be.visible");
+
+    cy.getByTestId("user-profile-photos-albums-section")
+      .find('[data-testid^="user-profile-photos-album-card-"]')
+      .first()
+      .click();
+
+    cy.getByTestId("user-profile-photos-selected-album-section")
+      .should("be.visible")
+      .find('[data-testid^="user-profile-photos-album-image-"]')
       .its("length")
       .should("be.greaterThan", 0);
   });
@@ -221,10 +238,48 @@ describe("Photos auth regression (alice)", () => {
     cy.getByTestId("profile-photos-albums-section").within(() => {
       cy.contains("Alice Travel (Seed)").should("be.visible");
       cy.contains("Alice Empty Album (Seed)").should("be.visible");
+    });
+
+    cy.contains(
+      'article[data-testid^="profile-photos-album-"]',
+      "Alice Travel (Seed)",
+    )
+      .find('[data-testid^="profile-photos-album-card-"]')
+      .click();
+
+    cy.getByTestId("profile-photos-selected-album-section").within(() => {
       cy.get('[data-testid^="profile-photos-album-image-"]')
         .its("length")
         .should("be.greaterThan", 0);
+    });
+
+    cy.contains(
+      'article[data-testid^="profile-photos-album-"]',
+      "Alice Empty Album (Seed)",
+    )
+      .find('[data-testid^="profile-photos-album-card-"]')
+      .click();
+
+    cy.getByTestId("profile-photos-selected-album-section").within(() => {
       cy.contains("Album is empty.").should("be.visible");
     });
+  });
+
+  it("opens selected album photo in modal and closes it", () => {
+    cy.contains(
+      'article[data-testid^="profile-photos-album-"]',
+      "Alice Travel (Seed)",
+    )
+      .find('[data-testid^="profile-photos-album-card-"]')
+      .click();
+
+    cy.getByTestId("profile-photos-selected-album-section")
+      .find('[data-testid^="profile-photos-album-image-"]')
+      .first()
+      .click();
+
+    cy.getByTestId("profile-photos-modal").should("be.visible");
+    cy.getByTestId("profile-photos-modal-close-button").click();
+    cy.getByTestId("profile-photos-modal").should("not.exist");
   });
 });

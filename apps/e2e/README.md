@@ -234,7 +234,7 @@ Currently covers:
 
 ### Photos
 
-- **Photos/Albums**: Create/update/delete album, upload photos, verify album delete behavior, and verify public profile photos rendering
+- **Photos/Albums**: Create/update/delete album, use albums-first drill-in flow, open/close photo modal, verify album delete behavior, and verify public profile rendering
 
 ## Best Practices
 

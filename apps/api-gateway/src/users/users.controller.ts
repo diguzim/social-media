@@ -223,6 +223,10 @@ export class UsersController {
         id: album.id,
         name: album.name,
         description: album.description,
+        coverPhotoId: album.coverPhotoId,
+        coverImageUrl: album.coverPhotoId
+          ? this.buildUserPhotoUrl(profile.id, album.coverPhotoId)
+          : undefined,
         createdAt: album.createdAt,
         updatedAt: album.updatedAt,
         photos: album.photos.map((photo) =>
@@ -261,6 +265,10 @@ export class UsersController {
         id: rpcReply.album.id,
         name: rpcReply.album.name,
         description: rpcReply.album.description,
+        coverPhotoId: rpcReply.album.coverPhotoId,
+        coverImageUrl: rpcReply.album.coverPhotoId
+          ? this.buildUserPhotoUrl(req.user.userId, rpcReply.album.coverPhotoId)
+          : undefined,
         createdAt: rpcReply.album.createdAt,
         updatedAt: rpcReply.album.updatedAt,
         photos: [],
@@ -286,6 +294,7 @@ export class UsersController {
           albumId: params.albumId,
           name: body.name,
           description: body.description,
+          coverPhotoId: body.coverPhotoId,
           correlationId: getCorrelationId(),
         },
       ),
@@ -296,6 +305,10 @@ export class UsersController {
         id: rpcReply.album.id,
         name: rpcReply.album.name,
         description: rpcReply.album.description,
+        coverPhotoId: rpcReply.album.coverPhotoId,
+        coverImageUrl: rpcReply.album.coverPhotoId
+          ? this.buildUserPhotoUrl(req.user.userId, rpcReply.album.coverPhotoId)
+          : undefined,
         createdAt: rpcReply.album.createdAt,
         updatedAt: rpcReply.album.updatedAt,
         photos: [],

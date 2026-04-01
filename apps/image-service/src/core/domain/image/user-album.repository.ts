@@ -9,6 +9,7 @@ export interface CreateUserAlbumData {
 export interface UpdateUserAlbumData {
   name?: string;
   description?: string | null;
+  coverPhotoId?: string | null;
 }
 
 export abstract class UserAlbumRepository {

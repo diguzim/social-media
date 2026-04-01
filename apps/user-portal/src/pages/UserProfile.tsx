@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { API } from '@repo/contracts';
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
@@ -62,6 +62,7 @@ function UserFriendItem({
 export function UserProfile() {
   const { state, actions } = useUserProfileStateContract();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { username, section } = useParams<{ username: string; section?: string }>();
   const activeSection = normalizeProfileSection(section);
   const {
@@ -90,6 +91,8 @@ export function UserProfile() {
   });
   const [isPhotosLoading, setIsPhotosLoading] = useState(false);
   const [photosError, setPhotosError] = useState('');
+  const selectedAlbumId = searchParams.get('album');
+  const selectedPhotoId = searchParams.get('photo');
 
   const sentinelRef = useInfiniteScrollObserver({
     enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
@@ -97,6 +100,32 @@ export function UserProfile() {
       void actions.loadNextPostsPage();
     },
   });
+
+  const setSelectedAlbumId = (albumId: string | null) => {
+    setSearchParams((currentParams) => {
+      const params = new URLSearchParams(currentParams);
+      if (albumId) {
+        params.set('album', albumId);
+      } else {
+        params.delete('album');
+      }
+
+      params.delete('photo');
+      return params;
+    });
+  };
+
+  const setSelectedPhotoId = (photoId: string | null) => {
+    setSearchParams((currentParams) => {
+      const params = new URLSearchParams(currentParams);
+      if (photoId) {
+        params.set('photo', photoId);
+      } else {
+        params.delete('photo');
+      }
+      return params;
+    });
+  };
 
   useEffect(() => {
     if (!username) {
@@ -141,6 +170,13 @@ export function UserProfile() {
       isCancelled = true;
     };
   }, [activeSection, profile?.username]);
+
+  const selectedAlbum = photosData.albums.find((album) => album.id === selectedAlbumId) ?? null;
+  const allVisiblePhotos = [
+    ...photosData.unsortedPhotos,
+    ...photosData.albums.flatMap((album) => album.photos),
+  ];
+  const selectedPhoto = allVisiblePhotos.find((photo) => photo.id === selectedPhotoId) ?? null;
 
   const onSectionChange = (nextSection: ProfileSectionKey) => {
     if (!username) {
@@ -305,6 +341,105 @@ export function UserProfile() {
             </p>
           ) : (
             <div className="mt-5 space-y-5">
+              <section data-testid="user-profile-photos-albums-section">
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">Albums</h3>
+                {photosData.albums.length === 0 ? (
+                  <p
+                    data-testid="user-profile-photos-albums-empty"
+                    className="text-sm text-slate-600"
+                  >
+                    No albums yet.
+                  </p>
+                ) : (
+                  <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+                    {photosData.albums.map((album) => (
+                      <article
+                        key={album.id}
+                        data-testid={`user-profile-photos-album-${album.id}`}
+                        className={`min-w-[180px] rounded-lg border p-2 ${
+                          selectedAlbumId === album.id
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-slate-200 bg-white'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          data-testid={`user-profile-photos-album-card-${album.id}`}
+                          onClick={() => {
+                            setSelectedAlbumId(album.id);
+                          }}
+                          className="w-full text-left"
+                        >
+                          {album.coverImageUrl ? (
+                            <img
+                              data-testid={`user-profile-photos-album-cover-image-${album.id}`}
+                              src={album.coverImageUrl}
+                              alt={`${album.name} cover`}
+                              className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                            />
+                          ) : (
+                            <div
+                              data-testid={`user-profile-photos-album-cover-empty-${album.id}`}
+                              className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-xs text-slate-500"
+                            >
+                              No cover
+                            </div>
+                          )}
+                          <h4 className="mt-2 truncate text-sm font-semibold text-slate-900">
+                            {album.name}
+                          </h4>
+                          <p className="text-xs text-slate-500">{album.photos.length} photos</p>
+                        </button>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {selectedAlbum ? (
+                <section data-testid="user-profile-photos-selected-album-section">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">{selectedAlbum.name}</h3>
+                      <p className="text-sm text-slate-500">Album photos</p>
+                    </div>
+                    <button
+                      type="button"
+                      data-testid="user-profile-photos-selected-album-close-button"
+                      onClick={() => {
+                        setSelectedAlbumId(null);
+                      }}
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
+                    >
+                      Close album
+                    </button>
+                  </div>
+
+                  {selectedAlbum.photos.length === 0 ? (
+                    <p className="mt-1 text-sm text-slate-600">Album is empty.</p>
+                  ) : (
+                    <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                      {selectedAlbum.photos.map((photo) => (
+                        <button
+                          key={photo.id}
+                          type="button"
+                          data-testid={`user-profile-photos-album-image-${photo.id}`}
+                          onClick={() => {
+                            setSelectedPhotoId(photo.id);
+                          }}
+                        >
+                          <img
+                            src={photo.imageUrl}
+                            alt={photo.description ?? `${selectedAlbum.name} photo`}
+                            className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              ) : null}
+
               <section data-testid="user-profile-photos-unsorted-section">
                 <h3 className="mb-2 text-lg font-semibold text-slate-900">Unsorted Photos</h3>
                 {photosData.unsortedPhotos.length === 0 ? (
@@ -317,57 +452,63 @@ export function UserProfile() {
                 ) : (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                     {photosData.unsortedPhotos.map((photo) => (
-                      <img
+                      <button
                         key={photo.id}
+                        type="button"
                         data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
-                        src={photo.imageUrl}
-                        alt={photo.description ?? 'Photo'}
-                        className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              <section data-testid="user-profile-photos-albums-section">
-                <h3 className="mb-2 text-lg font-semibold text-slate-900">Albums</h3>
-                {photosData.albums.length === 0 ? (
-                  <p
-                    data-testid="user-profile-photos-albums-empty"
-                    className="text-sm text-slate-600"
-                  >
-                    No albums yet.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {photosData.albums.map((album) => (
-                      <article key={album.id} data-testid={`user-profile-photos-album-${album.id}`}>
-                        <h4 className="text-sm font-semibold text-slate-900">{album.name}</h4>
-                        {album.description ? (
-                          <p className="text-xs text-slate-500">{album.description}</p>
-                        ) : null}
-                        {album.photos.length === 0 ? (
-                          <p className="mt-1 text-sm text-slate-600">Album is empty.</p>
-                        ) : (
-                          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                            {album.photos.map((photo) => (
-                              <img
-                                key={photo.id}
-                                data-testid={`user-profile-photos-album-image-${photo.id}`}
-                                src={photo.imageUrl}
-                                alt={photo.description ?? `${album.name} photo`}
-                                className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </article>
+                        onClick={() => {
+                          setSelectedPhotoId(photo.id);
+                        }}
+                      >
+                        <img
+                          src={photo.imageUrl}
+                          alt={photo.description ?? 'Photo'}
+                          className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                        />
+                      </button>
                     ))}
                   </div>
                 )}
               </section>
             </div>
           )}
+
+          {selectedPhoto ? (
+            <div
+              data-testid="user-profile-photos-modal"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4"
+            >
+              <button
+                type="button"
+                data-testid="user-profile-photos-modal-overlay"
+                aria-label="Close photo modal"
+                className="absolute inset-0"
+                onClick={() => {
+                  setSelectedPhotoId(null);
+                }}
+              />
+              <div className="relative z-10 w-full max-w-4xl rounded-xl bg-white p-4 shadow-xl">
+                <div className="mb-2 flex justify-end">
+                  <button
+                    type="button"
+                    data-testid="user-profile-photos-modal-close-button"
+                    onClick={() => {
+                      setSelectedPhotoId(null);
+                    }}
+                    className="rounded-md border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
+                  >
+                    Close
+                  </button>
+                </div>
+                <img
+                  data-testid={`user-profile-photos-modal-image-${selectedPhoto.id}`}
+                  src={selectedPhoto.imageUrl}
+                  alt={selectedPhoto.description ?? 'Photo'}
+                  className="max-h-[75vh] w-full rounded-md object-contain"
+                />
+              </div>
+            </div>
+          ) : null}
         </section>
       ) : null}
 

@@ -11,7 +11,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Profile picture upload on Profile page (JPG/PNG up to 2MB)
 - Modern public profile page (avatar, name, username, stats) for viewing other users by username
 - URL-driven tabbed profile sections on both Profile and UserProfile: Timeline, Photos, About, Friends, Personal Data
-- Photos tab supports albums and unsorted photos with full album CRUD on own profile (create/edit/delete album, upload photo, public read-only gallery)
+- Photos tab supports an albums-first experience (horizontal album cards + drill-in gallery), photo modal viewing, and full album CRUD on own profile (create/edit/delete + manual cover selection)
 - Owner-aware profile actions (edit/add placeholders only shown on own profile)
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
@@ -111,7 +111,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - GET /users/:username/photos (requires auth)
 - GET /users/:userId/photos/:photoId (public image stream used by profile photos galleries)
 - POST /users/me/albums (requires auth)
-- PATCH /users/me/albums/:albumId (requires auth)
+- PATCH /users/me/albums/:albumId (requires auth; supports `name`, `description`, and `coverPhotoId`)
 - DELETE /users/me/albums/:albumId (requires auth)
 - POST /users/me/photos (requires auth; multipart image upload)
 - PATCH /users/me/photos/:photoId (requires auth)

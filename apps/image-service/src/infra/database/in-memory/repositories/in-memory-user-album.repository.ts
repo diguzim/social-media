@@ -22,6 +22,7 @@ export class InMemoryUserAlbumRepository implements UserAlbumRepository {
       ownerUserId: data.ownerUserId,
       name: data.name,
       description: data.description ?? null,
+      coverPhotoId: null,
       createdAt: now,
       updatedAt: null,
     });
@@ -68,6 +69,10 @@ export class InMemoryUserAlbumRepository implements UserAlbumRepository {
       album.description = data.description;
     }
 
+    if (data.coverPhotoId !== undefined) {
+      album.coverPhotoId = data.coverPhotoId;
+    }
+
     album.updatedAt = new Date();
 
     return album;
@@ -84,6 +89,7 @@ export class InMemoryUserAlbumRepository implements UserAlbumRepository {
         ownerUserId: "1",
         name: "Alice Travel (Seed)",
         description: "Seeded album with photos",
+        coverPhotoId: "uph-2",
         createdAt: new Date("2025-01-10T09:00:00.000Z"),
         updatedAt: null,
       }),
@@ -92,6 +98,7 @@ export class InMemoryUserAlbumRepository implements UserAlbumRepository {
         ownerUserId: "1",
         name: "Alice Empty Album (Seed)",
         description: "Seeded empty album",
+        coverPhotoId: null,
         createdAt: new Date("2025-01-10T09:05:00.000Z"),
         updatedAt: null,
       }),
@@ -100,6 +107,7 @@ export class InMemoryUserAlbumRepository implements UserAlbumRepository {
         ownerUserId: "2",
         name: "Bob Moments (Seed)",
         description: "Seeded album for another user",
+        coverPhotoId: "uph-3",
         createdAt: new Date("2025-01-10T09:10:00.000Z"),
         updatedAt: null,
       }),

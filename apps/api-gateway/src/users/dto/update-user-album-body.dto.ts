@@ -18,4 +18,14 @@ export class UpdateUserAlbumBodyDto implements API.UpdateUserAlbumBody {
     return typeof value === 'string' ? value.trim() : value;
   })
   description?: string | null;
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => {
+    if (value === null) {
+      return null;
+    }
+
+    return typeof value === 'string' ? value.trim() : value;
+  })
+  coverPhotoId?: string | null;
 }

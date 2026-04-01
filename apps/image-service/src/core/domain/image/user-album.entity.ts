@@ -3,6 +3,7 @@ export interface UserAlbumProps {
   ownerUserId: string;
   name: string;
   description?: string | null;
+  coverPhotoId?: string | null;
   createdAt: Date;
   updatedAt?: Date | null;
 }
@@ -12,6 +13,7 @@ export class UserAlbum {
   ownerUserId: string;
   name: string;
   description: string | null;
+  coverPhotoId: string | null;
   createdAt: Date;
   updatedAt: Date | null;
 
@@ -20,6 +22,7 @@ export class UserAlbum {
     this.ownerUserId = props.ownerUserId;
     this.name = props.name;
     this.description = props.description ?? null;
+    this.coverPhotoId = props.coverPhotoId ?? null;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt ?? null;
   }

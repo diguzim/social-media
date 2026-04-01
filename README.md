@@ -67,7 +67,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - Home (`/`) shows "Welcome {name}!" and user summary
    - Profile (`/profile`) shows URL-driven tabbed sections: Timeline, Photos, About, Friends, Personal Data
    - UserProfile (`/users/:username`) shows the same tabbed layout with owner-aware actions
-   - Photos tab is backend-driven (albums + unsorted photos); own profile supports full album CRUD while public profile is read-only
+   - Photos tab is backend-driven with horizontal album cards, album drill-in, and photo modal viewing; own profile supports full album CRUD while public profile is read-only
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`

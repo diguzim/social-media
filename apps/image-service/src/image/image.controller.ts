@@ -163,6 +163,7 @@ export class ImageController {
         ownerUserId: album.ownerUserId,
         name: album.name,
         description: album.description,
+        coverPhotoId: album.coverPhotoId,
         createdAt: album.createdAt.toISOString(),
         updatedAt: album.updatedAt?.toISOString() ?? null,
       },
@@ -186,6 +187,7 @@ export class ImageController {
         ownerUserId: album.ownerUserId,
         name: album.name,
         description: album.description,
+        coverPhotoId: album.coverPhotoId,
         createdAt: album.createdAt.toISOString(),
         updatedAt: album.updatedAt?.toISOString() ?? null,
       },
@@ -218,6 +220,7 @@ export class ImageController {
         ownerUserId: album.ownerUserId,
         name: album.name,
         description: album.description,
+        coverPhotoId: album.coverPhotoId,
         createdAt: album.createdAt.toISOString(),
         updatedAt: album.updatedAt?.toISOString() ?? null,
         photos: album.photos.map((photo) => ({
