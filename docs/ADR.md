@@ -248,131 +248,226 @@ Complexity constraints are initially **soft limits** (warnings/guidance), not ha
 
 ---
 
-## ADR-009: Design System Architecture (Tokens, Primitives, Responsive Layout)
+## ADR-009: Unified Design System and Monorepo UI Architecture
 
 **Date:** 2026-04  
 **Status:** Accepted
 
 ### Context
 
-The `apps/user-portal` frontend currently styles UI via ad-hoc Tailwind utility classes and a small set of CSS classes (`.page-container`, `.card`, `.btn-*`) in `src/styles.css`. There is no formal:
+The project needs both:
 
-- **Design tokens** (spacing, colors, typography, breakpoints)
-- **Layout system** (primitives for responsive containers, stacks, grids, sections)
-- **Governance** (compliance rules, migration strategy, component contract stability)
+- strong, explicit design-system directives (tokens, primitives, responsive rules, governance)
+- monorepo-level reuse and ownership clarity for UI components
 
-This lack of structure creates:
+Without a unified directive, the team risks:
 
-- Inconsistent spacing and alignment across pages
-- Difficulty onboarding new contributors to responsive patterns
-- Risk of visual regressions when refactoring components (no predictable primitives to anchor on)
-- No single source of truth for breakpoints and responsive behavior
-- Scattered stories in Storybook without a cohesive token/primitive narrative
+- inconsistent spacing/alignment and responsive behavior
+- Storybook ownership ambiguity (component demos vs integration stories)
+- duplicated implementation effort and drift across apps
+- unclear testing ownership between reusable UI and product integration layers
 
 ### Decision
 
-Establish a **Design System for `apps/user-portal`** with four pillars:
+Adopt a **unified design system + monorepo UI architecture** with these directives.
 
-#### 1. Token System (CSS Variables + Tailwind Mapping)
+Decision levels used below:
 
-- Define design tokens as **CSS custom properties (variables)** in `apps/user-portal/src/styles.css`:
-  - `--space-*` for spacing (4px, 8px, 16px, 24px, 32px, 48px units)
-  - `--color-*` for brand colors and semantic roles (`--color-bg`, `--color-text`, `--color-accent`, `--color-border`, etc.)
-  - `--type-*` for typography (font sizes, weights, line heights)
-  - `--radius-*` for border radii (`--radius-sm`, `--radius-md`, `--radius-lg`)
-  - `--shadow-*` for elevation levels
-  - `--breakpoint-*` for responsive breakpoints (mobile-first: `--breakpoint-sm`, `--breakpoint-md`, `--breakpoint-lg`)
+- **Must**: architecture boundaries and safety rails
+- **Should**: strong defaults the team should generally follow
+- **Note**: useful guidance or future-friendly ideas that do not need hard enforcement
 
-- **Map tokens into Tailwind** via `tailwind.config.ts`:
-  - `spacing: { ... }` reads `--space-*` variables
-  - `colors: { ... }` reads `--color-*` variables
-  - `fontSize: { ... }` reads `--type-*` variables
-  - `borderRadius: { ... }` reads `--radius-*` variables
-  - `boxShadow: { ... }` reads `--shadow-*` variables
-  - `screens: { ... }` reads `--breakpoint-*` variables
+#### 1) Naming and ownership boundaries
 
-- **Token source of truth**: CSS variables (single file, easy audit)
-- **Scope**: **`apps/user-portal` only** in this ADR; future monorepo-wide extraction planned as a separate ADR
+- Showcase/docs app: `apps/ui-showcase`
+- Shared runtime package: `packages/ui` published as `@repo/ui`
+- Product app scope: `apps/user-portal` keeps product integration/page concerns
 
-#### 2. Layout Primitives
+#### 2) Token system
 
-Define explicit **layout building blocks** (as React components in `apps/user-portal/src/components/layout/`):
+- Define tokens as CSS custom properties for spacing, color, typography, radius, shadow, and breakpoints.
+- Tailwind consumes those tokens through config or CSS-variable-based utility mapping.
+- Token names are a stable contract; changing names is a deliberate versioned decision.
+- **Note:** exact token values and scales are implementation details, not ADR material.
 
-- **`Container`** — full-width responsive wrapper with max-width and centered padding
-- **`Stack`** — vertical or horizontal flex layout with consistent gap (xy-axis direction, adjustable via props)
-- **`Grid`** — responsive multi-column layout with configurable columns per breakpoint
-- **`Section`** — semantic grouping with padding + optional background/border
+#### 3) Theming
 
-Each primitive:
+- Tokens must support theme switching through CSS variable overrides.
+- Default themes are `light` and `dark`.
+- Theme switching must not require component changes.
+- Hardcoded colors in components should be avoided.
+- **Note:** multi-brand support can be added later by layering brand overrides on the same theme system.
 
-- Uses design tokens for spacing, gaps, and responsive breakpoints
-- Exposes props for common customizations (e.g., `gap`, `columns`, `align`, `justify`)
-- Accepts `className` for utility extensions (Tailwind fallback)
-- Includes Storybook stories showing all responsive breakpoints
-- Is testable via deterministic selectors (`data-testid`)
+#### 4) Layout primitives
 
-Existing reusable components like `LoadingBlock`, `SectionSkeleton`, `PendingButton` integrate with primitives through consistent token usage.
+Core layout primitives remain first-class and reusable:
 
-#### 3. Responsive Breakpoint Strategy
+- `Container`
+- `Stack`
+- `Grid`
+- `Section`
 
-- **Mobile-first approach**: base styles for mobile, then `@media (min-width: ...)` for larger screens
-- **Standard breakpoints** (aligned with Tailwind defaults but enforced via tokens):
-  - `sm: 640px` — tablet portrait
-  - `md: 768px` — small desktop
-  - `lg: 1024px` — desktop
-  - `xl: 1280px` — large desktop
-- **Usage pattern**: token-based breakpoints in Tailwind utilities + component props (e.g., `columns={{ sm: 1, md: 2, lg: 3 }}`)
+Requirements:
 
-#### 4. Governance and Compliance
+- token-driven spacing/colors/typography
+- mobile-first responsive behavior
+- `className` escape hatch
+- stable `data-testid` passthrough
 
-**New/Changed UI Compliance:**
+#### 5) Styling strategy
 
-- All new components or pages must use design primitives from `components/layout/` for major layouts
-- All new components must use design tokens for spacing, colors, and typography
-- Token usage validated via setup to warn (e.g., ESLint rule or TypeScript strict type checking based on accepted token exhaustive props)
+- Tailwind is the primary styling mechanism.
+- Styling should come from tokens, Tailwind config, and component variants.
+- Arbitrary values should be rare and justified.
+- Base components should keep a small variant surface such as `size`, `variant`, and `state`.
+- Complex styling should live inside components, not be rebuilt ad hoc in apps.
+- `cva` or an equivalent variant helper is the preferred way to manage variant classes.
+- **Note:** exact linting/enforcement can stay lighter-weight and evolve over time.
 
-**Legacy Migration:**
+#### 6) Component taxonomy
 
-- Existing pages/components can use ad-hoc utilities during refactoring (no retrofit requirement)
-- When a page/component is actively being refactored or extended, migrate its layout patterns to use new primitives
-- Phased migration order (for consistency):
-  1. `Home` page (primary user journey, high visibility)
-  2. `Profile` / `UserProfile` page (user-facing identity surface)
-  3. `MyPosts` page (content management surface)
-  4. Account settings pages (admin surface)
-  5. Shared form components (reuse amplifier)
-  6. Other routes as needed
+UI is structured in layers so ownership, testing, and extraction remain clear:
 
-**Component Contract Stability:**
+1. **Layout components**
+   - purpose: layout and spacing building blocks
+   - examples: `Container`, `Stack`, `Grid`, `Section`
+   - extraction: first candidates for `@repo/ui`
 
-- Design primitives are **public contracts** — breaking changes require team discussion and Storybook story updates
-- Component selectors (`data-testid`) must remain stable across token/primitive updates
-- Storybook stories must be updated whenever a component's responsive behavior changes
-- E2E tests depend on `data-testid` selectors; ensure selectors are unaffected by style changes
+2. **Base components**
+   - purpose: minimal reusable controls with little visual opinion
+   - examples: `Button`, `Input`, `Text`, `Heading`
+   - extraction: must have package-local interaction, accessibility, and contract tests
 
-**Drift Detection:**
+3. **Composed components**
+   - purpose: reusable components with stronger visual/behavioral defaults
+   - examples: `Card`, `Modal`, `Dropdown`, `FormField`
+   - extraction: only when they are reusable without product-specific orchestration
 
-- Quarterly audit: scan codebase for hardcoded spacing/colors outside token system (via ESLint or manual inspection)
-- Storybook serves as the visual contract — if a story looks different than design intent, re-align the token values or primitive logic
-- Design system README in `apps/user-portal` documents current tokens, primitives, and usage examples
+4. **Feature components**
+   - purpose: product-specific UI that binds domain data, state, and flows together
+   - examples: `UserCard`, `PostList`, `ProfileHeader`
+   - extraction: remain app-owned unless they can be split into reusable sublayers
+
+Taxonomy rules:
+
+- layout components and many base components belong in `@repo/ui`
+- composed components are extracted only when their behavior is not tightly coupled to `user-portal`
+- feature components remain app-owned and are validated through integration tests
+
+Proposed folder structure:
+
+```text
+packages/ui/
+  src/
+    layout-components/
+    base-components/
+    composed-components/
+
+apps/user-portal/
+  src/
+    components/
+      feature/
+```
+
+Folder rules:
+
+- one component family per folder
+- tests live next to the component
+- story files live next to the component for showcase ownership
+- `index.ts` files expose the public API for each layer
+- feature components remain in `apps/user-portal` unless explicitly promoted
+
+#### 7) Responsive strategy and breakpoints
+
+- Use **mobile-first** approach as default: base styles first, progressive enhancement for larger viewports
+- Standard breakpoint set:
+  - `sm: 640px` (tablet portrait)
+  - `md: 768px` (small desktop)
+  - `lg: 1024px` (desktop)
+  - `xl: 1280px` (large desktop)
+- Layout primitives and utility usage must remain aligned with this breakpoint system
+
+#### 8) Storybook scope split
+
+- Component demo stories belong to `apps/ui-showcase`
+- `apps/user-portal` keeps integration/page stories only
+- Avoid duplicate ownership of the same component demo across apps
+
+#### 9) Runtime consumption model
+
+- Apps consume reusable runtime UI through `@repo/ui`
+- `apps/ui-showcase` demonstrates components; it is not the runtime ownership source
+
+#### 10) Testing split
+
+- `@repo/ui` must test extracted components internally (unit + interaction + accessibility + contract tests)
+- `apps/user-portal` keeps integration tests, route/page tests, and e2e journey validation
+- A component should not be considered extract-ready without package-local tests
+
+#### 11) Accessibility requirements
+
+Accessibility is part of the component contract, not optional.
+
+All components in `@repo/ui` must:
+
+- follow WAI-ARIA best practices
+- support keyboard navigation
+- expose proper roles and labels
+- pass automated accessibility checks (for example, `axe`)
+
+Accessibility failures block extraction and release in the shared UI package.
+
+#### 12) State and behavior boundaries
+
+- `@repo/ui` components may include UI behavior (for example: dropdown open/close, modal visibility, tab selection, focus management)
+- Business logic must NOT exist in `@repo/ui`
+- Async/data-fetching logic belongs to apps, not the shared UI package
+
+This keeps `@repo/ui` reusable without turning it into a “smart UI package”.
+
+#### 13) Governance, contract stability, and migration
+
+- New and changed UI should continue to use tokens and primitives, preserve selector stability, and treat design primitives as public contracts.
+- Breaking API changes need coordinated updates across apps.
+- Story updates are required when responsive or component behavior changes.
+- Storybook remains the visual contract for reusable UI behavior.
+- **Note:** periodic drift checks are useful, but the exact cadence can stay flexible.
+
+Migration phases:
+
+1. Token/primitives hardening for shared consumption
+2. Low-coupling primitives/controls first
+3. Storybook split completion (component demos in `ui-showcase`, integration stories in `user-portal`)
+4. Higher-coupling composed widgets after orchestration boundaries are isolated
+
+- **Note:** extraction order can vary when a component is clearly reusable or clearly app-specific.
+
+#### 14) Component API guidelines
+
+- Component APIs should feel predictable and easy to compose.
+- Prefer controlled + uncontrolled support when it adds value.
+- Prefer composition and children/slots over prop explosion.
+- Use consistent names such as `variant`, `size`, `as`, and `disabled`.
+- Avoid boolean traps like `isSomething` or `hasSomething` when a simpler name works.
+- **Note:** exact slot shapes and extra props can stay component-specific when needed.
+
+#### 15) Performance considerations
+
+- Avoid unnecessary re-renders.
+- Prefer ESM named exports so unused components can be tree-shaken.
+- Keep `@repo/ui` dependencies small and justified.
+- Prefer headless patterns when a component becomes too complex for a simple styled wrapper.
+- **Note:** bundle thresholds, profiler workflows, and performance audits can live in implementation docs or CI config.
 
 ### Consequences
 
-✅ **Consistency:** All pages use the same spacing scales, colors, typography — improved visual coherence  
-✅ **Maintainability:** Tokens are centralized in one file — changes propagate automatically via Tailwind + CSS vars  
-✅ **Accessibility:** Semantic primitives (e.g., `role="region"` on `Section`) improve screen-reader support  
-✅ **Documentation:** Storybook stories + design system README make onboarding faster for new contributors  
-✅ **Refactoring safety:** Primitives and tokens act as anchors — CSS changes are less risky when styling is predictable  
-✅ **Responsive UX:** Explicit breakpoints and layout primitives reduce responsive layout bugs
+✅ Single normative ADR for design-system and monorepo UI decisions  
+✅ Reuse model is explicit (`@repo/ui` for runtime, `ui-showcase` for demos)  
+✅ Reduced ambiguity for humans and AI tooling  
+✅ Stronger regression safety via package-local UI tests + app integration/e2e tests  
+✅ Explicit mobile-first and breakpoint standards reduce responsive regressions  
+✅ Token governance reduces design drift and improves long-term maintainability
 
-⚠️ **Adoption overhead:** Contributors must learn token naming and primitive APIs — initial slower iteration  
-⚠️ **CSS var overhead:** CSS variables add a small runtime layer (negligible for this app scale)  
-⚠️ **Legacy code:** Existing pages use ad-hoc utilities; design system doesn't enforce retrofit (intentionally lenient on legacy)  
-⚠️ **Future refactoring:** If later extracted to a shared monorepo package, token definitions may need restructuring
-
-### Adoption Sequence
-
-1. **Phase 1 (Week 1):** Define tokens in `src/styles.css`, map into `tailwind.config.ts`, create layout primitives (`Container`, `Stack`, `Grid`, `Section`), document in `apps/user-portal/README.md`
-2. **Phase 2 (Week 2–3):** Migrate `Home` page and update its Storybook stories to showcase responsive behavior
-3. **Phase 3 (Week 4+):** Iteratively migrate remaining high-value pages (Profile, MyPosts, Account settings); update E2E selectors if needed
-4. **Ongoing:** All new UI must comply; legacy migrates incrementally when touched
+⚠️ Initial migration overhead (story split + packaging discipline)  
+⚠️ More coordination across workspaces for build/test/release flow  
+⚠️ Some feature-heavy widgets will remain app-local until decoupled

@@ -281,13 +281,14 @@ Soft decomposition thresholds (warning-level guidance):
 
 ## Storybook
 
-Storybook is colocated in `apps/user-portal` so portal UI can be validated in isolation while the design system evolves.
+Storybook in `apps/user-portal` now focuses on **integration/page-level validation** for this app.
+
+Component-level demo stories are intentionally removed from user-portal and are planned to live in a dedicated UI showcase app, while runtime components are planned to be consumed from shared package(s).
 
 - Config: `.storybook/main.ts` and `.storybook/preview.ts`
-- Initial stories cover loading primitives and Home loading scenarios:
-  - `src/components/loading/*.stories.tsx`
-  - `src/components/home/HomeProfileSummary.stories.tsx`
+- Current integration stories include:
   - `src/stories/HomeLoadingScenarios.stories.tsx`
+  - `src/stories/DesignSystem.stories.tsx`
 
 Run:
 
@@ -523,6 +524,13 @@ import { Section } from '@/components/layout';
 - All new components or pages must use design primitives from `src/components/layout/` for major layouts
 - All new components must use design tokens for spacing, colors, and typography
 - Existing pages/components use ad-hoc utilities during refactoring (no retrofit requirement)
+
+**Monorepo UI Direction:**
+
+- Runtime reusable UI components are planned for shared package(s) under `packages/`
+- A dedicated UI showcase/docs app is planned under `apps/` for component demos
+- user-portal keeps integration/page stories and product workflow validation
+- Shared package components must be tested in the package itself; user-portal keeps integration/e2e coverage
 
 **Responsive Pattern:**
 
