@@ -442,8 +442,7 @@ Migration phases:
 
 1. Token/primitives hardening for shared consumption
 2. Low-coupling primitives/controls first
-3. Storybook split completion (component demos in `ui-showcase`, integration stories in `user-portal`)
-4. Higher-coupling composed widgets after orchestration boundaries are isolated
+3. Higher-coupling composed widgets after orchestration boundaries are isolated
 
 - **Note:** extraction order can vary when a component is clearly reusable or clearly app-specific.
 

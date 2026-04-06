@@ -22,7 +22,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Flat comments CRUD directly on post cards (create, list, edit own, delete own)
 - Feed cards show author avatar + profile link in the header (fallback initial when no avatar)
 - Shared layout primitives consumed from `@repo/ui` (`Container`, `Stack`, `Grid`, `Section`)
-- Storybook for visual validation and loading state scenarios (integration/page focus; component demos are being migrated to `apps/ui-showcase`)
+- Storybook for visual validation and loading state scenarios (integration/page focus; component demos live in `apps/ui-showcase`)
 - Pluggable frontend state architecture via state contracts (interfaces + injectable presenters)
 
 ## Routes
@@ -284,7 +284,7 @@ Soft decomposition thresholds (warning-level guidance):
 
 Storybook in `apps/user-portal` now focuses on **integration/page-level validation** for this app.
 
-Component-level demo stories are intentionally removed from user-portal and are planned to live in a dedicated UI showcase app, while runtime components are planned to be consumed from shared package(s).
+Component-level demo stories are intentionally removed from user-portal and now live in `apps/ui-showcase`, while runtime shared components are consumed from `@repo/ui`.
 
 - Config: `.storybook/main.ts` and `.storybook/preview.ts`
 - Current integration stories include:

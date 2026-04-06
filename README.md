@@ -21,6 +21,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `friendship-service`: Friendship microservice listening on TCP (port 4005) for friend requests and relationship status
 - `event-handler-service`: Background worker that processes domain events (port 4003)
 - `user-portal`: React + Vite frontend for user management (port 3000)
+- `ui-showcase`: Storybook app for shared component demos (port 6006)
 
 ## Packages
 
@@ -236,6 +237,7 @@ pnpm --filter image-service dev
 pnpm --filter event-handler-service dev
 pnpm --filter user-portal dev
 pnpm --filter user-portal storybook
+pnpm --filter ui-showcase storybook
 ```
 
 ## Useful Scripts
