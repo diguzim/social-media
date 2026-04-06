@@ -15,6 +15,10 @@ Current extraction scope:
   - `Section`
 - Action primitives:
   - `Button`
+- Menu primitives:
+  - `DropdownMenu`
+  - `DropdownMenuTrigger`
+  - `DropdownMenuContent`
 - Dialog primitives:
   - `Modal`
 
@@ -28,7 +32,17 @@ Current extraction scope:
 ## Usage
 
 ```tsx
-import { Button, Container, Grid, Modal, Section, Stack } from "@repo/ui";
+import {
+  Button,
+  Container,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Grid,
+  Modal,
+  Section,
+  Stack,
+} from "@repo/ui";
 ```
 
 ## Build

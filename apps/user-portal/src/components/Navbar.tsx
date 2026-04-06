@@ -1,12 +1,60 @@
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@repo/ui';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  useDropdownMenu,
+} from '@repo/ui';
 import { clearAuth } from '../utils/auth';
 import { getUserProfile } from '../services/auth';
 
+interface NavbarMenuItemsProps {
+  profilePath: string;
+  onLogout: () => void;
+}
+
+function NavbarMenuItems({ profilePath, onLogout }: NavbarMenuItemsProps) {
+  const { close } = useDropdownMenu();
+
+  return (
+    <>
+      <Link
+        data-testid="navbar-profile-link"
+        to={profilePath}
+        onClick={close}
+        className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
+      >
+        Profile
+      </Link>
+      <Link
+        data-testid="navbar-account-settings-link"
+        to="/account/personal-data"
+        onClick={close}
+        className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
+      >
+        Account settings
+      </Link>
+      <Button
+        type="button"
+        variant="destructive"
+        fullWidth
+        size="sm"
+        data-testid="navbar-logout-button"
+        onClick={() => {
+          close();
+          onLogout();
+        }}
+        className="justify-start rounded-none rounded-b-md px-4 py-3"
+      >
+        Logout
+      </Button>
+    </>
+  );
+}
+
 export function Navbar() {
   const navigate = useNavigate();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const cachedUser = getUserProfile();
   const profilePath = cachedUser?.username ? `/users/${cachedUser.username}` : '/';
 
@@ -48,54 +96,21 @@ export function Navbar() {
         Social Media
       </h1>
 
-      <div data-testid="navbar-menu-container" className="relative">
-        <Button
-          type="button"
+      <DropdownMenu dataTestId="navbar-menu-container" className="relative">
+        <DropdownMenuTrigger
           data-testid="navbar-menu-button"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/80"
         >
           Menu ▼
-        </Button>
+        </DropdownMenuTrigger>
 
-        {isDropdownOpen && (
-          <div
-            data-testid="navbar-menu-dropdown"
-            className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
-          >
-            <Link
-              data-testid="navbar-profile-link"
-              to={profilePath}
-              onClick={() => setIsDropdownOpen(false)}
-              className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
-            >
-              Profile
-            </Link>
-            <Link
-              data-testid="navbar-account-settings-link"
-              to="/account/personal-data"
-              onClick={() => setIsDropdownOpen(false)}
-              className="block border-b border-slate-200 px-4 py-3 text-sm text-slate-700 no-underline transition hover:bg-slate-100"
-            >
-              Account settings
-            </Link>
-            <Button
-              type="button"
-              variant="destructive"
-              fullWidth
-              size="sm"
-              data-testid="navbar-logout-button"
-              onClick={() => {
-                setIsDropdownOpen(false);
-                handleLogout();
-              }}
-              className="justify-start rounded-none rounded-b-md px-4 py-3"
-            >
-              Logout
-            </Button>
-          </div>
-        )}
-      </div>
+        <DropdownMenuContent
+          dataTestId="navbar-menu-dropdown"
+          className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
+        >
+          <NavbarMenuItems profilePath={profilePath} onLogout={handleLogout} />
+        </DropdownMenuContent>
+      </DropdownMenu>
     </nav>
   );
 }

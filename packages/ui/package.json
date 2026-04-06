@@ -18,6 +18,10 @@
       "types": "./dist/button/index.d.ts",
       "default": "./dist/button/index.js"
     },
+    "./menu": {
+      "types": "./dist/menu/index.d.ts",
+      "default": "./dist/menu/index.js"
+    },
     "./layout-components": {
       "types": "./dist/layout-components/index.d.ts",
       "default": "./dist/layout-components/index.js"
