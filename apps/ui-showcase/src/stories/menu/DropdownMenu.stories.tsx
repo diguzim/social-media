@@ -56,7 +56,7 @@ function ControlledDropdownDemo() {
         Controlled menu
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg">
+      <DropdownMenuContent align="end" side="bottom" offset="md">
         <DemoMenuItems />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -82,7 +82,7 @@ export const Uncontrolled: Story = {
         Open menu
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg">
+      <DropdownMenuContent align="end" side="bottom" offset="md">
         <DemoMenuItems />
       </DropdownMenuContent>
     </DropdownMenu>

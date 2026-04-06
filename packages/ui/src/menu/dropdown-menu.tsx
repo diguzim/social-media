@@ -1,5 +1,11 @@
 import type { ButtonSize, ButtonVariant } from "../button/button.js";
 import { Button } from "../button/button.js";
+import {
+  FloatingPanel,
+  type FloatingPanelAlign,
+  type FloatingPanelOffset,
+  type FloatingPanelSide,
+} from "./floating-panel.js";
 import { cx } from "../layout-components/utils.js";
 import type {
   ButtonHTMLAttributes,
@@ -204,6 +210,9 @@ export interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement>
   children: ReactNode;
   dataTestId?: string;
   unmountOnClose?: boolean;
+  side?: FloatingPanelSide;
+  align?: FloatingPanelAlign;
+  offset?: FloatingPanelOffset;
 }
 
 export function DropdownMenuContent({
@@ -211,6 +220,9 @@ export function DropdownMenuContent({
   className,
   dataTestId,
   unmountOnClose = true,
+  side = "bottom",
+  align = "end",
+  offset = "md",
   ...props
 }: DropdownMenuContentProps) {
   const { open } = useDropdownMenuInternal();
@@ -220,13 +232,16 @@ export function DropdownMenuContent({
   }
 
   return (
-    <div
+    <FloatingPanel
       {...props}
-      data-testid={dataTestId}
+      dataTestId={dataTestId}
       role="menu"
+      side={side}
+      align={align}
+      offset={offset}
       className={cx(!open && !unmountOnClose ? "hidden" : undefined, className)}
     >
       {children}
-    </div>
+    </FloatingPanel>
   );
 }

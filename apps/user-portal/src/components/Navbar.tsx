@@ -106,7 +106,9 @@ export function Navbar() {
 
         <DropdownMenuContent
           dataTestId="navbar-menu-dropdown"
-          className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
+          align="end"
+          side="bottom"
+          offset="md"
         >
           <NavbarMenuItems profilePath={profilePath} onLogout={handleLogout} />
         </DropdownMenuContent>

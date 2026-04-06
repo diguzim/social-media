@@ -19,6 +19,7 @@ Current extraction scope:
   - `DropdownMenu`
   - `DropdownMenuTrigger`
   - `DropdownMenuContent`
+  - `FloatingPanel`
 - Dialog primitives:
   - `Modal`
 
@@ -38,6 +39,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  FloatingPanel,
   Grid,
   Modal,
   Section,
