@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { API } from '@repo/contracts';
 import {
   Button,
@@ -14,7 +14,6 @@ import {
 } from '@repo/ui';
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
-import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
 import {
   PROFILE_SECTION_TABS,
@@ -24,20 +23,14 @@ import {
 } from '../components/profile/ProfileSectionsTabs';
 import { getProfile, uploadProfileAvatar } from '../services/auth';
 import { getUserPhotos } from '../services/photos';
+import { AboutSection } from './UserProfile/components/AboutSection';
+import { FriendsSection } from './UserProfile/components/FriendsSection';
+import { PhotosSection } from './UserProfile/components/PhotosSection';
+import { PersonalSection } from './UserProfile/components/PersonalSection';
+import { TimelineSection } from './UserProfile/components/TimelineSection';
 
 const DEFAULT_AVATAR_DATA_URL =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22 viewBox=%220 0 120 120%22%3E%3Crect width=%22120%22 height=%22120%22 rx=%2260%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2260%22 y=%2266%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%23334155%22%3EAvatar%3C/text%3E%3C/svg%3E';
-
-type PhotoSectionKey = 'unsorted' | 'albums';
-
-const PROFILE_PHOTO_SECTION_TABS: Array<{ key: PhotoSectionKey; label: string }> = [
-  { key: 'unsorted', label: 'Unsorted' },
-  { key: 'albums', label: 'Albums' },
-];
-
-function normalizePhotoSection(section?: string): PhotoSectionKey {
-  return section === 'albums' ? 'albums' : 'unsorted';
-}
 
 interface OwnAvatarActionsMenuProps {
   isUploading: boolean;
@@ -86,99 +79,10 @@ function OwnAvatarActionsMenu({
   );
 }
 
-interface PhotoSectionTabsProps {
-  activeSection: PhotoSectionKey;
-  onChange: (section: PhotoSectionKey) => void;
-}
-
-function PhotoSectionTabs({ activeSection, onChange }: PhotoSectionTabsProps) {
-  return (
-    <div
-      data-testid="user-profile-photos-tabs"
-      className="mt-4 flex flex-wrap gap-2 border-b border-slate-200 pb-3"
-      role="tablist"
-      aria-label="Photo sections"
-    >
-      {PROFILE_PHOTO_SECTION_TABS.map((tab) => {
-        const isActive = tab.key === activeSection;
-
-        return (
-          <Button
-            key={tab.key}
-            data-testid={`user-profile-photos-tab-${tab.key}`}
-            type="button"
-            variant="toggle"
-            size="sm"
-            pressed={isActive}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => {
-              onChange(tab.key);
-            }}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? 'bg-primary-600 text-white'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            {tab.label}
-          </Button>
-        );
-      })}
-    </div>
-  );
-}
-
-function UserFriendItem({
-  id,
-  name,
-  username,
-  avatarUrl,
-}: {
-  id: string;
-  name: string;
-  username: string;
-  avatarUrl?: string;
-}) {
-  return (
-    <li data-testid={`user-profile-friend-item-${id}`} className="card p-4">
-      <div className="flex items-center gap-3">
-        {avatarUrl ? (
-          <img
-            data-testid={`user-profile-friend-avatar-${id}`}
-            src={avatarUrl}
-            alt={`${name} profile picture`}
-            className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover"
-          />
-        ) : (
-          <div
-            data-testid={`user-profile-friend-avatar-fallback-${id}`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
-          >
-            {name.charAt(0).toUpperCase() || '?'}
-          </div>
-        )}
-
-        <div>
-          <Link
-            to={`/users/${username}`}
-            data-testid={`user-profile-friend-link-${id}`}
-            className="text-base font-semibold text-slate-900 hover:text-blue-700 hover:underline"
-          >
-            {name}
-          </Link>
-          <p className="text-sm text-slate-500">@{username}</p>
-        </div>
-      </div>
-    </li>
-  );
-}
-
 export function UserProfile() {
   const { state, actions } = useUserProfileStateContract();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { username, section } = useParams<{ username: string; section?: string }>();
   const activeSection = normalizeProfileSection(section);
   const {
@@ -211,10 +115,6 @@ export function UserProfile() {
   const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(null);
   const [avatarCacheBuster, setAvatarCacheBuster] = useState<number | null>(null);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
-  const photoRouteSegments = location.pathname.split('/').filter(Boolean).slice(3);
-  const photoRouteSection = normalizePhotoSection(photoRouteSegments[0]);
-  const selectedAlbumId = photoRouteSection === 'albums' ? (photoRouteSegments[1] ?? null) : null;
-  const selectedPhotoId = searchParams.get('photo');
 
   const sentinelRef = useInfiniteScrollObserver({
     enabled: hasMorePosts && !isPostsLoading && !isLoadingMorePosts,
@@ -223,22 +123,12 @@ export function UserProfile() {
     },
   });
 
-  const setSelectedPhotoId = (photoId: string | null) => {
-    setSearchParams((currentParams) => {
-      const params = new URLSearchParams(currentParams);
-      if (photoId) {
-        params.set('photo', photoId);
-      } else {
-        params.delete('photo');
-      }
-      return params;
-    });
-  };
-
   useEffect(() => {
     if (!username) {
       return;
     }
+
+    const photoRouteSegments = location.pathname.split('/').filter(Boolean).slice(3);
 
     if (section === 'albums') {
       navigate(`/users/${username}/photos/unsorted`, { replace: true });
@@ -248,7 +138,7 @@ export function UserProfile() {
     if (activeSection === 'photos' && photoRouteSegments.length === 0) {
       navigate(`/users/${username}/photos/unsorted`, { replace: true });
     }
-  }, [activeSection, navigate, photoRouteSegments.length, section, username]);
+  }, [activeSection, location.pathname, navigate, section, username]);
 
   useEffect(() => {
     if (activeSection !== 'photos' || !profile?.username) {
@@ -297,12 +187,6 @@ export function UserProfile() {
     };
   }, [uploadedAvatarUrl]);
 
-  const selectedAlbum = photosData.albums.find((album) => album.id === selectedAlbumId) ?? null;
-  const allVisiblePhotos = [
-    ...photosData.unsortedPhotos,
-    ...photosData.albums.flatMap((album) => album.photos),
-  ];
-  const selectedPhoto = allVisiblePhotos.find((photo) => photo.id === selectedPhotoId) ?? null;
   const avatarBaseUrl = uploadedAvatarUrl ?? profile?.avatarUrl;
   const resolvedAvatarUrl = avatarBaseUrl
     ? avatarBaseUrl.startsWith('blob:') || avatarBaseUrl.startsWith('data:')
@@ -517,347 +401,41 @@ export function UserProfile() {
         />
 
         {activeSection === 'timeline' ? (
-          <section data-testid="user-profile-posts-section" className="mt-6">
-            <h2 className="mb-3 text-2xl font-semibold text-slate-900">Timeline</h2>
-
-            {isPostsLoading ? (
-              <p data-testid="user-profile-posts-loading" className="text-sm text-slate-600">
-                Loading posts...
-              </p>
-            ) : postsError && posts.length === 0 ? (
-              <p data-testid="user-profile-posts-error" className="text-sm text-danger-600">
-                {postsError}
-              </p>
-            ) : posts.length === 0 ? (
-              <p data-testid="user-profile-posts-empty" className="text-sm text-slate-600">
-                This user has not posted yet.
-              </p>
-            ) : (
-              <PostCardsInfiniteList
-                posts={posts}
-                onReactionChange={() => {
-                  void actions.refreshPosts();
-                }}
-                listTestId="user-profile-posts-list"
-                className="grid gap-3"
-                loadMoreError={postsLoadMoreError}
-                loadMoreErrorMessage={(currentError) => currentError}
-                loadMoreErrorTestId="user-profile-posts-load-more-error"
-                isLoadingMore={isLoadingMorePosts}
-                loadingMoreMessage="Loading more posts..."
-                loadingMoreTestId="user-profile-posts-loading-more"
-                hasMore={hasMorePosts}
-                sentinelRef={sentinelRef}
-                sentinelTestId="user-profile-posts-infinite-sentinel"
-                sentinelClassName="h-2 w-full"
-                endMessage="You've reached the end of this user's posts."
-                endTestId="user-profile-posts-end"
-              />
-            )}
-          </section>
+          <TimelineSection
+            posts={posts}
+            isPostsLoading={isPostsLoading}
+            postsError={postsError}
+            postsLoadMoreError={postsLoadMoreError}
+            isLoadingMorePosts={isLoadingMorePosts}
+            hasMorePosts={hasMorePosts}
+            sentinelRef={sentinelRef}
+            onRefreshPosts={() => {
+              void actions.refreshPosts();
+            }}
+          />
         ) : null}
 
         {activeSection === 'photos' ? (
-          <Section
-            dataTestId="user-profile-photos-section"
-            hasBorder
-            background="primary"
-            padding="p-6"
-          >
-            <h2 className="text-2xl font-semibold text-slate-900">Photos</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Browse standalone photos or navigate through albums.
-            </p>
-
-            <PhotoSectionTabs
-              activeSection={photoRouteSection}
-              onChange={(nextSection) => {
-                if (!username) {
-                  return;
-                }
-
-                if (nextSection === 'unsorted') {
-                  navigate(`/users/${username}/photos/unsorted`);
-                  return;
-                }
-
-                navigate(`/users/${username}/photos/albums`);
-              }}
-            />
-
-            {photosError ? (
-              <p data-testid="user-profile-photos-error" className="mt-4 text-sm text-danger-600">
-                {photosError}
-              </p>
-            ) : null}
-
-            {isPhotosLoading ? (
-              <p data-testid="user-profile-photos-loading" className="mt-4 text-sm text-slate-600">
-                Loading photos...
-              </p>
-            ) : photoRouteSection === 'albums' ? (
-              selectedAlbum ? (
-                <section
-                  data-testid="user-profile-photos-album-detail-section"
-                  className="mt-5 space-y-4"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">{selectedAlbum.name}</h3>
-                      <p className="text-sm text-slate-500">Album photos</p>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      data-testid="user-profile-photos-album-back-button"
-                      onClick={() => {
-                        if (!username) {
-                          return;
-                        }
-
-                        navigate(`/users/${username}/photos/albums`);
-                      }}
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-                    >
-                      Back to albums
-                    </Button>
-                  </div>
-
-                  {selectedAlbum.photos.length === 0 ? (
-                    <p
-                      data-testid="user-profile-photos-album-empty"
-                      className="text-sm text-slate-600"
-                    >
-                      Album is empty.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                      {selectedAlbum.photos.map((photo) => (
-                        <Button
-                          key={photo.id}
-                          type="button"
-                          variant="link"
-                          size="sm"
-                          data-testid={`user-profile-photos-album-image-${photo.id}`}
-                          onClick={() => {
-                            setSelectedPhotoId(photo.id);
-                          }}
-                          className="p-0"
-                        >
-                          <img
-                            src={photo.imageUrl}
-                            alt={photo.description ?? `${selectedAlbum.name} photo`}
-                            className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                          />
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              ) : (
-                <section
-                  data-testid="user-profile-photos-albums-section"
-                  className="mt-5 space-y-3"
-                >
-                  <h3 className="text-lg font-semibold text-slate-900">Albums</h3>
-                  {photosData.albums.length === 0 ? (
-                    <p
-                      data-testid="user-profile-photos-albums-empty"
-                      className="text-sm text-slate-600"
-                    >
-                      No albums yet.
-                    </p>
-                  ) : (
-                    <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
-                      {photosData.albums.map((album) => (
-                        <article
-                          key={album.id}
-                          data-testid={`user-profile-photos-album-${album.id}`}
-                          className="min-w-[180px] rounded-lg border border-slate-200 bg-white p-2"
-                        >
-                          <Button
-                            type="button"
-                            variant="link"
-                            size="sm"
-                            data-testid={`user-profile-photos-album-card-${album.id}`}
-                            onClick={() => {
-                              if (!username) {
-                                return;
-                              }
-
-                              navigate(`/users/${username}/photos/albums/${album.id}`);
-                            }}
-                            className="w-full text-left"
-                          >
-                            {album.coverImageUrl ? (
-                              <img
-                                data-testid={`user-profile-photos-album-cover-image-${album.id}`}
-                                src={album.coverImageUrl}
-                                alt={`${album.name} cover`}
-                                className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                              />
-                            ) : (
-                              <div
-                                data-testid={`user-profile-photos-album-cover-empty-${album.id}`}
-                                className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-xs text-slate-500"
-                              >
-                                No cover
-                              </div>
-                            )}
-                            <h4 className="mt-2 truncate text-sm font-semibold text-slate-900">
-                              {album.name}
-                            </h4>
-                            <p className="text-xs text-slate-500">{album.photos.length} photos</p>
-                          </Button>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              )
-            ) : (
-              <section
-                data-testid="user-profile-photos-unsorted-section"
-                className="mt-5 space-y-3"
-              >
-                <h3 className="text-lg font-semibold text-slate-900">Unsorted Photos</h3>
-                {photosData.unsortedPhotos.length === 0 ? (
-                  <p
-                    data-testid="user-profile-photos-unsorted-empty"
-                    className="text-sm text-slate-600"
-                  >
-                    No unsorted photos yet.
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                    {photosData.unsortedPhotos.map((photo) => (
-                      <Button
-                        key={photo.id}
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
-                        onClick={() => {
-                          setSelectedPhotoId(photo.id);
-                        }}
-                        className="p-0"
-                      >
-                        <img
-                          src={photo.imageUrl}
-                          alt={photo.description ?? 'Photo'}
-                          className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                        />
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </section>
-            )}
-
-            {selectedPhoto ? (
-              <Modal
-                isOpen={Boolean(selectedPhoto)}
-                onClose={() => {
-                  setSelectedPhotoId(null);
-                }}
-                ariaLabel={selectedPhoto.description ?? 'Photo preview'}
-                dataTestId="photo-modal"
-                overlayTestId="photo-modal-overlay"
-                closeButtonTestId="photo-modal-close-button"
-                dialogClassName="max-w-4xl"
-              >
-                <img
-                  data-testid={`photo-modal-image-${selectedPhoto.id}`}
-                  src={selectedPhoto.imageUrl}
-                  alt={selectedPhoto.description ?? 'Photo'}
-                  className="max-h-[75vh] w-full rounded-md object-contain"
-                />
-              </Modal>
-            ) : null}
-          </Section>
+          <PhotosSection
+            profileUsername={profile.username}
+            photosData={photosData}
+            isPhotosLoading={isPhotosLoading}
+            photosError={photosError}
+          />
         ) : null}
 
-        {activeSection === 'about' ? (
-          <Section
-            dataTestId="user-profile-about-section"
-            hasBorder
-            background="primary"
-            padding="p-6"
-          >
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">About</h2>
-              <p className="mt-1 text-sm text-slate-600">Public bio and profile summary.</p>
-            </div>
-
-            <p data-testid="user-profile-about-placeholder" className="mt-4 text-sm text-slate-600">
-              About information is not available yet.
-            </p>
-          </Section>
-        ) : null}
+        {activeSection === 'about' ? <AboutSection /> : null}
 
         {activeSection === 'friends' ? (
-          <section data-testid="user-profile-friends-section" className="mt-6">
-            <h2 className="mb-3 text-2xl font-semibold text-slate-900">Friends</h2>
-
-            {!canViewAcceptedFriends ? (
-              <p data-testid="user-profile-friends-placeholder" className="text-sm text-slate-600">
-                Public accepted-friends listing is coming soon.
-              </p>
-            ) : isFriendsLoading ? (
-              <p data-testid="user-profile-friends-loading" className="text-sm text-slate-600">
-                Loading accepted friends...
-              </p>
-            ) : friendsError ? (
-              <p data-testid="user-profile-friends-error" className="text-sm text-danger-600">
-                {friendsError}
-              </p>
-            ) : friends.length === 0 ? (
-              <p data-testid="user-profile-friends-empty" className="text-sm text-slate-600">
-                No accepted friends yet.
-              </p>
-            ) : (
-              <ul data-testid="user-profile-friends-list" className="grid gap-3">
-                {friends.map((friend) => (
-                  <UserFriendItem
-                    key={friend.id}
-                    id={friend.id}
-                    name={friend.name}
-                    username={friend.username}
-                    avatarUrl={friend.avatarUrl}
-                  />
-                ))}
-              </ul>
-            )}
-          </section>
+          <FriendsSection
+            friends={friends}
+            isFriendsLoading={isFriendsLoading}
+            friendsError={friendsError}
+            canViewAcceptedFriends={canViewAcceptedFriends}
+          />
         ) : null}
 
-        {activeSection === 'personal' ? (
-          <Section
-            dataTestId="user-profile-personal-section"
-            hasBorder
-            background="primary"
-            padding="p-6"
-          >
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Personal Data</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Location, birth date, gender, work, and education.
-              </p>
-            </div>
-
-            <div
-              data-testid="user-profile-personal-placeholder"
-              className="mt-4 grid gap-2 sm:grid-cols-2"
-            >
-              <p className="text-sm text-slate-600">Location: —</p>
-              <p className="text-sm text-slate-600">Birth date: —</p>
-              <p className="text-sm text-slate-600">Gender: —</p>
-              <p className="text-sm text-slate-600">Work: —</p>
-              <p className="text-sm text-slate-600 sm:col-span-2">Education: —</p>
-            </div>
-          </Section>
-        ) : null}
+        {activeSection === 'personal' ? <PersonalSection /> : null}
       </Stack>
     </Container>
   );
