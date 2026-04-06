@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { Container, Section, Stack } from '../components/layout';
 import { confirmEmailVerification } from '../services/auth';
 
 type VerificationState = 'pending' | 'success' | 'already_verified' | 'error';
@@ -29,60 +30,73 @@ export function VerifyEmail() {
   }, [searchParams]);
 
   return (
-    <div data-testid="verify-email-page" className="auth-container text-center">
-      {state === 'pending' && <p data-testid="verify-email-pending">Verifying your email…</p>}
+    <Container maxWidth="md" dataTestId="verify-email-page">
+      <Section hasBorder background="primary" className="text-center shadow-card" padding="p-6">
+        <Stack gap="gap-4" align="center">
+          {state === 'pending' && <p data-testid="verify-email-pending">Verifying your email…</p>}
 
-      {state === 'success' && (
-        <>
-          <h1 data-testid="verify-email-success-title" className="section-title">
-            Email verified!
-          </h1>
-          <p className="mt-3 text-slate-600">
-            Your email has been confirmed. You can now use all features.
-          </p>
-          <Link
-            data-testid="verify-email-go-home-link"
-            to="/"
-            className="btn-primary mt-6 inline-block"
-          >
-            Go to home
-          </Link>
-        </>
-      )}
+          {state === 'success' && (
+            <>
+              <h1
+                data-testid="verify-email-success-title"
+                className="text-2xl font-bold text-slate-900"
+              >
+                Email verified!
+              </h1>
+              <p className="text-slate-600">
+                Your email has been confirmed. You can now use all features.
+              </p>
+              <Link
+                data-testid="verify-email-go-home-link"
+                to="/"
+                className="btn-primary inline-block"
+              >
+                Go to home
+              </Link>
+            </>
+          )}
 
-      {state === 'already_verified' && (
-        <>
-          <h1 data-testid="verify-email-already-title" className="section-title">
-            Already verified
-          </h1>
-          <p className="mt-3 text-slate-600">Your email address has already been confirmed.</p>
-          <Link
-            data-testid="verify-email-go-home-link"
-            to="/"
-            className="btn-primary mt-6 inline-block"
-          >
-            Go to home
-          </Link>
-        </>
-      )}
+          {state === 'already_verified' && (
+            <>
+              <h1
+                data-testid="verify-email-already-title"
+                className="text-2xl font-bold text-slate-900"
+              >
+                Already verified
+              </h1>
+              <p className="text-slate-600">Your email address has already been confirmed.</p>
+              <Link
+                data-testid="verify-email-go-home-link"
+                to="/"
+                className="btn-primary inline-block"
+              >
+                Go to home
+              </Link>
+            </>
+          )}
 
-      {state === 'error' && (
-        <>
-          <h1 data-testid="verify-email-error-title" className="section-title text-red-600">
-            Verification failed
-          </h1>
-          <p data-testid="verify-email-error-message" className="mt-3 status-error">
-            {errorMessage}
-          </p>
-          <p className="mt-4 text-sm text-slate-600">
-            The link may have expired.{' '}
-            <Link to="/" className="link-primary">
-              Go home
-            </Link>{' '}
-            and request a new one.
-          </p>
-        </>
-      )}
-    </div>
+          {state === 'error' && (
+            <>
+              <h1
+                data-testid="verify-email-error-title"
+                className="text-2xl font-bold text-red-600"
+              >
+                Verification failed
+              </h1>
+              <p data-testid="verify-email-error-message" className="status-error">
+                {errorMessage}
+              </p>
+              <p className="text-sm text-slate-600">
+                The link may have expired.{' '}
+                <Link to="/" className="link-primary">
+                  Go home
+                </Link>{' '}
+                and request a new one.
+              </p>
+            </>
+          )}
+        </Stack>
+      </Section>
+    </Container>
   );
 }
