@@ -80,7 +80,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(function Grid(
       ref={ref}
       {...props}
       data-testid={dataTestId}
-      className={cx("grid", columnsClass, gapClass, className)}
+      className={cx("grid mx-auto w-full", columnsClass, gapClass, className)}
     >
       {children}
     </div>

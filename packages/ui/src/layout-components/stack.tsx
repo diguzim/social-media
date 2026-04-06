@@ -78,7 +78,7 @@ export const Stack = forwardRef<HTMLDivElement, StackProps>(function Stack(
       {...props}
       data-testid={dataTestId}
       className={cx(
-        "flex",
+        "flex mx-auto w-full",
         directionClass,
         gapClass,
         alignClass,
