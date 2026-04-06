@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 interface ProfileHeaderCardProps {
   cardTestId: string;
   avatarTestId: string;
@@ -9,6 +11,7 @@ interface ProfileHeaderCardProps {
   name: string;
   username: string;
   avatarUrl?: string;
+  avatarSlot?: ReactNode;
   postsCount: number;
   isVerified?: boolean;
 }
@@ -27,6 +30,7 @@ export function ProfileHeaderCard({
   name,
   username,
   avatarUrl,
+  avatarSlot,
   postsCount,
   isVerified,
 }: ProfileHeaderCardProps) {
@@ -34,12 +38,14 @@ export function ProfileHeaderCard({
     <section data-testid={cardTestId} className="card mt-5 p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <img
-            data-testid={avatarTestId}
-            src={avatarUrl || DEFAULT_AVATAR_DATA_URL}
-            alt={`${name} profile`}
-            className="h-20 w-20 rounded-full border border-slate-200 object-cover sm:h-24 sm:w-24"
-          />
+          {avatarSlot ?? (
+            <img
+              data-testid={avatarTestId}
+              src={avatarUrl || DEFAULT_AVATAR_DATA_URL}
+              alt={`${name} profile`}
+              className="h-20 w-20 rounded-full border border-slate-200 object-cover sm:h-24 sm:w-24"
+            />
+          )}
 
           <div>
             <div className="flex items-center gap-2">

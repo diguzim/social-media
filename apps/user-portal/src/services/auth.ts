@@ -27,8 +27,15 @@ export type UserProfile = GetProfileResponse;
 export type PublicUserProfile = GetPublicProfileResponse;
 
 export interface UploadProfileAvatarResponse {
-  imageUrl: string;
+  imageUrl?: string;
   uploadedAt: string;
+}
+
+interface UploadProfileAvatarRawResponse {
+  imageUrl?: string;
+  avatarUrl?: string;
+  url?: string;
+  uploadedAt?: string;
 }
 
 const EMAIL_CONFIRM_INFLIGHT = new Map<string, Promise<ConfirmEmailVerificationResponse>>();
@@ -208,7 +215,13 @@ export async function uploadProfileAvatar(file: File): Promise<UploadProfileAvat
     throw new Error(error.message || 'Failed to upload profile image');
   }
 
-  return response.json();
+  const payload = (await response.json()) as UploadProfileAvatarRawResponse;
+  const imageUrl = payload.imageUrl ?? payload.avatarUrl ?? payload.url;
+
+  return {
+    imageUrl,
+    uploadedAt: payload.uploadedAt ?? new Date().toISOString(),
+  };
 }
 
 export function storeUserProfile(profile: UserProfile): void {

@@ -1,7 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { API } from '@repo/contracts';
-import { Button, Container, Modal, Section, Stack } from '@repo/ui';
+import {
+  Button,
+  Container,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Modal,
+  Section,
+  Stack,
+  useDropdownMenu,
+} from '@repo/ui';
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
@@ -12,7 +22,58 @@ import {
   normalizeProfileSection,
   type ProfileSectionKey,
 } from '../components/profile/ProfileSectionsTabs';
+import { getProfile, uploadProfileAvatar } from '../services/auth';
 import { getUserPhotos } from '../services/photos';
+
+const DEFAULT_AVATAR_DATA_URL =
+  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22 viewBox=%220 0 120 120%22%3E%3Crect width=%22120%22 height=%22120%22 rx=%2260%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2260%22 y=%2266%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%23334155%22%3EAvatar%3C/text%3E%3C/svg%3E';
+
+interface OwnAvatarActionsMenuProps {
+  isUploading: boolean;
+  onSeeImage: () => void;
+  onChangeImage: () => void;
+}
+
+function OwnAvatarActionsMenu({
+  isUploading,
+  onSeeImage,
+  onChangeImage,
+}: OwnAvatarActionsMenuProps) {
+  const { close } = useDropdownMenu();
+
+  return (
+    <>
+      <Button
+        type="button"
+        variant="link"
+        fullWidth
+        data-testid="user-profile-avatar-see-image-action"
+        onClick={() => {
+          close();
+          onSeeImage();
+        }}
+        className="justify-start rounded-none border-b border-slate-200 px-4 py-3 text-slate-700 hover:bg-slate-100"
+      >
+        See image
+      </Button>
+      <Button
+        type="button"
+        variant="link"
+        fullWidth
+        data-testid="user-profile-avatar-change-image-action"
+        onClick={() => {
+          close();
+          onChangeImage();
+        }}
+        isPending={isUploading}
+        pendingText="Opening..."
+        className="justify-start rounded-none px-4 py-3 text-slate-700 hover:bg-slate-100"
+      >
+        Change image
+      </Button>
+    </>
+  );
+}
 
 function UserFriendItem({
   id,
@@ -91,6 +152,13 @@ export function UserProfile() {
   });
   const [isPhotosLoading, setIsPhotosLoading] = useState(false);
   const [photosError, setPhotosError] = useState('');
+  const [isAvatarActionsOpen, setIsAvatarActionsOpen] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [avatarUploadError, setAvatarUploadError] = useState('');
+  const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(null);
+  const [avatarCacheBuster, setAvatarCacheBuster] = useState<number | null>(null);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const selectedAlbumId = searchParams.get('album');
   const selectedPhotoId = searchParams.get('photo');
 
@@ -171,12 +239,138 @@ export function UserProfile() {
     };
   }, [activeSection, profile?.username]);
 
+  useEffect(() => {
+    setUploadedAvatarUrl(null);
+    setAvatarCacheBuster(null);
+  }, [username]);
+
+  useEffect(() => {
+    return () => {
+      if (uploadedAvatarUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(uploadedAvatarUrl);
+      }
+    };
+  }, [uploadedAvatarUrl]);
+
   const selectedAlbum = photosData.albums.find((album) => album.id === selectedAlbumId) ?? null;
   const allVisiblePhotos = [
     ...photosData.unsortedPhotos,
     ...photosData.albums.flatMap((album) => album.photos),
   ];
   const selectedPhoto = allVisiblePhotos.find((photo) => photo.id === selectedPhotoId) ?? null;
+  const avatarBaseUrl = uploadedAvatarUrl ?? profile?.avatarUrl;
+  const resolvedAvatarUrl = avatarBaseUrl
+    ? avatarBaseUrl.startsWith('blob:') || avatarBaseUrl.startsWith('data:')
+      ? avatarBaseUrl
+      : `${avatarBaseUrl}${avatarBaseUrl.includes('?') ? '&' : '?'}v=${avatarCacheBuster ?? 'base'}`
+    : DEFAULT_AVATAR_DATA_URL;
+  const profileName = profile?.name ?? 'User';
+
+  const openAvatarModal = () => {
+    setIsAvatarModalOpen(true);
+  };
+
+  const closeAvatarModal = () => {
+    setIsAvatarModalOpen(false);
+  };
+
+  const openAvatarPicker = () => {
+    avatarFileInputRef.current?.click();
+  };
+
+  const handleAvatarFileSelected = async (fileList: FileList | null) => {
+    const selectedFile = fileList?.[0] ?? null;
+
+    if (!selectedFile) {
+      return;
+    }
+
+    setAvatarUploadError('');
+    setIsAvatarUploading(true);
+    const localPreviewUrl = URL.createObjectURL(selectedFile);
+
+    try {
+      const uploadResult = await uploadProfileAvatar(selectedFile);
+      if (uploadResult.imageUrl) {
+        URL.revokeObjectURL(localPreviewUrl);
+        setUploadedAvatarUrl(uploadResult.imageUrl);
+      } else {
+        setUploadedAvatarUrl(localPreviewUrl);
+      }
+      setAvatarCacheBuster(Date.now());
+      await getProfile();
+      await actions.refresh();
+      setIsAvatarActionsOpen(false);
+    } catch (uploadError) {
+      URL.revokeObjectURL(localPreviewUrl);
+      setAvatarUploadError(
+        uploadError instanceof Error ? uploadError.message : 'Failed to upload profile image'
+      );
+    } finally {
+      setIsAvatarUploading(false);
+
+      if (avatarFileInputRef.current) {
+        avatarFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handlePublicAvatarClick = () => {
+    setAvatarUploadError('');
+    openAvatarModal();
+  };
+
+  const avatarSlot = isOwnProfile ? (
+    <DropdownMenu
+      open={isAvatarActionsOpen}
+      onOpenChange={(open) => {
+        setAvatarUploadError('');
+        setIsAvatarActionsOpen(open);
+      }}
+      className="inline-flex"
+    >
+      <DropdownMenuTrigger
+        data-testid="user-profile-avatar-trigger"
+        variant="ghost"
+        className="h-auto w-auto rounded-full bg-transparent p-0 hover:bg-transparent"
+      >
+        <img
+          data-testid="user-profile-avatar-image"
+          src={resolvedAvatarUrl}
+          alt={`${profileName} profile`}
+          className="h-20 w-20 rounded-full border border-slate-200 object-cover sm:h-24 sm:w-24"
+        />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        dataTestId="user-profile-avatar-actions-menu"
+        align="start"
+        side="bottom"
+        offset="sm"
+      >
+        <OwnAvatarActionsMenu
+          isUploading={isAvatarUploading}
+          onSeeImage={openAvatarModal}
+          onChangeImage={openAvatarPicker}
+        />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <Button
+      type="button"
+      data-testid="user-profile-avatar-trigger"
+      variant="ghost"
+      className="h-auto w-auto rounded-full bg-transparent p-0 hover:bg-transparent"
+      onClick={handlePublicAvatarClick}
+    >
+      <img
+        data-testid="user-profile-avatar-image"
+        src={resolvedAvatarUrl}
+        alt={`${profileName} profile`}
+        className="h-20 w-20 rounded-full border border-slate-200 object-cover sm:h-24 sm:w-24"
+      />
+    </Button>
+  );
 
   const onSectionChange = (nextSection: ProfileSectionKey) => {
     if (!username) {
@@ -219,6 +413,7 @@ export function UserProfile() {
         <ProfileHeaderCard
           cardTestId="user-profile-card"
           avatarTestId="user-profile-avatar-image"
+          avatarSlot={avatarSlot}
           nameTestId="user-profile-name"
           usernameTestId="user-profile-username"
           verifiedBadgeTestId="user-profile-verified-badge"
@@ -230,6 +425,39 @@ export function UserProfile() {
           postsCount={posts.length}
           isVerified={Boolean(profile.emailVerifiedAt)}
         />
+
+        <input
+          ref={avatarFileInputRef}
+          type="file"
+          accept="image/jpeg,image/png"
+          data-testid="user-profile-avatar-file-input"
+          className="hidden"
+          onChange={(event) => {
+            void handleAvatarFileSelected(event.target.files);
+          }}
+        />
+
+        {avatarUploadError ? (
+          <p data-testid="user-profile-avatar-upload-error" className="text-sm text-danger-600">
+            {avatarUploadError}
+          </p>
+        ) : null}
+
+        <Modal
+          isOpen={isAvatarModalOpen}
+          onClose={closeAvatarModal}
+          ariaLabel={`${profileName} avatar preview`}
+          dataTestId="user-profile-avatar-modal"
+          closeButtonTestId="user-profile-avatar-modal-close-button"
+          dialogClassName="max-w-xl"
+        >
+          <img
+            data-testid="user-profile-avatar-modal-image"
+            src={resolvedAvatarUrl}
+            alt={`${profileName} avatar`}
+            className="max-h-[70vh] w-full rounded-md object-contain"
+          />
+        </Modal>
 
         <Section dataTestId="user-profile-meta" hasBorder background="primary" padding="p-4">
           <div data-testid="user-profile-friendship-section" className="space-y-2">

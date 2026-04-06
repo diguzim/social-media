@@ -91,6 +91,7 @@ Examples:
 - Navbar account settings: `navbar-account-settings-link`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
+- UserProfile avatar actions/modal: `user-profile-avatar-trigger`, `user-profile-avatar-actions-menu`, `user-profile-avatar-see-image-action`, `user-profile-avatar-change-image-action`, `user-profile-avatar-file-input`, `user-profile-avatar-upload-error`, `user-profile-avatar-modal`, `user-profile-avatar-modal-image`, `user-profile-avatar-modal-close-button`
 - Account settings: `account-settings-page`, `account-settings-navigation`, `account-settings-nav-*`
 
 These attributes are stable hooks for automated tests and should be kept backward-compatible when possible.
@@ -579,9 +580,10 @@ The app communicates with the API Gateway which routes requests to microservices
 - UserProfile header includes placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
 - About and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
 - UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API
+- Unified UserProfile avatar behavior: viewing your own profile opens a floating actions menu (`See image`, `Change image`), while viewing another profile opens avatar preview directly in a modal
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary
 
 ## TODO
 
-- [ ] Reintroduce own-profile management actions in unified user profile (`/users/:username`) when product flow is defined (avatar upload, album/photo CRUD, About/Personal edit actions)
+- [ ] Add own-profile management actions for album/photo CRUD and About/Personal editing in unified user profile (`/users/:username`)
