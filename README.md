@@ -145,7 +145,6 @@ Current examples in `user-portal`:
 - Register uses `useRegisterStateContract()` with `useRegisterStatePresenter`
 - Login uses `useLoginStateContract()` with `useLoginStatePresenter`
 - MyPosts uses `useMyPostsStateContract()` with `useMyPostsStatePresenter`
-- Profile uses `useProfileStateContract()` with `useProfileStatePresenter`
 - UserProfile uses `useUserProfileStateContract()` with `useUserProfileStatePresenter`
 - Composition root uses `AppStateContractsProvider` to aggregate contract providers and prevent wrapper nesting in `App.tsx`
 

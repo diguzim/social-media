@@ -3,7 +3,6 @@ import { StateContractsProvider } from '../home';
 import { RegisterStateContractProvider } from '../register';
 import { LoginStateContractProvider } from '../login';
 import { MyPostsStateContractProvider } from '../my-posts';
-import { ProfileStateContractProvider } from '../profile';
 import { UserProfileStateContractProvider } from '../user-profile';
 import { FriendsStateContractProvider } from '../friends';
 
@@ -14,7 +13,6 @@ const STATE_CONTRACT_PROVIDERS: ProviderComponent[] = [
   RegisterStateContractProvider,
   LoginStateContractProvider,
   MyPostsStateContractProvider,
-  ProfileStateContractProvider,
   UserProfileStateContractProvider,
   FriendsStateContractProvider,
 ];
