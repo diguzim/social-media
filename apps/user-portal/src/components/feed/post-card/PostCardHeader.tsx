@@ -110,7 +110,7 @@ export function PostCardHeader({
                   size="sm"
                   data-testid={`post-edit-${postId}`}
                   onClick={onEnterEditMode}
-                  className="rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100"
+                  className="rounded-md border border-slate-300 text-slate-700"
                 >
                   Edit
                 </Button>
@@ -141,7 +141,7 @@ export function PostCardHeader({
           className={`inline-flex items-center gap-1 rounded-md transition-colors ${
             likedByMe
               ? 'bg-danger-100 text-danger-700 hover:bg-danger-200'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              : 'bg-slate-100 text-black hover:bg-slate-200'
           }`}
           isPending={isLikePending}
           pendingText="..."
