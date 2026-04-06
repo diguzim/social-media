@@ -13,6 +13,8 @@ Current extraction scope:
   - `Stack`
   - `Grid`
   - `Section`
+- Dialog primitives:
+  - `Modal`
 
 ## Principles
 
@@ -24,7 +26,7 @@ Current extraction scope:
 ## Usage
 
 ```tsx
-import { Container, Grid, Section, Stack } from "@repo/ui";
+import { Container, Grid, Modal, Section, Stack } from "@repo/ui";
 ```
 
 ## Build

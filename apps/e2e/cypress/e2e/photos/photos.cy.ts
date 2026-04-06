@@ -103,8 +103,8 @@ describe("Photos auth regression (alice)", () => {
       .first()
       .click();
 
-    cy.getByTestId("user-profile-photos-modal").should("be.visible");
-    cy.getByTestId("user-profile-photos-modal-close-button").click();
-    cy.getByTestId("user-profile-photos-modal").should("not.exist");
+    cy.getByTestId("photo-modal").should("be.visible");
+    cy.getByTestId("photo-modal-close-button").click();
+    cy.getByTestId("photo-modal").should("not.exist");
   });
 });

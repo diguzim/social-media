@@ -6,7 +6,7 @@ import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfi
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
 import { PendingButton } from '../components/loading/PendingButton';
-import { Container, Section, Stack } from '@repo/ui';
+import { Container, Modal, Section, Stack } from '@repo/ui';
 import {
   PROFILE_SECTION_TABS,
   ProfileSectionsTabs,
@@ -472,40 +472,24 @@ export function UserProfile() {
             )}
 
             {selectedPhoto ? (
-              <div
-                data-testid="user-profile-photos-modal"
-                className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4"
+              <Modal
+                isOpen={Boolean(selectedPhoto)}
+                onClose={() => {
+                  setSelectedPhotoId(null);
+                }}
+                ariaLabel={selectedPhoto.description ?? 'Photo preview'}
+                dataTestId="photo-modal"
+                overlayTestId="photo-modal-overlay"
+                closeButtonTestId="photo-modal-close-button"
+                dialogClassName="max-w-4xl"
               >
-                <button
-                  type="button"
-                  data-testid="user-profile-photos-modal-overlay"
-                  aria-label="Close photo modal"
-                  className="absolute inset-0"
-                  onClick={() => {
-                    setSelectedPhotoId(null);
-                  }}
+                <img
+                  data-testid={`photo-modal-image-${selectedPhoto.id}`}
+                  src={selectedPhoto.imageUrl}
+                  alt={selectedPhoto.description ?? 'Photo'}
+                  className="max-h-[75vh] w-full rounded-md object-contain"
                 />
-                <div className="relative z-10 w-full max-w-4xl rounded-xl bg-white p-4 shadow-xl">
-                  <div className="mb-2 flex justify-end">
-                    <button
-                      type="button"
-                      data-testid="user-profile-photos-modal-close-button"
-                      onClick={() => {
-                        setSelectedPhotoId(null);
-                      }}
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-                    >
-                      Close
-                    </button>
-                  </div>
-                  <img
-                    data-testid={`user-profile-photos-modal-image-${selectedPhoto.id}`}
-                    src={selectedPhoto.imageUrl}
-                    alt={selectedPhoto.description ?? 'Photo'}
-                    className="max-h-[75vh] w-full rounded-md object-contain"
-                  />
-                </div>
-              </div>
+              </Modal>
             ) : null}
           </Section>
         ) : null}

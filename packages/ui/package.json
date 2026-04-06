@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./modal": {
+      "types": "./dist/modal/index.d.ts",
+      "default": "./dist/modal/index.js"
+    },
     "./layout-components": {
       "types": "./dist/layout-components/index.d.ts",
       "default": "./dist/layout-components/index.js"

@@ -21,6 +21,7 @@ Dedicated Storybook app for shared UI component demos.
 - `src/stories/layout/Stack.stories.tsx`
 - `src/stories/layout/Grid.stories.tsx`
 - `src/stories/layout/Section.stories.tsx`
+- `src/stories/modal/Modal.stories.tsx`
 
 ## Run
 
