@@ -107,17 +107,20 @@ export function PostCardHeader({
               <>
                 <Button
                   type="button"
+                  size="sm"
                   data-testid={`post-edit-${postId}`}
                   onClick={onEnterEditMode}
-                  className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  className="rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100"
                 >
                   Edit
                 </Button>
                 <Button
+                  variant="destructive"
+                  size="sm"
                   data-testid={`post-delete-${postId}`}
                   onClick={onDeletePost}
                   disabled={isPostDeleting}
-                  className="rounded-md bg-danger-50 px-2 py-1 text-xs font-medium text-danger-700 hover:bg-danger-100"
+                  className="rounded-md"
                   isPending={isPostDeleting}
                   pendingText="Deleting..."
                 >
@@ -129,12 +132,13 @@ export function PostCardHeader({
         )}
 
         <Button
+          size="sm"
           data-testid={`like-button-${postId}`}
           onClick={onLikeClick}
           disabled={isLikePending}
           pressed={likedByMe}
           aria-label={likedByMe ? 'Unlike post' : 'Like post'}
-          className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-md transition-colors ${
             likedByMe
               ? 'bg-danger-100 text-danger-700 hover:bg-danger-200'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
