@@ -386,6 +386,11 @@ Folder rules:
   - `lg: 1024px` (desktop)
   - `xl: 1280px` (large desktop)
 - Layout primitives and utility usage must remain aligned with this breakpoint system
+- Preserve DOM/source order by default; only change visual order when the responsive layout truly needs it.
+- Use responsive direction changes for common row/column shifts; `Stack` should support vertical-to-horizontal flow, and `Grid` should support column-count changes across breakpoints.
+- Hide, collapse, or remove content at breakpoints only for secondary or duplicated content; do not hide essential information from keyboard or reading order.
+- When a layout change repeats across screens, prefer a primitive prop or a composed wrapper over one-off utility patches.
+- `className` may be used for layout-only overrides, but the base responsive behavior should still be understandable from the component API.
 
 #### 8) Storybook scope split
 

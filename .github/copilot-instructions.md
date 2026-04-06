@@ -126,7 +126,10 @@ When introducing a new domain/entity that is backed by an in-memory repository, 
   - `component-name/ComponentName*.tsx` (presentational slices)
   - optional `component-name/types.ts` (local view-model types/utilities)
 - Keep lint complexity constraints as **soft limits** (warnings) to guide decomposition without blocking delivery.
-- Storybook is colocated in `apps/user-portal` for frontend UI documentation and visual validation
+- For responsive layouts, prefer mobile-first primitives (`Container`, `Stack`, `Grid`, `Section`) and preserve DOM/source order by default; change visual order only when the layout truly needs it.
+- Use responsive direction/column changes for row↔column and one↔many screen transitions; prefer primitive props or composed wrappers over one-off utility patches when a pattern repeats.
+- Hide or collapse content at breakpoints only for secondary or duplicated content; do not hide essential information from keyboard or reading order.
+- Storybook component demos belong in `apps/ui-showcase`; `apps/user-portal` keeps integration/page stories only.
 - For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
 - For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending
 - Always use `data-testid` attributes on interactive elements and key containers
@@ -139,6 +142,7 @@ When introducing a new domain/entity that is backed by an in-memory repository, 
 - Use **`useTransition` / `startTransition`** for non-urgent updates (filters, pagination, tab/route-like updates) so stale content can stay visible
 - Use **`useDeferredValue`** for input-driven filtering/search to keep typing responsive
 - Add **Error Boundaries per island** so one failed section does not collapse the entire page
+- Shared reusable UI belongs in `packages/ui` and is consumed via `@repo/ui`; app-specific composition stays in `apps/user-portal`.
 - Use reusable loading primitives (e.g., section skeletons/placeholders) that support variable layout needs (`height`, `width`, `variant`, `lines`, `minHeight`)
 - Prevent layout shift during loading (reserve space with skeleton containers/min heights)
 - For form actions (login/register/create post), keep forms visible while pending: disable submit, show inline pending feedback, and prevent duplicate submissions
