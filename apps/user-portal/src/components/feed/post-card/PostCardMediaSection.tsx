@@ -1,5 +1,6 @@
 import type { TouchEvent } from 'react';
 import type { PostImage } from '@repo/contracts/api';
+import { Button } from '@repo/ui';
 
 interface PostCardMediaSectionProps {
   postId: string;
@@ -42,24 +43,28 @@ export function PostCardMediaSection({
 
         {postImages.length > 1 && (
           <>
-            <button
+            <Button
               type="button"
+              variant="link"
+              size="sm"
               data-testid={`post-image-prev-${postId}`}
               onClick={onPrevious}
               className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white hover:bg-black/60"
               aria-label="Previous image"
             >
               ←
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="link"
+              size="sm"
               data-testid={`post-image-next-${postId}`}
               onClick={onNext}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2 py-1 text-sm text-white hover:bg-black/60"
               aria-label="Next image"
             >
               →
-            </button>
+            </Button>
             <div className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-0.5 text-xs text-white">
               {currentImageIndex + 1}/{postImages.length}
             </div>
@@ -70,9 +75,11 @@ export function PostCardMediaSection({
       {postImages.length > 1 && (
         <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
           {postImages.map((image, index) => (
-            <button
+            <Button
               key={image.id}
               type="button"
+              variant="link"
+              size="sm"
               data-testid={`post-image-thumb-${postId}-${index}`}
               onClick={() => onSelectImage(index)}
               className={`shrink-0 overflow-hidden rounded border-2 ${
@@ -87,7 +94,7 @@ export function PostCardMediaSection({
                 alt="Post image thumbnail"
                 className="h-12 w-12 object-cover"
               />
-            </button>
+            </Button>
           ))}
         </div>
       )}

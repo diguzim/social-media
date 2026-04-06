@@ -54,25 +54,29 @@ export function PostCardCommentsSection({
       <h4 className="mb-2 text-sm font-semibold text-slate-800">Comments</h4>
 
       {!isCommentsVisible && (
-        <button
+        <Button
           type="button"
+          variant="link"
+          size="sm"
           data-testid={`comments-open-${postId}`}
           onClick={onOpenComments}
-          className="mb-3 text-xs font-medium text-blue-600 hover:underline"
+          className="mb-3"
         >
           Show comments
-        </button>
+        </Button>
       )}
 
       {isCommentsVisible && (
-        <button
+        <Button
           type="button"
+          variant="link"
+          size="sm"
           data-testid={`comments-close-${postId}`}
           onClick={onCloseComments}
-          className="mb-3 text-xs font-medium text-slate-600 hover:underline"
+          className="mb-3 text-slate-600 hover:text-slate-700"
         >
           Hide comments
-        </button>
+        </Button>
       )}
 
       {!isCommentsVisible ? null : (
@@ -142,7 +146,7 @@ export function PostCardCommentsSection({
                           disabled={isMutating}
                         />
                         <div className="mt-2 flex gap-2">
-                          <button
+                          <Button
                             type="button"
                             data-testid={`comment-edit-save-${postId}-${comment.id}`}
                             onClick={() => onUpdateComment(comment.id)}
@@ -150,8 +154,8 @@ export function PostCardCommentsSection({
                             disabled={isMutating || !editingCommentContent.trim()}
                           >
                             Save
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
                             data-testid={`comment-edit-cancel-${postId}-${comment.id}`}
                             onClick={onCancelEditComment}
@@ -159,7 +163,7 @@ export function PostCardCommentsSection({
                             disabled={isMutating}
                           >
                             Cancel
-                          </button>
+                          </Button>
                         </div>
                       </>
                     ) : (
@@ -168,24 +172,28 @@ export function PostCardCommentsSection({
 
                     {isOwner && !isEditing && (
                       <div className="mt-2 flex gap-2">
-                        <button
+                        <Button
                           type="button"
+                          variant="link"
+                          size="sm"
                           data-testid={`comment-edit-${postId}-${comment.id}`}
                           onClick={() => onStartEditComment(comment)}
-                          className="text-xs font-medium text-blue-600 hover:underline"
+                          className="p-0"
                           disabled={isMutating}
                         >
                           Edit
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
+                          variant="link"
+                          size="sm"
                           data-testid={`comment-delete-${postId}-${comment.id}`}
                           onClick={() => onDeleteComment(comment.id)}
-                          className="text-xs font-medium text-danger-600 hover:underline"
+                          className="p-0 text-danger-600 hover:text-danger-700"
                           disabled={isMutating}
                         >
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </li>

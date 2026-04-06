@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Button } from '@repo/ui';
 import {
   RegisterStateContractProvider,
   useRegisterStateContract,
@@ -13,12 +14,12 @@ function TestConsumer() {
     <div>
       <span data-testid="register-state-name">{state.formData.name}</span>
       <span data-testid="register-state-valid">{String(state.isFormValid)}</span>
-      <button
+      <Button
         data-testid="register-update-btn"
         onClick={() => actions.updateField('name', 'Updated Name')}
       >
         update
-      </button>
+      </Button>
     </div>
   );
 }

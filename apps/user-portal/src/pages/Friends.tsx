@@ -150,13 +150,14 @@ export function Friends() {
                       Accept
                     </Button>
                     <Button
+                      variant="destructive"
                       data-testid={`incoming-reject-${request.id}`}
                       isPending={state.pendingRequestId === request.id}
                       pendingText="Rejecting..."
                       onClick={() => {
                         void actions.rejectRequest(request.id);
                       }}
-                      className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                      className="rounded-md px-3 py-2 text-sm font-medium"
                     >
                       Reject
                     </Button>

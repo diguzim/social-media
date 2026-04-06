@@ -1,3 +1,4 @@
+import { Button } from '@repo/ui';
 import type { EditableImage } from './types';
 
 interface PostCardEditFormProps {
@@ -86,10 +87,12 @@ export function PostCardEditForm({
                 data-testid={`post-edit-image-item-${postId}-${index}`}
                 className="group relative"
               >
-                <button
+                <Button
                   type="button"
                   onClick={() => onSelectImage(index)}
-                  className="overflow-hidden rounded border-2 border-slate-300 hover:border-primary-400"
+                  variant="link"
+                  size="sm"
+                  className="overflow-hidden rounded border-2 border-slate-300 p-0 hover:border-primary-400"
                   aria-label={`Select image ${index + 1}`}
                 >
                   <img
@@ -97,16 +100,18 @@ export function PostCardEditForm({
                     alt="Editable post thumbnail"
                     className="h-14 w-14 object-cover"
                   />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="link"
+                  size="sm"
                   data-testid={`post-edit-image-remove-${postId}-${index}`}
                   onClick={() => onRemoveImage(image.key)}
                   disabled={isPostSaving}
                   className="absolute -right-1 -top-1 rounded-full bg-danger-600 px-1.5 py-0.5 text-[10px] font-semibold text-white"
                 >
                   ×
-                </button>
+                </Button>
                 {image.kind === 'new' && (
                   <span className="absolute bottom-0 left-0 rounded-tr bg-primary-700 px-1 text-[10px] text-white">
                     New

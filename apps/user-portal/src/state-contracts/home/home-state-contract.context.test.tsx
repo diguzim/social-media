@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Button } from '@repo/ui';
 import { StateContractsProvider, useHomeStateContract, type UseHomeStateContract } from './index';
 
 function TestConsumer() {
@@ -9,9 +10,9 @@ function TestConsumer() {
     <div>
       <span data-testid="state-user-name">{state.user?.name ?? 'none'}</span>
       <span data-testid="state-feed-key">{state.feedRefreshKey}</span>
-      <button data-testid="state-refresh-btn" onClick={actions.refreshFeed}>
+      <Button data-testid="state-refresh-btn" onClick={actions.refreshFeed}>
         refresh
-      </button>
+      </Button>
     </div>
   );
 }

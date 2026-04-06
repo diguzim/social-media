@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Button } from '@repo/ui';
 import {
   UserProfileStateContractProvider,
   useUserProfileStateContract,
@@ -16,24 +17,24 @@ function TestConsumer() {
       <span data-testid="user-profile-state-posts-count">{state.posts.length}</span>
       <span data-testid="user-profile-state-error">{state.error}</span>
       <span data-testid="user-profile-state-loading">{String(state.isLoading)}</span>
-      <button data-testid="user-profile-refresh-btn" onClick={() => actions.refresh()}>
+      <Button data-testid="user-profile-refresh-btn" onClick={() => actions.refresh()}>
         refresh
-      </button>
-      <button data-testid="user-profile-refresh-posts-btn" onClick={() => actions.refreshPosts()}>
+      </Button>
+      <Button data-testid="user-profile-refresh-posts-btn" onClick={() => actions.refreshPosts()}>
         refresh-posts
-      </button>
-      <button
+      </Button>
+      <Button
         data-testid="user-profile-send-friend-request-btn"
         onClick={() => actions.sendFriendRequest()}
       >
         send-friend-request
-      </button>
-      <button
+      </Button>
+      <Button
         data-testid="user-profile-load-next-posts-btn"
         onClick={() => actions.loadNextPostsPage()}
       >
         next-posts
-      </button>
+      </Button>
     </div>
   );
 }

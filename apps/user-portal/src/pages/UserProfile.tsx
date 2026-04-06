@@ -358,8 +358,10 @@ export function UserProfile() {
                               : 'border-slate-200 bg-white'
                           }`}
                         >
-                          <button
+                          <Button
                             type="button"
+                            variant="link"
+                            size="sm"
                             data-testid={`user-profile-photos-album-card-${album.id}`}
                             onClick={() => {
                               setSelectedAlbumId(album.id);
@@ -385,7 +387,7 @@ export function UserProfile() {
                               {album.name}
                             </h4>
                             <p className="text-xs text-slate-500">{album.photos.length} photos</p>
-                          </button>
+                          </Button>
                         </article>
                       ))}
                     </div>
@@ -401,8 +403,10 @@ export function UserProfile() {
                         </h3>
                         <p className="text-sm text-slate-500">Album photos</p>
                       </div>
-                      <button
+                      <Button
                         type="button"
+                        variant="secondary"
+                        size="sm"
                         data-testid="user-profile-photos-selected-album-close-button"
                         onClick={() => {
                           setSelectedAlbumId(null);
@@ -410,7 +414,7 @@ export function UserProfile() {
                         className="rounded-md border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
                       >
                         Close album
-                      </button>
+                      </Button>
                     </div>
 
                     {selectedAlbum.photos.length === 0 ? (
@@ -418,20 +422,23 @@ export function UserProfile() {
                     ) : (
                       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                         {selectedAlbum.photos.map((photo) => (
-                          <button
+                          <Button
                             key={photo.id}
                             type="button"
+                            variant="link"
+                            size="sm"
                             data-testid={`user-profile-photos-album-image-${photo.id}`}
                             onClick={() => {
                               setSelectedPhotoId(photo.id);
                             }}
+                            className="p-0"
                           >
                             <img
                               src={photo.imageUrl}
                               alt={photo.description ?? `${selectedAlbum.name} photo`}
                               className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
                             />
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     )}
@@ -450,20 +457,23 @@ export function UserProfile() {
                   ) : (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                       {photosData.unsortedPhotos.map((photo) => (
-                        <button
+                        <Button
                           key={photo.id}
                           type="button"
+                          variant="link"
+                          size="sm"
                           data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
                           onClick={() => {
                             setSelectedPhotoId(photo.id);
                           }}
+                          className="p-0"
                         >
                           <img
                             src={photo.imageUrl}
                             alt={photo.description ?? 'Photo'}
                             className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
                           />
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   )}

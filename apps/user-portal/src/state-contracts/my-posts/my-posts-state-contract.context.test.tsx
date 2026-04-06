@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Button } from '@repo/ui';
 import {
   MyPostsStateContractProvider,
   useMyPostsStateContract,
@@ -14,12 +15,12 @@ function TestConsumer() {
       <span data-testid="my-posts-state-count">{state.posts.length}</span>
       <span data-testid="my-posts-state-loading">{String(state.isLoading)}</span>
       <span data-testid="my-posts-state-has-more">{String(state.hasMore)}</span>
-      <button data-testid="my-posts-refresh-btn" onClick={() => void actions.refresh()}>
+      <Button data-testid="my-posts-refresh-btn" onClick={() => void actions.refresh()}>
         refresh
-      </button>
-      <button data-testid="my-posts-load-next-btn" onClick={() => void actions.loadNextPage()}>
+      </Button>
+      <Button data-testid="my-posts-load-next-btn" onClick={() => void actions.loadNextPage()}>
         load-next
-      </button>
+      </Button>
     </div>
   );
 }

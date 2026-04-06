@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '@repo/ui';
 import { requestEmailVerification } from '../services/auth';
 
 interface UnverifiedEmailBannerProps {
@@ -37,14 +38,17 @@ export function UnverifiedEmailBanner({ onVerified: _onVerified }: UnverifiedEma
             Email sent! Check your inbox.
           </span>
         ) : (
-          <button
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
             data-testid="unverified-email-banner-resend-button"
             onClick={handleResend}
             disabled={sending}
-            className="underline font-medium hover:text-yellow-900 disabled:opacity-50 cursor-pointer"
+            className="cursor-pointer font-medium text-yellow-800 underline hover:text-yellow-900"
           >
             {sending ? 'Sending…' : 'Resend verification email'}
-          </button>
+          </Button>
         )}
 
         {error && (

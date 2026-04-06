@@ -1,3 +1,5 @@
+import { Button } from '@repo/ui';
+
 export type ProfileSectionKey = 'timeline' | 'photos' | 'about' | 'friends' | 'personal';
 
 export interface ProfileSectionTab {
@@ -57,10 +59,13 @@ export function ProfileSectionsTabs({
         const isActive = tab.key === activeSection;
 
         return (
-          <button
+          <Button
             key={tab.key}
             data-testid={`${testIdPrefix}-tab-${tab.key}`}
             type="button"
+            variant="toggle"
+            size="sm"
+            pressed={isActive}
             role="tab"
             aria-selected={isActive}
             onClick={() => {
@@ -73,7 +78,7 @@ export function ProfileSectionsTabs({
             }`}
           >
             {tab.label}
-          </button>
+          </Button>
         );
       })}
     </div>

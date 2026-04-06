@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Button } from '@repo/ui';
 import {
   LoginStateContractProvider,
   useLoginStateContract,
@@ -13,12 +14,12 @@ function TestConsumer() {
     <div>
       <span data-testid="login-state-email">{state.formData.email}</span>
       <span data-testid="login-state-valid">{String(state.isFormValid)}</span>
-      <button
+      <Button
         data-testid="login-update-btn"
         onClick={() => actions.updateField('email', 'updated@example.com')}
       >
         update
-      </button>
+      </Button>
     </div>
   );
 }

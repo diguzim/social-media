@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Button } from '@repo/ui';
 import { clearAuth } from '../utils/auth';
 import { getUserProfile } from '../services/auth';
 
@@ -48,13 +49,14 @@ export function Navbar() {
       </h1>
 
       <div data-testid="navbar-menu-container" className="relative">
-        <button
+        <Button
+          type="button"
           data-testid="navbar-menu-button"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/80"
         >
           Menu ▼
-        </button>
+        </Button>
 
         {isDropdownOpen && (
           <div
@@ -77,16 +79,20 @@ export function Navbar() {
             >
               Account settings
             </Link>
-            <button
+            <Button
+              type="button"
+              variant="destructive"
+              fullWidth
+              size="sm"
               data-testid="navbar-logout-button"
               onClick={() => {
                 setIsDropdownOpen(false);
                 handleLogout();
               }}
-              className="block w-full rounded-b-md px-4 py-3 text-left text-sm text-danger-600 transition hover:bg-slate-100"
+              className="justify-start rounded-none rounded-b-md px-4 py-3"
             >
               Logout
-            </button>
+            </Button>
           </div>
         )}
       </div>

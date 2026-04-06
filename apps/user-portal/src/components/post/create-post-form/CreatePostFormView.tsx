@@ -93,7 +93,7 @@ export function CreatePostFormView({
                   className="flex items-center justify-between rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700"
                 >
                   <span className="truncate">{image.name}</span>
-                  <button
+                  <Button
                     type="button"
                     data-testid={`create-post-remove-image-${index}`}
                     onClick={() => onRemoveImage(index)}
@@ -101,7 +101,7 @@ export function CreatePostFormView({
                     disabled={isSubmitting}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>

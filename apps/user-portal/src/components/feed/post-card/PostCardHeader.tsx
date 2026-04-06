@@ -93,7 +93,7 @@ export function PostCardHeader({
                 >
                   Save
                 </Button>
-                <button
+                <Button
                   type="button"
                   data-testid={`post-edit-cancel-${postId}`}
                   onClick={onCancelEdit}
@@ -101,18 +101,18 @@ export function PostCardHeader({
                   className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                 >
                   Cancel
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <button
+                <Button
                   type="button"
                   data-testid={`post-edit-${postId}`}
                   onClick={onEnterEditMode}
                   className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
                 >
                   Edit
-                </button>
+                </Button>
                 <Button
                   data-testid={`post-delete-${postId}`}
                   onClick={onDeletePost}
@@ -132,6 +132,7 @@ export function PostCardHeader({
           data-testid={`like-button-${postId}`}
           onClick={onLikeClick}
           disabled={isLikePending}
+          pressed={likedByMe}
           aria-label={likedByMe ? 'Unlike post' : 'Like post'}
           className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
             likedByMe
