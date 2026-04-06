@@ -128,6 +128,10 @@
 		@apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
 	}
 
+	.btn-secondary {
+		@apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 focus:ring-slate-400;
+	}
+
 	.link-primary {
 		@apply font-medium text-primary-600 hover:text-primary-700 hover:underline;
 	}

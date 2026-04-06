@@ -1,6 +1,6 @@
 import type { LoginRequest } from '../services/auth';
 import type { ChangeEvent, FormEvent } from 'react';
-import { Container, Section, Stack } from '@repo/ui';
+import { Button, Container, Section, Stack } from '@repo/ui';
 import { useLoginStateContract } from '../state-contracts/login';
 
 const LOGIN_FIELDS = ['email', 'password'] as const;
@@ -70,14 +70,16 @@ export function Login() {
               </div>
             )}
 
-            <button
+            <Button
               data-testid="login-submit-button"
               type="submit"
               disabled={!state.isFormValid || state.isLoading}
-              className="btn-primary w-full"
+              fullWidth
+              isPending={state.isLoading}
+              pendingText="Logging in..."
             >
-              {state.isLoading ? 'Logging in...' : 'Login'}
-            </button>
+              Login
+            </Button>
           </form>
 
           <p className="text-center text-sm text-slate-600">

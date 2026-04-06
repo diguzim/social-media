@@ -1,5 +1,5 @@
+import { Button } from '@repo/ui';
 import { Link } from 'react-router-dom';
-import { PendingButton } from '../../loading/PendingButton';
 
 interface PostCardHeaderProps {
   postId: string;
@@ -83,15 +83,16 @@ export function PostCardHeader({
           <>
             {isEditingPost ? (
               <>
-                <PendingButton
+                <Button
                   data-testid={`post-save-${postId}`}
                   onClick={onSavePost}
                   disabled={isPostSaving}
                   className="rounded-md bg-primary-600 px-2 py-1 text-xs font-medium text-white hover:bg-primary-700"
                   isPending={isPostSaving}
-                  idleText="Save"
                   pendingText="Saving..."
-                />
+                >
+                  Save
+                </Button>
                 <button
                   type="button"
                   data-testid={`post-edit-cancel-${postId}`}
@@ -112,21 +113,22 @@ export function PostCardHeader({
                 >
                   Edit
                 </button>
-                <PendingButton
+                <Button
                   data-testid={`post-delete-${postId}`}
                   onClick={onDeletePost}
                   disabled={isPostDeleting}
                   className="rounded-md bg-danger-50 px-2 py-1 text-xs font-medium text-danger-700 hover:bg-danger-100"
                   isPending={isPostDeleting}
-                  idleText="Delete"
                   pendingText="Deleting..."
-                />
+                >
+                  Delete
+                </Button>
               </>
             )}
           </>
         )}
 
-        <PendingButton
+        <Button
           data-testid={`like-button-${postId}`}
           onClick={onLikeClick}
           disabled={isLikePending}
@@ -137,9 +139,10 @@ export function PostCardHeader({
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
           isPending={isLikePending}
-          idleText={likedByMe ? '❤️ Liked' : '🤍 Like'}
           pendingText="..."
-        />
+        >
+          {likedByMe ? '❤️ Liked' : '🤍 Like'}
+        </Button>
         <span data-testid={`like-count-${postId}`} className="text-xs text-slate-600">
           {likeCount}
         </span>

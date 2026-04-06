@@ -1,6 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import type { RegisterRequest } from '../services/auth';
-import { Container, Section, Stack } from '@repo/ui';
+import { Button, Container, Section, Stack } from '@repo/ui';
 import { useRegisterStateContract } from '../state-contracts/register';
 
 const REGISTER_FIELDS = ['name', 'username', 'email', 'password'] as const;
@@ -102,14 +102,16 @@ export function Register() {
               </div>
             )}
 
-            <button
+            <Button
               data-testid="register-submit-button"
               type="submit"
               disabled={!state.isFormValid || state.isLoading}
-              className="btn-primary w-full"
+              fullWidth
+              isPending={state.isLoading}
+              pendingText="Registering..."
             >
-              {state.isLoading ? 'Registering...' : 'Register'}
-            </button>
+              Register
+            </Button>
           </form>
 
           <div className="text-center text-sm text-slate-600">

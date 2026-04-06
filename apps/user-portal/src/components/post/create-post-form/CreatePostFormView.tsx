@@ -1,5 +1,5 @@
-import { PendingButton } from '../../loading/PendingButton';
 import type { FormEvent } from 'react';
+import { Button } from '@repo/ui';
 
 interface CreatePostFormViewProps {
   title: string;
@@ -120,14 +120,15 @@ export function CreatePostFormView({
           </p>
         )}
 
-        <PendingButton
+        <Button
           type="submit"
           data-testid="create-post-submit-button"
           isPending={isSubmitting}
-          idleText="Create Post"
           pendingText="Creating..."
           className="btn btn-primary w-full"
-        />
+        >
+          Create Post
+        </Button>
       </form>
     </section>
   );

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { PendingButton } from '../loading/PendingButton';
+import { Button } from '@repo/ui';
 
 interface AvatarUploadProps {
   isUploading: boolean;
@@ -94,15 +94,16 @@ export function AvatarUpload({ isUploading, error, onUpload }: AvatarUploadProps
         </p>
       )}
 
-      <PendingButton
+      <Button
         data-testid="profile-avatar-upload-button"
         isPending={isUploading}
-        idleText="Upload picture"
         pendingText="Uploading..."
         onClick={handleSubmit}
         className="btn btn-primary mt-4"
         disabled={!file}
-      />
+      >
+        Upload picture
+      </Button>
     </div>
   );
 }

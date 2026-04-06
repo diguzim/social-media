@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from '@repo/ui';
 import { HomeProfileSummary } from '../components/home/HomeProfileSummary';
 import { SectionSkeleton } from '../components/loading/SectionSkeleton';
 import { InlineStatus } from '../components/loading/InlineStatus';
-import { PendingButton } from '../components/loading/PendingButton';
 
 function HomeScenariosCanvas() {
   const user = {
@@ -43,12 +43,9 @@ function HomeScenariosCanvas() {
           <p className="mb-3 text-slate-700">
             Create post form remains visible while submit is pending.
           </p>
-          <PendingButton
-            isPending
-            idleText="Create Post"
-            pendingText="Creating..."
-            className="btn btn-primary w-full"
-          />
+          <Button isPending pendingText="Creating..." className="btn btn-primary w-full">
+            Create Post
+          </Button>
         </div>
       </section>
     </div>

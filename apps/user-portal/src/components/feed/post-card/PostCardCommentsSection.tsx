@@ -1,5 +1,5 @@
+import { Button } from '@repo/ui';
 import type { PostComment } from '../../../services/posts';
-import { PendingButton } from '../../loading/PendingButton';
 
 interface PostCardCommentsSectionProps {
   postId: string;
@@ -87,15 +87,16 @@ export function PostCardCommentsSection({
               className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100"
               disabled={isCommentCreating}
             />
-            <PendingButton
+            <Button
               data-testid={`comment-submit-${postId}`}
               onClick={onCreateComment}
               disabled={isCommentCreating || !newCommentContent.trim()}
               className="btn-primary self-start rounded-full px-4 py-2 text-sm font-semibold shadow-sm"
               isPending={isCommentCreating}
-              idleText="Comment"
               pendingText="..."
-            />
+            >
+              Comment
+            </Button>
           </div>
 
           {commentsError && (

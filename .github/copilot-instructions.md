@@ -147,7 +147,7 @@ When introducing a new domain/entity that is backed by an in-memory repository, 
 - Prevent layout shift during loading (reserve space with skeleton containers/min heights)
 - For form actions (login/register/create post), keep forms visible while pending: disable submit, show inline pending feedback, and prevent duplicate submissions
 - Prefer request deduplication + abort stale requests + stale-while-revalidate behavior for smoother progressive rendering
-- Default shared loading primitives should live under `src/components/loading/` (for example: `LoadingBlock`, `SectionSkeleton`, `PendingButton`, `InlineStatus`)
+- Default shared loading primitives should live under `src/components/loading/` (for example: `LoadingBlock`, `SectionSkeleton`, `InlineStatus`)
 - Prefer introducing loading primitives before refactoring pages so page migrations reuse the same visual language
 - Recommended first rollout order: `Home` page → `Profile` page → `MyPosts` page → shared form pending states
 - For the `Home` page, prefer these initial islands: profile summary, create-post form, feed list

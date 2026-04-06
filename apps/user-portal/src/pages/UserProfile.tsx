@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { API } from '@repo/contracts';
+import { Button, Container, Modal, Section, Stack } from '@repo/ui';
 import { useUserProfileStateContract } from '../state-contracts/user-profile';
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
-import { PendingButton } from '../components/loading/PendingButton';
-import { Container, Modal, Section, Stack } from '@repo/ui';
 import {
   PROFILE_SECTION_TABS,
   ProfileSectionsTabs,
@@ -247,16 +246,17 @@ export function UserProfile() {
             </p>
 
             {!isOwnProfile && friendshipStatus === 'none' ? (
-              <PendingButton
+              <Button
                 data-testid="user-profile-send-friend-request"
                 isPending={isFriendshipActionPending}
-                idleText="Add friend"
                 pendingText="Sending..."
                 onClick={() => {
                   void actions.sendFriendRequest();
                 }}
                 className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700"
-              />
+              >
+                Add friend
+              </Button>
             ) : null}
 
             {friendshipError ? (

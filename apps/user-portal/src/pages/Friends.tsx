@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Container, Stack } from '@repo/ui';
+import { Button, Container, Stack } from '@repo/ui';
 import { useFriendsStateContract } from '../state-contracts/friends';
-import { PendingButton } from '../components/loading/PendingButton';
 
 function UserIdentityCard({
   id,
@@ -139,26 +138,28 @@ export function Friends() {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <PendingButton
+                    <Button
                       data-testid={`incoming-accept-${request.id}`}
                       isPending={state.pendingRequestId === request.id}
-                      idleText="Accept"
                       pendingText="Accepting..."
                       onClick={() => {
                         void actions.acceptRequest(request.id);
                       }}
                       className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700"
-                    />
-                    <PendingButton
+                    >
+                      Accept
+                    </Button>
+                    <Button
                       data-testid={`incoming-reject-${request.id}`}
                       isPending={state.pendingRequestId === request.id}
-                      idleText="Reject"
                       pendingText="Rejecting..."
                       onClick={() => {
                         void actions.rejectRequest(request.id);
                       }}
                       className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                    />
+                    >
+                      Reject
+                    </Button>
                   </div>
                 </li>
               ))}
