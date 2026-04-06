@@ -321,7 +321,7 @@ Requirements:
 - Arbitrary values should be rare and justified.
 - Base components should keep a small variant surface such as `size`, `variant`, and `state`.
 - Complex styling should live inside components, not be rebuilt ad hoc in apps.
-- `cva` or an equivalent variant helper is the preferred way to manage variant classes.
+- `cva` or an equivalent variant helper is the preferred way to manage variant classes, and `twMerge` (or equivalent) can be used to safely combine component defaults with `className` overrides.
 - **Note:** exact linting/enforcement can stay lighter-weight and evolve over time.
 
 #### 6) Component taxonomy
