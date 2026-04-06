@@ -68,6 +68,10 @@ describe('PostCard', () => {
     expect(screen.getByTestId('post-title-post-1')).toHaveTextContent('My first post');
     expect(screen.getByTestId('post-content-post-1')).toHaveTextContent('Hello feed!');
     expect(screen.getByTestId('post-author-link-post-1')).toHaveTextContent('Alice');
+    expect(screen.getByTestId('post-author-avatar-link-post-1')).toHaveAttribute(
+      'href',
+      '/users/alice'
+    );
     expect(screen.getByTestId('post-author-avatar-post-1')).toBeInTheDocument();
     expect(screen.getByTestId('post-created-at-post-1')).toBeInTheDocument();
   });
@@ -87,6 +91,10 @@ describe('PostCard', () => {
     );
 
     expect(screen.getByTestId('post-author-link-post-2')).toHaveTextContent('Bob');
+    expect(screen.getByTestId('post-author-avatar-link-post-2')).toHaveAttribute(
+      'href',
+      '/users/bob'
+    );
     expect(screen.getByTestId('post-author-avatar-fallback-post-2')).toHaveTextContent('B');
   });
 

@@ -47,22 +47,29 @@ export function PostCardHeader({
   return (
     <header className="mb-3 flex items-start justify-between gap-3">
       <div className="flex min-w-0 items-center gap-3">
-        {hasAvatar ? (
-          <img
-            data-testid={`post-author-avatar-${postId}`}
-            src={authorAvatarUrl}
-            alt={`${authorLabel} profile picture`}
-            className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover"
-          />
-        ) : (
-          <div
-            data-testid={`post-author-avatar-fallback-${postId}`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
-            aria-label={`${authorLabel} avatar fallback`}
-          >
-            {authorInitial}
-          </div>
-        )}
+        <Link
+          data-testid={`post-author-avatar-link-${postId}`}
+          to={`/users/${authorUsername}`}
+          className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+          aria-label={`View ${authorLabel}'s profile`}
+        >
+          {hasAvatar ? (
+            <img
+              data-testid={`post-author-avatar-${postId}`}
+              src={authorAvatarUrl}
+              alt={`${authorLabel} profile picture`}
+              className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+            />
+          ) : (
+            <div
+              data-testid={`post-author-avatar-fallback-${postId}`}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
+              aria-label={`${authorLabel} avatar fallback`}
+            >
+              {authorInitial}
+            </div>
+          )}
+        </Link>
 
         <div className="min-w-0">
           <Link

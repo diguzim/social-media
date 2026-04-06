@@ -459,41 +459,41 @@ export function UserProfile() {
           />
         </Modal>
 
-        <Section dataTestId="user-profile-meta" hasBorder background="primary" padding="p-4">
-          <div data-testid="user-profile-friendship-section" className="space-y-2">
-            <p data-testid="user-profile-friendship-status" className="text-sm text-slate-700">
-              {isOwnProfile
-                ? 'This is your profile.'
-                : friendshipStatus === 'friends'
+        {!isOwnProfile && (
+          <Section dataTestId="user-profile-meta" hasBorder background="primary" padding="p-4">
+            <div data-testid="user-profile-friendship-section" className="space-y-2">
+              <p data-testid="user-profile-friendship-status" className="text-sm text-slate-700">
+                {friendshipStatus === 'friends'
                   ? 'You are friends.'
                   : friendshipStatus === 'pending_outgoing'
                     ? 'Friend request pending approval.'
                     : friendshipStatus === 'pending_incoming'
                       ? 'This user sent you a friend request.'
                       : 'You are not friends yet.'}
-            </p>
-
-            {!isOwnProfile && friendshipStatus === 'none' ? (
-              <Button
-                data-testid="user-profile-send-friend-request"
-                isPending={isFriendshipActionPending}
-                pendingText="Sending..."
-                onClick={() => {
-                  void actions.sendFriendRequest();
-                }}
-                className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700"
-              >
-                Add friend
-              </Button>
-            ) : null}
-
-            {friendshipError ? (
-              <p data-testid="user-profile-friendship-error" className="text-sm text-danger-600">
-                {friendshipError}
               </p>
-            ) : null}
-          </div>
-        </Section>
+
+              {!isOwnProfile && friendshipStatus === 'none' ? (
+                <Button
+                  data-testid="user-profile-send-friend-request"
+                  isPending={isFriendshipActionPending}
+                  pendingText="Sending..."
+                  onClick={() => {
+                    void actions.sendFriendRequest();
+                  }}
+                  className="rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700"
+                >
+                  Add friend
+                </Button>
+              ) : null}
+
+              {friendshipError ? (
+                <p data-testid="user-profile-friendship-error" className="text-sm text-danger-600">
+                  {friendshipError}
+                </p>
+              ) : null}
+            </div>
+          </Section>
+        )}
 
         <ProfileSectionsTabs
           tabs={PROFILE_SECTION_TABS}

@@ -20,22 +20,29 @@ function UserIdentityCard({
 
   return (
     <div className="flex items-center gap-3">
-      {hasAvatar ? (
-        <img
-          data-testid={`${testIdPrefix}-avatar-${id}`}
-          src={avatarUrl}
-          alt={`${name} profile picture`}
-          className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover"
-        />
-      ) : (
-        <div
-          data-testid={`${testIdPrefix}-avatar-fallback-${id}`}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
-          aria-label={`${name} avatar fallback`}
-        >
-          {initial}
-        </div>
-      )}
+      <Link
+        data-testid={`${testIdPrefix}-avatar-link-${id}`}
+        to={`/users/${username}`}
+        className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+        aria-label={`View ${name}'s profile`}
+      >
+        {hasAvatar ? (
+          <img
+            data-testid={`${testIdPrefix}-avatar-${id}`}
+            src={avatarUrl}
+            alt={`${name} profile picture`}
+            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+          />
+        ) : (
+          <div
+            data-testid={`${testIdPrefix}-avatar-fallback-${id}`}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700"
+            aria-label={`${name} avatar fallback`}
+          >
+            {initial}
+          </div>
+        )}
+      </Link>
 
       <div>
         <Link
