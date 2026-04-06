@@ -39,6 +39,7 @@ export function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/" element={<Home />} />
             <Route path="/users/:username" element={<UserProfile />} />
+            <Route path="/users/:username/:section/*" element={<UserProfile />} />
             <Route path="/users/:username/:section" element={<UserProfile />} />
             <Route path="/account" element={<AccountSettingsLayout />}>
               <Route index element={<Navigate to="personal-data" replace />} />

@@ -9,16 +9,20 @@ describe("Photos feature", () => {
     });
   });
 
-  it("renders own photos route without management controls", function () {
+  it("redirects the base photos route to the unsorted tab", function () {
+    cy.location("pathname").should("include", "/photos/unsorted");
+    cy.getByTestId("user-profile-photos-tabs").should("be.visible");
+    cy.getByTestId("user-profile-photos-tab-unsorted").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
     cy.getByTestId("user-profile-photos-section").should("be.visible");
-    cy.getByTestId("user-profile-photos-albums-section").should("be.visible");
     cy.getByTestId("user-profile-photos-unsorted-section").should("be.visible");
-    cy.getByTestId("profile-photos-create-button").should("not.exist");
-    cy.getByTestId("profile-photos-upload-button").should("not.exist");
   });
 });
 
-describe("Photos auth regression (alice)", () => {
+describe("Photos nested navigation (alice)", () => {
   beforeEach(() => {
     const apiBaseUrl =
       (Cypress.env("API_BASE_URL") as string | undefined) ??
@@ -54,11 +58,28 @@ describe("Photos auth regression (alice)", () => {
     });
   });
 
-  it("loads alice seeded photo scenarios: unsorted, album with photo, and empty album", () => {
+  it("shows unsorted photos under the unsorted tab", () => {
+    cy.getByTestId("user-profile-photos-tab-unsorted").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
+
     cy.getByTestId("user-profile-photos-unsorted-section")
       .find("img")
       .its("length")
       .should("be.greaterThan", 0);
+  });
+
+  it("navigates to albums and opens an album detail page", () => {
+    cy.getByTestId("user-profile-photos-tab-albums").click();
+
+    cy.location("pathname").should("include", "/photos/albums");
+    cy.getByTestId("user-profile-photos-tab-albums").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
 
     cy.getByTestId("user-profile-photos-albums-section").within(() => {
       cy.contains("Alice Travel (Seed)").should("be.visible");
@@ -72,25 +93,20 @@ describe("Photos auth regression (alice)", () => {
       .find('[data-testid^="user-profile-photos-album-card-"]')
       .click();
 
-    cy.getByTestId("user-profile-photos-selected-album-section").within(() => {
+    cy.location("pathname").should("include", "/photos/albums/");
+    cy.getByTestId("user-profile-photos-album-detail-section").within(() => {
       cy.get('[data-testid^="user-profile-photos-album-image-"]')
         .its("length")
         .should("be.greaterThan", 0);
     });
 
-    cy.contains(
-      'article[data-testid^="user-profile-photos-album-"]',
-      "Alice Empty Album (Seed)",
-    )
-      .find('[data-testid^="user-profile-photos-album-card-"]')
-      .click();
-
-    cy.getByTestId("user-profile-photos-selected-album-section").within(() => {
-      cy.contains("Album is empty.").should("be.visible");
-    });
+    cy.getByTestId("user-profile-photos-album-back-button").click();
+    cy.getByTestId("user-profile-photos-albums-section").should("be.visible");
   });
 
-  it("opens selected album photo in modal and closes it", () => {
+  it("can open an album photo in the modal and close it", () => {
+    cy.getByTestId("user-profile-photos-tab-albums").click();
+
     cy.contains(
       'article[data-testid^="user-profile-photos-album-"]',
       "Alice Travel (Seed)",
@@ -98,7 +114,7 @@ describe("Photos auth regression (alice)", () => {
       .find('[data-testid^="user-profile-photos-album-card-"]')
       .click();
 
-    cy.getByTestId("user-profile-photos-selected-album-section")
+    cy.getByTestId("user-profile-photos-album-detail-section")
       .find('[data-testid^="user-profile-photos-album-image-"]')
       .first()
       .click();

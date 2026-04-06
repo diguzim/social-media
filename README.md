@@ -64,14 +64,15 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - User profile fetched via GET `/users/me` and cached as `user`
    - User redirected to home page
 
-3. **Protected Pages** (`/`, `/users/:username`, `/users/:username/:section`, `/account/*`, `/friends`) - Authenticated user area
+3. **Protected Pages** (`/`, `/users/:username`, `/users/:username/:section`, `/users/:username/photos/*`, `/account/*`, `/friends`) - Authenticated user area
    - Route guard requires both `jwtToken` and `user` in localStorage
    - Home (`/`) shows "Welcome {name}!" and user summary
    - User profile (`/users/:username`) is the single profile route for both self and other users
    - Ownership differentiation is a core behavior switch on user profile routes: route `:username` is compared against the authenticated user profile to drive self vs public behavior
    - Profile sections are URL-driven tabs: Timeline, Photos, About, Friends, Personal Data
+   - Photos section is a nested route area with Unsorted and Albums tabs (`/users/:username/photos/unsorted`, `/users/:username/photos/albums`, `/users/:username/photos/albums/:albumId`)
    - Account management lives in a dedicated settings-like area with left-side vertical navigation and URL-driven subroutes (`/account/personal-data`, `/account/privacy`, `/account/security`, `/account/notifications`, `/account/configurations`, `/account/help-support`)
-   - Photos tab is backend-driven with horizontal album cards, album drill-in, and photo modal viewing (read-only in the unified profile UI)
+   - Photos tab is backend-driven with nested unsorted/albums navigation and photo modal viewing (read-only in the unified profile UI)
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`

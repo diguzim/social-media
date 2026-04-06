@@ -114,6 +114,14 @@ export class InMemoryUserPhotoRepository implements UserPhotoRepository {
         uploadedAt: new Date("2025-01-11T08:00:00.000Z"),
       },
       {
+        id: "uph-1b",
+        ownerUserId: "1",
+        albumId: null,
+        description: "Alice Seed Unsorted 2",
+        filename: "seed-user-photo-alice-unsorted-2.png",
+        uploadedAt: new Date("2025-01-11T08:05:00.000Z"),
+      },
+      {
         id: "uph-2",
         ownerUserId: "1",
         albumId: "alb-1",

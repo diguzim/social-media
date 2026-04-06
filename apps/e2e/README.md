@@ -23,7 +23,7 @@ cypress/
       home.cy.ts          # Home page and profile/feed view
       verify-email.cy.ts  # Email verification page flow
     photos/
-      photos.cy.ts        # Albums + unsorted photos on own/public profile routes
+      photos.cy.ts        # Nested unsorted/albums photos routes on own/public profile pages
     posts/
       feed.cy.ts          # Feed API enrichment and pagination checks
       create-post.cy.ts   # Create post UI flow on Home/My Posts
@@ -234,7 +234,7 @@ Currently covers:
 
 ### Photos
 
-- **Photos/Albums**: Create/update/delete album, use albums-first drill-in flow, open/close photo modal, verify album delete behavior, and verify public profile rendering
+- **Photos/Albums**: Create/update/delete album, navigate nested unsorted/albums photo tabs, open/close photo modal, verify album detail navigation, and verify public profile rendering
 
 ## Best Practices
 

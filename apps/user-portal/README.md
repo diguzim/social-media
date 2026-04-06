@@ -10,7 +10,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Unified profile page (avatar, name, username, stats) served by `/users/:username` for both self and public views
 - Ownership differentiation is explicit on `/users/:username`: route username is compared with authenticated user username to drive self/public behavior
 - URL-driven tabbed profile sections: Timeline, Photos, About, Friends, Personal Data
-- Photos tab supports an albums-first experience (horizontal album cards + drill-in gallery) and photo modal viewing
+- Photos section uses nested routes with Unsorted and Albums tabs, plus album detail navigation and photo modal viewing
 - Dedicated account-management area with left-side vertical navigation and URL subroutes under `/account/*`
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
@@ -32,6 +32,10 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - `/login` - User login form
 - `/users/:username` - Protected public profile page (defaults to Timeline)
 - `/users/:username/:section` - Protected public profile section route (`timeline|photos|about|friends|personal`)
+- `/users/:username/photos` - Protected photos root route (redirects to `/users/:username/photos/unsorted`)
+- `/users/:username/photos/unsorted` - Protected unsorted photos tab
+- `/users/:username/photos/albums` - Protected albums tab
+- `/users/:username/photos/albums/:albumId` - Protected album detail tab
 - `/account` - Protected account settings root (redirects to `/account/personal-data`)
 - `/account/personal-data` - Personal data settings section (default)
 - `/account/privacy` - Privacy settings section (mock)
@@ -91,6 +95,7 @@ Examples:
 - Navbar account settings: `navbar-account-settings-link`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
+- UserProfile photo tabs: `user-profile-photos-tabs`, `user-profile-photos-tab-unsorted`, `user-profile-photos-tab-albums`, `user-profile-photos-unsorted-section`, `user-profile-photos-albums-section`, `user-profile-photos-album-detail-section`, `user-profile-photos-album-back-button`
 - UserProfile avatar actions/modal: `user-profile-avatar-trigger`, `user-profile-avatar-actions-menu`, `user-profile-avatar-see-image-action`, `user-profile-avatar-change-image-action`, `user-profile-avatar-file-input`, `user-profile-avatar-upload-error`, `user-profile-avatar-modal`, `user-profile-avatar-modal-image`, `user-profile-avatar-modal-close-button`
 - Account settings: `account-settings-page`, `account-settings-navigation`, `account-settings-nav-*`
 
