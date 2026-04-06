@@ -21,7 +21,8 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Like/unlike posts with optimistic updates and reaction counts
 - Flat comments CRUD directly on post cards (create, list, edit own, delete own)
 - Feed cards show author avatar + profile link in the header (fallback initial when no avatar)
-- Storybook for visual component validation and loading state scenarios
+- Shared layout primitives consumed from `@repo/ui` (`Container`, `Stack`, `Grid`, `Section`)
+- Storybook for visual validation and loading state scenarios (integration/page focus; component demos are being migrated to `apps/ui-showcase`)
 - Pluggable frontend state architecture via state contracts (interfaces + injectable presenters)
 
 ## Routes
@@ -159,7 +160,7 @@ pnpm build
 src/
   app/            - Application root and routing
   pages/          - Page components (Home, Register, Login, Profile, Friends)
-  components/     - Reusable UI components (e.g., Navbar, Feed, PostCard)
+  components/     - App-level reusable UI composition (shared primitives are in `@repo/ui`)
   components/loading/ - Shared loading primitives (skeletons, pending buttons, inline status)
   components/home/ - Home page island components
   state-contracts/ - Frontend state contracts, presenters, and providers (replaceable state management)

@@ -30,6 +30,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `@repo/exception-filters`: Shared NestJS exception filters
 - `@repo/log-context`: Correlation id, user id, and request duration context
 - `@repo/typescript-config`: Shared TypeScript base config
+- `@repo/ui`: Shared runtime UI primitives/components for frontend apps
 
 ## Infrastructure (Dev)
 

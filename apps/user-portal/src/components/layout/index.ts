@@ -1,16 +1,10 @@
 /**
- * Layout Primitives: Core building blocks for the design system.
- *
- * These components encapsulate responsive design patterns and use design tokens
- * (CSS variables) for consistency across the application.
+ * Layout primitives are shared from @repo/ui.
  *
  * Import examples:
  * ```tsx
- * import { Container, Stack, Grid, Section } from '@/components/layout';
+ * import { Container, Stack, Grid, Section } from '@repo/ui';
  * ```
  */
 
-export { Container } from './Container';
-export { Stack } from './Stack';
-export { Grid } from './Grid';
-export { Section } from './Section';
+export { Container, Grid, Section, Stack } from '@repo/ui';

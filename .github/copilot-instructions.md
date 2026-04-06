@@ -130,7 +130,7 @@ When introducing a new domain/entity that is backed by an in-memory repository, 
 - Use responsive direction/column changes for row↔column and one↔many screen transitions; prefer primitive props or composed wrappers over one-off utility patches when a pattern repeats.
 - Hide or collapse content at breakpoints only for secondary or duplicated content; do not hide essential information from keyboard or reading order.
 - Storybook component demos belong in `apps/ui-showcase`; `apps/user-portal` keeps integration/page stories only.
-- For new shared UI/loading components, add or update stories in `src/**/*.stories.tsx` in the same task
+- For new shared UI/loading components, add or update stories in `apps/ui-showcase/src/**/*.stories.tsx` in the same task; keep `apps/user-portal` stories focused on integration/page behavior
 - For progressive loading UX changes, include stories that cover at least: initial load, section load, background refresh, and interaction pending
 - Always use `data-testid` attributes on interactive elements and key containers
 - JWT token stored in `localStorage` under key `jwtToken`
@@ -181,7 +181,7 @@ When introducing a new domain/entity that is backed by an in-memory repository, 
   - `docs/PRD.md` for feature scope or roadmap changes
   - `docs/ADR.md` when an architectural decision is introduced or changed
   - `.github/copilot-instructions.md` when project conventions or architecture guidance evolve
-  - Storybook stories in `apps/user-portal/src/**/*.stories.tsx` when frontend component behavior/states change
+  - Storybook stories in `apps/ui-showcase/src/**/*.stories.tsx` for shared component changes, and `apps/user-portal/src/**/*.stories.tsx` for integration/page behavior changes
 - If no documentation change is needed, explicitly verify that the existing docs are still accurate before considering the task complete
 - Prefer small, precise documentation updates that stay aligned with the code instead of leaving stale or aspirational text
 - When updating TODO/checklist sections in docs, remove completed items instead of marking them as done (`[x]`); keep TODO lists focused on remaining work only
