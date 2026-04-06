@@ -1,6 +1,6 @@
 import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfiniteScrollObserver';
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
-import { Container, Stack } from '../components/layout';
+import { Container, Stack } from '@repo/ui';
 import { useMyPostsStateContract } from '../state-contracts/my-posts';
 
 export function MyPosts() {

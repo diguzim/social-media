@@ -1,6 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import type { RegisterRequest } from '../services/auth';
-import { Container, Section, Stack } from '../components/layout';
+import { Container, Section, Stack } from '@repo/ui';
 import { useRegisterStateContract } from '../state-contracts/register';
 
 const REGISTER_FIELDS = ['name', 'username', 'email', 'password'] as const;

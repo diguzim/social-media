@@ -6,7 +6,7 @@ import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfi
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
 import { PendingButton } from '../components/loading/PendingButton';
-import { Container, Section, Stack } from '../components/layout';
+import { Container, Section, Stack } from '@repo/ui';
 import {
   PROFILE_SECTION_TABS,
   ProfileSectionsTabs,

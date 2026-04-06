@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Container, Section, Stack } from '../components/layout';
+import { Container, Section, Stack } from '@repo/ui';
 
 export function NotFound() {
   return (

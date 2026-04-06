@@ -1,4 +1,4 @@
-import { Container, Stack } from '../components/layout';
+import { Container, Stack } from '@repo/ui';
 import { HomeCreatePostSection } from '../components/home/HomeCreatePostSection';
 import { HomeFeedSection } from '../components/home/HomeFeedSection';
 import { useHomeStateContract } from '../state-contracts/home';

@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Container, Grid, Section, Stack } from '../../components/layout';
+import { Container, Grid, Section, Stack } from '@repo/ui';
 import { ACCOUNT_SETTINGS_NAV_ITEMS } from './account-settings.routes';
 
 export function AccountSettingsLayout() {

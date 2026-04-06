@@ -1,6 +1,6 @@
 import type { LoginRequest } from '../services/auth';
 import type { ChangeEvent, FormEvent } from 'react';
-import { Container, Section, Stack } from '../components/layout';
+import { Container, Section, Stack } from '@repo/ui';
 import { useLoginStateContract } from '../state-contracts/login';
 
 const LOGIN_FIELDS = ['email', 'password'] as const;

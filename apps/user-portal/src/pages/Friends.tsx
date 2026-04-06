@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
+import { Container, Stack } from '@repo/ui';
 import { useFriendsStateContract } from '../state-contracts/friends';
 import { PendingButton } from '../components/loading/PendingButton';
-import { Container, Stack } from '../components/layout';
 
 function UserIdentityCard({
   id,

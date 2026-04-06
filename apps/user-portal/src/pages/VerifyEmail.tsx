@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Container, Section, Stack } from '../components/layout';
+import { Container, Section, Stack } from '@repo/ui';
 import { confirmEmailVerification } from '../services/auth';
 
 type VerificationState = 'pending' | 'success' | 'already_verified' | 'error';

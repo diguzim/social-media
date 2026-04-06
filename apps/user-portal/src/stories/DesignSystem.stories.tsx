@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Container, Stack } from '../components/layout';
+import { Container, Stack } from '@repo/ui';
 
 const meta: Meta = {
   title: 'Pages/Home/Layout',

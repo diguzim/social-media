@@ -384,14 +384,14 @@ Mobile-first breakpoints (all values from CSS variables):
 
 ### Layout Primitives
 
-**Layout primitives** are React components in `src/components/layout/` that encapsulate responsive design patterns and use tokens consistently.
+**Layout primitives** are shared React components from `@repo/ui` that encapsulate responsive design patterns and use tokens consistently.
 
 #### Container
 
 Responsive full-width wrapper with max-width, centered padding, and mobile-first breakpoints.
 
 ```tsx
-import { Container } from '@/components/layout';
+import { Container } from '@repo/ui';
 
 <Container maxWidth="6xl" padding="px-4 py-10">
   <h1>My Page</h1>
@@ -411,7 +411,7 @@ import { Container } from '@/components/layout';
 Flexible container for stacking items vertically or horizontally with consistent gaps.
 
 ```tsx
-import { Stack } from '@/components/layout';
+import { Stack } from '@repo/ui';
 
 {
   /* Vertical stack (default) */
@@ -446,7 +446,7 @@ import { Stack } from '@/components/layout';
 Responsive multi-column layout with mobile-first breakpoints.
 
 ```tsx
-import { Grid } from '@/components/layout';
+import { Grid } from '@repo/ui';
 
 {
   /* 1 column on mobile, 2 on tablet, 3 on desktop */
@@ -478,7 +478,7 @@ import { Grid } from '@/components/layout';
 Semantic grouping container with optional title, background, border, and padding. Renders as `<section>` element for proper document outline.
 
 ```tsx
-import { Section } from '@/components/layout';
+import { Section } from '@repo/ui';
 
 <Section title="Personal Information">
   <p>Your profile details go here.</p>
@@ -513,7 +513,7 @@ import { Section } from '@/components/layout';
 
 **New/Changed UI Compliance:**
 
-- All new components or pages must use design primitives from `src/components/layout/` for major layouts
+- All new components or pages must use design primitives from `@repo/ui` for major layouts
 - All new components must use design tokens for spacing, colors, and typography
 - Existing pages/components use ad-hoc utilities during refactoring (no retrofit requirement)
 
