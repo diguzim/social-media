@@ -19,6 +19,7 @@ import {
   updateMyAlbum,
   uploadMyPhoto,
 } from '../services/photos';
+import { Container } from '../components/layout';
 
 function ProfileFriendItem({
   id,
@@ -313,24 +314,28 @@ export function Profile() {
 
   if (isLoading) {
     return (
-      <div data-testid="profile-loading-state" className="page-container max-w-3xl text-center">
-        <p data-testid="profile-loading-text">Loading your profile...</p>
-      </div>
+      <Container maxWidth="3xl" dataTestId="profile-loading-state">
+        <div className="card text-center">
+          <p data-testid="profile-loading-text">Loading your profile...</p>
+        </div>
+      </Container>
     );
   }
 
   if (error && !user) {
     return (
-      <div data-testid="profile-error-state" className="page-container max-w-3xl text-center">
-        <p data-testid="profile-error-message" className="status-error">
-          {error}
-        </p>
-      </div>
+      <Container maxWidth="3xl" dataTestId="profile-error-state">
+        <div className="card text-center">
+          <p data-testid="profile-error-message" className="status-error">
+            {error}
+          </p>
+        </div>
+      </Container>
     );
   }
 
   return (
-    <div data-testid="profile-page" className="page-container max-w-5xl">
+    <Container maxWidth="5xl" dataTestId="profile-page">
       {user && (
         <>
           <ProfileHeaderCard
@@ -871,6 +876,6 @@ export function Profile() {
           </div>
         </section>
       ) : null}
-    </div>
+    </Container>
   );
 }

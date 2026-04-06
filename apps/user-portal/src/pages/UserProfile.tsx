@@ -6,6 +6,7 @@ import { useInfiniteScrollObserver } from '../components/infinite-scroll/useInfi
 import { PostCardsInfiniteList } from '../components/post-list/PostCardsInfiniteList';
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard';
 import { PendingButton } from '../components/loading/PendingButton';
+import { Container } from '../components/layout';
 import {
   PROFILE_SECTION_TABS,
   ProfileSectionsTabs,
@@ -193,27 +194,28 @@ export function UserProfile() {
 
   if (isLoading) {
     return (
-      <div
-        data-testid="user-profile-loading-state"
-        className="page-container max-w-3xl text-center"
-      >
-        <p data-testid="user-profile-loading-text">Loading user profile...</p>
-      </div>
+      <Container maxWidth="3xl" dataTestId="user-profile-loading-state">
+        <div className="card text-center">
+          <p data-testid="user-profile-loading-text">Loading user profile...</p>
+        </div>
+      </Container>
     );
   }
 
   if (error || !profile) {
     return (
-      <div data-testid="user-profile-error-state" className="page-container max-w-3xl text-center">
-        <p data-testid="user-profile-error-message" className="status-error">
-          {error || 'User profile not found'}
-        </p>
-      </div>
+      <Container maxWidth="3xl" dataTestId="user-profile-error-state">
+        <div className="card text-center">
+          <p data-testid="user-profile-error-message" className="status-error">
+            {error || 'User profile not found'}
+          </p>
+        </div>
+      </Container>
     );
   }
 
   return (
-    <div data-testid="user-profile-page" className="page-container max-w-5xl">
+    <Container maxWidth="5xl" dataTestId="user-profile-page">
       <ProfileHeaderCard
         cardTestId="user-profile-card"
         avatarTestId="user-profile-avatar-image"
@@ -570,6 +572,6 @@ export function UserProfile() {
           </div>
         </section>
       ) : null}
-    </div>
+    </Container>
   );
 }
