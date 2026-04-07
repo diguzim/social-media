@@ -278,7 +278,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)
 - [ ] Production docker-compose (all services)
-- [ ] Error tracking (Sentry)
 - [ ] Observability platform (Datadog)
 - [ ] Distributed tracing (OpenTelemetry)
 - [ ] Kubernetes deployment

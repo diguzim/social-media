@@ -240,6 +240,10 @@ FRIENDSHIP_SERVICE_PORT=4005
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
+
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
 ```
 
 ## Features
@@ -250,6 +254,7 @@ LOKI_PORT=3100
 - **Exception Handling**: AllExceptionsFilter for serializing microservice errors
 - **Request Logging**: Correlation ID tracking and request duration
 - **RPC Routing**: @nestjs/microservices ClientProxy pattern
+- **Error Monitoring**: Sentry SDK (`@sentry/node`) initialized in app bootstrap when `SENTRY_DSN` is provided
 
 ## Running
 

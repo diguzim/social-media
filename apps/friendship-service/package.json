@@ -28,6 +28,7 @@
     "@repo/contracts": "workspace:*",
     "@repo/exception-filters": "workspace:*",
     "@repo/log-context": "workspace:*",
+    "@sentry/node": "^10.47.0",
     "nestjs-pino": "^4.1.0",
     "pino-loki": "^3.0.0",
     "reflect-metadata": "^0.2.2",

@@ -31,6 +31,7 @@
     "@repo/events": "workspace:*",
     "@repo/exception-filters": "workspace:*",
     "@repo/log-context": "workspace:*",
+    "@sentry/node": "^10.47.0",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
     "nestjs-pino": "^4.1.0",

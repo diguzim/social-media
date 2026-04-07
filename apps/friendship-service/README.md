@@ -14,11 +14,26 @@ TCP microservice responsible for friendship requests and relationships.
 
 - Default TCP port: `4005`
 
+## Configuration
+
+Environment variables (see `.env.example`):
+
+```env
+PORT=4005
+LOGS_TO_LOKI=true
+LOKI_HOST=http://localhost
+LOKI_PORT=3100
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
+```
+
 ## Notes
 
 - Uses in-memory repository for now
 - API Gateway handles authentication and forwards actor `userId`
 - Feed behavior is unchanged by friendships at this stage
+- Sentry captures runtime errors when `SENTRY_DSN` is configured
 
 ## Seeded data (in-memory)
 

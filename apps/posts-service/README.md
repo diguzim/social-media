@@ -78,6 +78,7 @@ The service handles RPC messages from the API Gateway:
   - Input: `{ postId, commentId, authorId }`
   - Output: `{ success: true }`
   - Requires: authorId must match comment owner
+
 ## Use Cases
 
 ### CreatePostUseCase
@@ -146,6 +147,9 @@ Logging environment variables:
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
 ```
 
 Example:
@@ -244,6 +248,7 @@ curl -X DELETE http://localhost:4000/posts/1 \
 - **Comment Ownership Verification**: Only comment authors can edit or delete comments
 - **Correlation Tracking**: Request correlation IDs for tracing
 - **Structured Logging**: Pino logger with request context
+- **Error Monitoring**: Sentry SDK (`@sentry/node`) initialized at bootstrap when `SENTRY_DSN` is set
 
 ## Tech Stack
 

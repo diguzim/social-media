@@ -102,6 +102,9 @@ IMAGE_STORAGE_DIR=/tmp/social-media-images
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
 ```
 
 ## Running
@@ -126,3 +129,4 @@ pnpm --filter image-service dev
   - Bob (`userId=2`) has a seeded album with one photo
 - Storage provider is abstracted so local filesystem can be swapped for S3-compatible storage later.
 - Retrieval over RPC returns image bytes/metadata, so API Gateway does not depend on filesystem paths from this service.
+- Sentry captures runtime errors when `SENTRY_DSN` is configured.

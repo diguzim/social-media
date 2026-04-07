@@ -146,6 +146,9 @@ RABBITMQ_EXCHANGE=social-media.events
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
 ```
 
 ## Storage
@@ -223,6 +226,7 @@ curl -X POST http://localhost:4000/users/email-verification/request \
 - **amqplib** - RabbitMQ client
 - **Jest** - Testing framework
 - **Pino** - Structured logging
+- **Sentry** - Error monitoring (`@sentry/node`)
 
 ## Error Handling
 

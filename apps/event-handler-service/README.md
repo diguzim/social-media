@@ -129,6 +129,9 @@ RABBITMQ_USER_REGISTERED_QUEUE=social-media.user-registered
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
+SENTRY_TRACES_SAMPLE_RATE=1.0
 ```
 
 ## Message Flow
@@ -217,6 +220,7 @@ View service logs (in pnpm dev output):
 - **Pino** - Structured logging
 - **Jest** - Testing framework
 - **TypeScript 5.7** - Type safety
+- **Sentry** - Error monitoring (`@sentry/node`)
 
 ## Future Enhancements
 
