@@ -226,6 +226,10 @@ export async function uploadProfileAvatar(file: File): Promise<UploadProfileAvat
 
 export function storeUserProfile(profile: UserProfile): void {
   localStorage.setItem('user', JSON.stringify(profile));
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('user-profile-updated'));
+  }
 }
 
 export function getUserProfile(): UserProfile | null {

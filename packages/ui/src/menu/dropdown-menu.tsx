@@ -10,11 +10,14 @@ import { cx } from "../layout-components/utils.js";
 import type {
   ButtonHTMLAttributes,
   HTMLAttributes,
+  ReactElement,
   MouseEvent as ReactMouseEvent,
   ReactNode,
 } from "react";
 import {
+  cloneElement,
   createContext,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
@@ -168,6 +171,7 @@ export interface DropdownMenuTriggerProps extends Omit<
   "children" | "onClick"
 > {
   children: ReactNode;
+  asChild?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
@@ -179,9 +183,18 @@ export interface DropdownMenuTriggerProps extends Omit<
 }
 
 export function DropdownMenuTrigger({
+  asChild = false,
   children,
   onClick,
-  ...props
+  className,
+  variant,
+  size,
+  fullWidth,
+  isPending,
+  pendingText,
+  dataTestId,
+  pressed,
+  ...buttonProps
 }: DropdownMenuTriggerProps) {
   const { toggle, open } = useDropdownMenuInternal();
 
@@ -193,9 +206,48 @@ export function DropdownMenuTrigger({
     }
   };
 
+  if (asChild) {
+    if (!isValidElement(children)) {
+      throw new Error(
+        "DropdownMenuTrigger with asChild requires a single React element child",
+      );
+    }
+
+    const child = children as ReactElement<any>;
+
+    const handleChildClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
+      child.props.onClick?.(event);
+      onClick?.(event);
+
+      if (!event.defaultPrevented) {
+        toggle();
+      }
+    };
+
+    return cloneElement(child, {
+      ...buttonProps,
+      ...(child.type === "button" && child.props.type === undefined
+        ? { type: "button" }
+        : undefined),
+      onClick: handleChildClick,
+      className: cx(child.props.className, className),
+      "aria-haspopup": "menu",
+      "aria-expanded": open,
+      "data-testid": dataTestId,
+    } as any);
+  }
+
   return (
     <Button
-      {...props}
+      {...buttonProps}
+      variant={variant}
+      size={size}
+      fullWidth={fullWidth}
+      isPending={isPending}
+      pendingText={pendingText}
+      dataTestId={dataTestId}
+      pressed={pressed}
+      className={className}
       type="button"
       onClick={handleClick}
       aria-haspopup="menu"

@@ -17,7 +17,7 @@ Current extraction scope:
   - `Button`
 - Menu primitives:
   - `DropdownMenu`
-  - `DropdownMenuTrigger`
+  - `DropdownMenuTrigger` (supports `asChild` for custom trigger elements)
   - `DropdownMenuContent`
   - `FloatingPanel`
 - Dialog primitives:

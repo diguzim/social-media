@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Button,
@@ -55,8 +56,29 @@ function NavbarMenuItems({ profilePath, onLogout }: NavbarMenuItemsProps) {
 
 export function Navbar() {
   const navigate = useNavigate();
-  const cachedUser = getUserProfile();
+  const [cachedUser, setCachedUser] = useState(() => getUserProfile());
+  const [isAvatarBroken, setIsAvatarBroken] = useState(false);
   const profilePath = cachedUser?.username ? `/users/${cachedUser.username}` : '/';
+
+  useEffect(() => {
+    const syncProfile = () => {
+      setCachedUser(getUserProfile());
+    };
+
+    syncProfile();
+
+    window.addEventListener('storage', syncProfile);
+    window.addEventListener('user-profile-updated', syncProfile as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', syncProfile);
+      window.removeEventListener('user-profile-updated', syncProfile as EventListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsAvatarBroken(false);
+  }, [cachedUser?.avatarUrl]);
 
   const handleLogout = () => {
     clearAuth();
@@ -98,10 +120,31 @@ export function Navbar() {
 
       <DropdownMenu dataTestId="navbar-menu-container" className="relative">
         <DropdownMenuTrigger
+          asChild
           data-testid="navbar-menu-button"
-          className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/80"
+          className="rounded-full focus:outline-none focus:ring-2 focus:ring-white/80"
+          aria-label="Open user menu"
         >
-          Menu ▼
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/20 text-sm font-semibold text-white transition hover:bg-white/30"
+          >
+            {cachedUser?.avatarUrl && !isAvatarBroken ? (
+              <img
+                data-testid="navbar-menu-avatar-image"
+                src={cachedUser.avatarUrl}
+                alt={`${cachedUser.name ?? 'User'} avatar`}
+                className="h-full w-full object-cover"
+                onError={() => {
+                  setIsAvatarBroken(true);
+                }}
+              />
+            ) : (
+              <span data-testid="navbar-menu-avatar-fallback" aria-hidden="true">
+                {(cachedUser?.name?.trim().charAt(0) || '?').toUpperCase()}
+              </span>
+            )}
+          </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent

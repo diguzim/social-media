@@ -92,3 +92,22 @@ export const Uncontrolled: Story = {
 export const Controlled: Story = {
   render: () => <ControlledDropdownDemo />,
 };
+
+export const CustomTrigger: Story = {
+  render: () => (
+    <DropdownMenu className="relative">
+      <DropdownMenuTrigger asChild aria-label="Open profile menu">
+        <button
+          type="button"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+        >
+          RA
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" side="bottom" offset="md">
+        <DemoMenuItems />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};

@@ -91,7 +91,7 @@ Examples:
 - Login: `login-email-input`, `login-password-input`, `login-submit-button`
 - Register: `register-name-input`, `register-username-input`, `register-email-input`, `register-submit-button`
 - Home: `home-page`, `home-create-post-section`, `home-feed-section`
-- Navbar: `navbar-menu-button`, `navbar-profile-link`, `navbar-logout-button`
+- Navbar: `navbar-menu-button`, `navbar-menu-avatar-image`, `navbar-menu-avatar-fallback`, `navbar-profile-link`, `navbar-logout-button`
 - Navbar account settings: `navbar-account-settings-link`
 - UserProfile: `user-profile-card`, `user-profile-stats`, `user-profile-posts-list`
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
