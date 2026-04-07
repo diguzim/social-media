@@ -22,6 +22,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Like/unlike posts with optimistic updates and reaction counts
 - Flat comments CRUD directly on post cards (create, list, edit own, delete own)
 - Feed cards show author avatar + profile link in the header (fallback initial when no avatar)
+- Sentry browser monitoring initialized from Vite env (`VITE_SENTRY_DSN`)
 - Shared layout primitives consumed from `@repo/ui` (`Container`, `Stack`, `Grid`, `Section`)
 - Storybook for visual validation and loading state scenarios (integration/page focus; component demos live in `apps/ui-showcase`)
 - Pluggable frontend state architecture via state contracts (interfaces + injectable presenters)
@@ -155,6 +156,14 @@ Run development server:
 ```sh
 pnpm dev
 ```
+
+### Sentry (local setup)
+
+Create `apps/user-portal/.env` from `apps/user-portal/.env.example` and set:
+
+- `VITE_SENTRY_DSN`
+- `VITE_SENTRY_ENVIRONMENT` (usually `development` locally)
+- `VITE_SENTRY_TRACES_SAMPLE_RATE` (for local testing, `1.0`)
 
 Build for production:
 
