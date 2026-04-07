@@ -4,3 +4,4 @@ export * from "./profile.contract.js";
 export * from "./public-profile.contract.js";
 export * from "./email-verification.contract.js";
 export * from "./profile-image.contract.js";
+export * from "./personal-data.contract.js";

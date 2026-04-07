@@ -11,6 +11,8 @@ export interface GetProfileByUsernameOutput {
   username: string;
   email: string;
   emailVerifiedAt: string | null;
+  gender: string | null;
+  about: string | null;
 }
 
 @Injectable()
@@ -34,6 +36,8 @@ export class GetProfileByUsernameUseCase {
       username: user.username,
       email: user.email,
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
+      gender: user.gender,
+      about: user.about,
     };
   }
 }

@@ -11,6 +11,7 @@ describe('GetProfileUseCase', () => {
       findByEmail: jest.fn(),
       findByUsernameCanonical: jest.fn(),
       findById: jest.fn(),
+      updatePersonalData: jest.fn(),
       markEmailVerified: jest.fn(),
     };
   });
@@ -22,6 +23,8 @@ describe('GetProfileUseCase', () => {
       username: 'johndoe',
       usernameCanonical: 'johndoe',
       email: 'john@doe.com',
+      gender: 'male',
+      about: 'About John',
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
@@ -39,6 +42,8 @@ describe('GetProfileUseCase', () => {
       username: 'johndoe',
       email: 'john@doe.com',
       emailVerifiedAt: null,
+      gender: 'male',
+      about: 'About John',
     });
   });
 
@@ -50,6 +55,8 @@ describe('GetProfileUseCase', () => {
       username: 'johndoe',
       usernameCanonical: 'johndoe',
       email: 'john@doe.com',
+      gender: null,
+      about: null,
       passwordHash: 'hashed-password',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: null,
@@ -66,6 +73,8 @@ describe('GetProfileUseCase', () => {
       username: 'johndoe',
       email: 'john@doe.com',
       emailVerifiedAt: verifiedAt.toISOString(),
+      gender: null,
+      about: null,
     });
   });
 

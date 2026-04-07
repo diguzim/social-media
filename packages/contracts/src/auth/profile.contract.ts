@@ -9,4 +9,6 @@ export interface GetProfileReply {
   username: string;
   email: string;
   emailVerifiedAt: string | null;
+  gender?: string | null;
+  about?: string | null;
 }

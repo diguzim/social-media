@@ -4,6 +4,7 @@ import { RegisterUseCase } from 'src/core/application/authentication/register.us
 import { LoginUseCase } from 'src/core/application/authentication/login.use-case';
 import { GetProfileUseCase } from 'src/core/application/authentication/get-profile.use-case';
 import { GetProfileByUsernameUseCase } from 'src/core/application/authentication/get-profile-by-username.use-case';
+import { UpdatePersonalDataUseCase } from 'src/core/application/authentication/update-personal-data.use-case';
 import { CreateEmailVerificationTokenUseCase } from 'src/core/application/email-verification/create-email-verification-token.use-case';
 import { ConfirmEmailVerificationUseCase } from 'src/core/application/email-verification/confirm-email-verification.use-case';
 import { RequestEmailVerificationUseCase } from 'src/core/application/email-verification/request-email-verification.use-case';
@@ -20,6 +21,7 @@ export class AuthController {
     private loginUseCase: LoginUseCase,
     private getProfileUseCase: GetProfileUseCase,
     private getProfileByUsernameUseCase: GetProfileByUsernameUseCase,
+    private updatePersonalDataUseCase: UpdatePersonalDataUseCase,
     private createEmailVerificationTokenUseCase: CreateEmailVerificationTokenUseCase,
     private confirmEmailVerificationUseCase: ConfirmEmailVerificationUseCase,
     private requestEmailVerificationUseCase: RequestEmailVerificationUseCase,
@@ -71,6 +73,8 @@ export class AuthController {
       username: result.username,
       email: result.email,
       emailVerifiedAt: result.emailVerifiedAt,
+      gender: result.gender,
+      about: result.about,
     };
   }
 
@@ -93,6 +97,34 @@ export class AuthController {
       username: result.username,
       email: result.email,
       emailVerifiedAt: result.emailVerifiedAt,
+      gender: result.gender,
+      about: result.about,
+    };
+  }
+
+  @MessagePattern({ cmd: AUTH_COMMANDS.updatePersonalData })
+  async handleUpdatePersonalData(
+    request: RPC.UpdatePersonalDataRequest,
+  ): Promise<RPC.UpdatePersonalDataReply> {
+    this.logger.debug('Auth service: handling updatePersonalData command', {
+      userId: request.userId,
+    });
+
+    const result = await this.updatePersonalDataUseCase.execute({
+      userId: request.userId,
+      name: request.name,
+      gender: request.gender,
+      about: request.about,
+    });
+
+    return {
+      id: result.id,
+      name: result.name,
+      username: result.username,
+      email: result.email,
+      emailVerifiedAt: result.emailVerifiedAt,
+      gender: result.gender,
+      about: result.about,
     };
   }
 

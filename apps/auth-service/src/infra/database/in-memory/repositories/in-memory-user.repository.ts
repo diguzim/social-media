@@ -4,6 +4,7 @@ import { User } from 'src/core/domain/user/user.entity';
 import {
   UserRepository,
   CreateUserData,
+  UpdatePersonalDataInput,
 } from 'src/core/domain/user/user.repository';
 
 @Injectable()
@@ -50,6 +51,21 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
+  async updatePersonalData(input: UpdatePersonalDataInput): Promise<User> {
+    const user = this.users.find((item) => item.id === input.userId);
+    if (!user) {
+      throw new Error(`User with id ${input.userId} not found`);
+    }
+
+    user.name = input.name;
+    user.gender = input.gender;
+    user.about = input.about;
+    user.updatedAt = new Date();
+
+    return user;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
   async markEmailVerified(userId: string, verifiedAt: Date): Promise<User> {
     const user = this.users.find((item) => item.id === userId);
     if (!user) {
@@ -72,6 +88,8 @@ export class InMemoryUserRepository implements UserRepository {
         username: 'alice',
         usernameCanonical: 'alice',
         email: 'alice@example.com',
+        gender: 'female',
+        about: 'Loves sharing travel moments and coffee photos.',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-01'),
         // Seed users are pre-verified so E2E tests work without a verification step
@@ -83,6 +101,8 @@ export class InMemoryUserRepository implements UserRepository {
         username: 'bob',
         usernameCanonical: 'bob',
         email: 'bob@example.com',
+        gender: 'male',
+        about: 'Backend enthusiast and weekend trail runner.',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-02'),
         emailVerifiedAt: new Date('2025-01-02'),
@@ -93,6 +113,8 @@ export class InMemoryUserRepository implements UserRepository {
         username: 'charlie',
         usernameCanonical: 'charlie',
         email: 'charlie@example.com',
+        gender: 'non_binary',
+        about: null,
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-03'),
         emailVerifiedAt: new Date('2025-01-03'),
@@ -103,6 +125,8 @@ export class InMemoryUserRepository implements UserRepository {
         username: 'diana',
         usernameCanonical: 'diana',
         email: 'diana@example.com',
+        gender: 'female',
+        about: 'Product designer focused on accessible interfaces.',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-04'),
         emailVerifiedAt: new Date('2025-01-04'),
@@ -113,6 +137,8 @@ export class InMemoryUserRepository implements UserRepository {
         username: 'eve',
         usernameCanonical: 'eve',
         email: 'eve@example.com',
+        gender: 'prefer_not_to_say',
+        about: 'Enjoys writing, reading, and community events.',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-05'),
         emailVerifiedAt: new Date('2025-01-05'),

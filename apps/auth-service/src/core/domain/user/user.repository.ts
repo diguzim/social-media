@@ -8,6 +8,13 @@ export interface CreateUserData {
   passwordHash: string;
 }
 
+export interface UpdatePersonalDataInput {
+  userId: string;
+  name: string;
+  gender: string;
+  about: string | null;
+}
+
 export abstract class UserRepository {
   abstract create(createUserData: CreateUserData): Promise<User>;
   abstract findByEmail(email: string): Promise<User | null>;
@@ -15,5 +22,6 @@ export abstract class UserRepository {
     usernameCanonical: string,
   ): Promise<User | null>;
   abstract findById(id: string): Promise<User | null>;
+  abstract updatePersonalData(input: UpdatePersonalDataInput): Promise<User>;
   abstract markEmailVerified(userId: string, verifiedAt: Date): Promise<User>;
 }

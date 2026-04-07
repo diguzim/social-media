@@ -9,6 +9,8 @@ describe('User Entity', () => {
         username: 'johndoe',
         usernameCanonical: 'johndoe',
         email: 'john@doe.com',
+        gender: 'male',
+        about: 'I like coding.',
         passwordHash: 'hashed-password',
         createdAt: new Date('2024-01-01T00:00:00Z'),
         updatedAt: new Date('2024-01-02T00:00:00Z'),
@@ -23,6 +25,8 @@ describe('User Entity', () => {
       expect(user.username).toBe('johndoe');
       expect(user.usernameCanonical).toBe('johndoe');
       expect(user.email).toBe('john@doe.com');
+      expect(user.gender).toBe('male');
+      expect(user.about).toBe('I like coding.');
       expect(user.passwordHash).toBe('hashed-password');
       expect(user.createdAt).toEqual(new Date('2024-01-01T00:00:00Z'));
       expect(user.updatedAt).toEqual(new Date('2024-01-02T00:00:00Z'));
@@ -40,6 +44,8 @@ describe('User Entity', () => {
       expect(user.name).toBe('');
       expect(user.username).toBe('');
       expect(user.usernameCanonical).toBe('');
+      expect(user.gender).toBeNull();
+      expect(user.about).toBeNull();
       expect(user.passwordHash).toBe('');
       expect(user.createdAt).toBeInstanceOf(Date);
       expect(user.updatedAt).toBeNull();
@@ -61,6 +67,8 @@ describe('User Entity', () => {
       expect(user.username).toBe('alice');
       expect(user.usernameCanonical).toBe('alice');
       expect(user.email).toBe('alice@example.com');
+      expect(user.gender).toBeNull();
+      expect(user.about).toBeNull();
       expect(user.passwordHash).toBe('hash123');
       expect(user.updatedAt).toBeNull();
       expect(user.emailVerifiedAt).toBeNull();
@@ -74,11 +82,15 @@ describe('User Entity', () => {
       user.name = 'Updated Name';
       user.username = 'updated-name';
       user.usernameCanonical = 'updated-name';
+      user.gender = 'non_binary';
+      user.about = 'Updated about';
       user.passwordHash = 'new-hash';
 
       expect(user.name).toBe('Updated Name');
       expect(user.username).toBe('updated-name');
       expect(user.usernameCanonical).toBe('updated-name');
+      expect(user.gender).toBe('non_binary');
+      expect(user.about).toBe('Updated about');
       expect(user.passwordHash).toBe('new-hash');
     });
 

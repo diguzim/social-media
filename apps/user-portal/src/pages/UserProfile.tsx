@@ -430,7 +430,7 @@ export function UserProfile() {
           />
         ) : null}
 
-        {activeSection === 'about' ? <AboutSection /> : null}
+        {activeSection === 'about' ? <AboutSection about={profile.about} /> : null}
 
         {activeSection === 'friends' ? (
           <FriendsSection
@@ -441,7 +441,7 @@ export function UserProfile() {
           />
         ) : null}
 
-        {activeSection === 'personal' ? <PersonalSection /> : null}
+        {activeSection === 'personal' ? <PersonalSection gender={profile.gender} /> : null}
       </Stack>
     </Container>
   );

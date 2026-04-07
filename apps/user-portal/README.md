@@ -12,6 +12,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - URL-driven tabbed profile sections: Timeline, Photos, About, Friends, Personal Data
 - Photos section uses nested routes with Unsorted and Albums tabs, plus album detail navigation, owner-only album create/edit/delete actions, owner-only contextual photo upload (unsorted or current album), owner-only photo delete actions, and photo modal viewing
 - Dedicated account-management area with left-side vertical navigation and URL subroutes under `/account/*`
+- Editable personal-data form under `/account/personal-data` (name, gender enum, about up to 2000 chars)
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
 - Client-side routing with React Router v6
@@ -80,7 +81,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 
 - **JWT Token** - localStorage key `jwtToken` (from login response)
 - **User Profile** - localStorage key `user` (from /users/me response)
-  - Structure: `{ id, name, username, email, emailVerifiedAt, avatarUrl? }`
+  - Structure: `{ id, name, username, email, emailVerifiedAt, gender?, about?, avatarUrl? }`
 
 ## Test Selectors (`data-testid`)
 
@@ -111,6 +112,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - POST /users (register)
 - POST /users/login
 - GET /users/me (requires Authorization: Bearer {token})
+- PATCH /users/me/personal-data (requires auth; body: `name`, `gender`, `about`)
 - GET /users/:username/profile (requires Authorization: Bearer {token})
 - POST /friends/requests (requires auth)
 - POST /friends/requests/:requestId/accept (requires auth)
@@ -127,9 +129,7 @@ All requests go through the API Gateway at `http://localhost:4000`:
 - PATCH /users/me/albums/:albumId (requires auth; supports `name`, `description`, and `coverPhotoId`)
 - DELETE /users/me/albums/:albumId (requires auth)
 - POST /users/me/photos (requires auth; multipart image upload)
-- PATCH /users/me/photos/:photoId (requires auth)
 - DELETE /users/me/photos/:photoId (requires auth)
-- GET /posts?page=1&limit=10&sortOrder=desc
 - GET /posts/feed (requires auth; feed with author enrichment, optional author avatarUrl, like counts + likedByMe)
 - POST /posts/:id/reactions (like/unlike a post)
 - GET /posts/:id/comments (list comments for a post)
@@ -565,10 +565,10 @@ The app communicates with the API Gateway which routes requests to microservices
   - `registerUser()` - POST /users
   - `loginUser()` - POST /users/login (stores JWT in localStorage)
   - `getProfile()` - GET /users/me (stores user profile in localStorage)
+  - `updateMyPersonalData()` - PATCH /users/me/personal-data
   - `uploadProfileAvatar()` - POST /users/avatar (multipart upload)
   - `getUserProfile()` - Retrieve cached profile from localStorage
 - `posts.ts` provides:
-  - `getPosts()` - GET /posts with pagination/filter query params
   - `getFeed()` - GET /posts/feed (requires auth; author-enriched with reaction counts and likedByMe)
   - `createPost()` - POST /posts (requires auth)
   - `togglePostReaction()` - POST /posts/:id/reactions (like/unlike, requires auth)
@@ -585,7 +585,7 @@ The app communicates with the API Gateway which routes requests to microservices
 - Home feed, My Posts, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
 - Feed, My Posts, and User Profile share a common paginated posts data hook for refresh/load-more behavior
 - UserProfile header shows confirmed friends count; `Following` and `Followers` remain placeholders for future backend integration
-- About and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
+- UserProfile About and Personal tabs render public `about` and `gender` values when available
 - UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API (public header friend count is available)
 - Unified UserProfile avatar behavior: viewing your own profile opens a floating actions menu (`See image`, `Change image`), while viewing another profile opens avatar preview directly in a modal
 - Like button uses optimistic updates: UI updates immediately, reverts on network error

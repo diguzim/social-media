@@ -32,6 +32,7 @@ import { UsernameParamDto } from './dto/username-param.dto';
 import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
 import { CreateUserAlbumBodyDto } from './dto/create-user-album-body.dto';
 import { UpdateUserAlbumBodyDto } from './dto/update-user-album-body.dto';
+import { UpdatePersonalDataBodyDto } from './dto/update-personal-data-body.dto';
 import { AlbumIdParamDto } from './dto/album-id-param.dto';
 import { PhotoIdParamDto } from './dto/photo-id-param.dto';
 import { IMAGE_SERVICE } from 'src/images/image.client';
@@ -150,6 +151,43 @@ export class UsersController {
       username: rpcReply.username,
       email: rpcReply.email,
       emailVerifiedAt: rpcReply.emailVerifiedAt,
+      gender: rpcReply.gender,
+      about: rpcReply.about,
+      avatarUrl,
+    };
+  }
+
+  @Patch('me/personal-data')
+  @UseGuards(JwtAuthGuard)
+  async updateMyPersonalData(
+    @Body() body: UpdatePersonalDataBodyDto,
+    @Request() req: { user: { userId: string } },
+  ): Promise<API.UpdateMyPersonalDataResponse> {
+    const rpcRequest: RPC.UpdatePersonalDataRequest = {
+      userId: req.user.userId,
+      name: body.name,
+      gender: body.gender as unknown as RPC.RpcProfileGender,
+      about: body.about,
+      correlationId: getCorrelationId(),
+    };
+
+    const rpcReply = await firstValueFrom(
+      this.authClient.send<
+        RPC.UpdatePersonalDataReply,
+        RPC.UpdatePersonalDataRequest
+      >({ cmd: AUTH_COMMANDS.updatePersonalData }, rpcRequest),
+    );
+
+    const avatarUrl = await this.tryBuildAvatarUrl(rpcReply.id);
+
+    return {
+      id: rpcReply.id,
+      name: rpcReply.name,
+      username: rpcReply.username,
+      email: rpcReply.email,
+      emailVerifiedAt: rpcReply.emailVerifiedAt,
+      gender: rpcReply.gender,
+      about: rpcReply.about,
       avatarUrl,
     };
   }
@@ -185,6 +223,8 @@ export class UsersController {
       name: rpcReply.name,
       username: rpcReply.username,
       emailVerifiedAt: rpcReply.emailVerifiedAt,
+      gender: rpcReply.gender,
+      about: rpcReply.about,
       avatarUrl,
     };
   }

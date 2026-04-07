@@ -1,6 +1,25 @@
 import { Section } from '@repo/ui';
 
-export function PersonalSection() {
+interface PersonalSectionProps {
+  gender?: string | null;
+}
+
+const GENDER_LABEL_BY_VALUE: Record<string, string> = {
+  female: 'Female',
+  male: 'Male',
+  non_binary: 'Non-binary',
+  prefer_not_to_say: 'Prefer not to say',
+};
+
+function formatGender(gender?: string | null): string {
+  if (!gender) {
+    return '—';
+  }
+
+  return GENDER_LABEL_BY_VALUE[gender] ?? '—';
+}
+
+export function PersonalSection({ gender }: PersonalSectionProps) {
   return (
     <Section
       dataTestId="user-profile-personal-section"
@@ -21,7 +40,9 @@ export function PersonalSection() {
       >
         <p className="text-sm text-slate-600">Location: —</p>
         <p className="text-sm text-slate-600">Birth date: —</p>
-        <p className="text-sm text-slate-600">Gender: —</p>
+        <p data-testid="user-profile-personal-gender" className="text-sm text-slate-600">
+          Gender: {formatGender(gender)}
+        </p>
         <p className="text-sm text-slate-600">Work: —</p>
         <p className="text-sm text-slate-600 sm:col-span-2">Education: —</p>
       </div>

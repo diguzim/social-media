@@ -39,8 +39,13 @@ The service handles RPC messages from the API Gateway:
 
 - `AUTH_COMMANDS.getProfile` - Retrieve user profile
   - Input: `{ userId }`
-  - Output: `{ id, name, username, email, emailVerifiedAt }`
+  - Output: `{ id, name, username, email, emailVerifiedAt, gender, about }`
   - Requires: User must exist
+
+- `AUTH_COMMANDS.updatePersonalData` - Update current user's personal data
+  - Input: `{ userId, name, gender, about }`
+  - Output: `{ id, name, username, email, emailVerifiedAt, gender, about }`
+  - Validation: non-empty `name`, `about` max 2000 characters
 
 - `AUTH_COMMANDS.createEmailVerificationToken` - Create a new hashed token
   - Input: `{ userId }`
@@ -80,8 +85,15 @@ The service handles RPC messages from the API Gateway:
 ### GetProfileUseCase
 
 1. Find user by userId
-2. Return id, name, username, email, and emailVerifiedAt (ISO string or null)
+2. Return id, name, username, email, emailVerifiedAt, gender, and about
 3. Throw NotFoundException if user not found
+
+### UpdatePersonalDataUseCase
+
+1. Normalize and validate input (`name`, `gender`, `about`)
+2. Enforce `about` max length (2000)
+3. Persist changes through UserRepository
+4. Return updated profile payload
 
 ### CreateEmailVerificationTokenUseCase
 

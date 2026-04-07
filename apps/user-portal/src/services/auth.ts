@@ -8,6 +8,8 @@ import type {
   ConfirmEmailVerificationRequest,
   ConfirmEmailVerificationResponse,
   RequestEmailVerificationResponse,
+  UpdateMyPersonalDataRequest,
+  UpdateMyPersonalDataResponse,
 } from '@repo/contracts/api';
 
 const API_BASE_URL = 'http://localhost:4000';
@@ -21,6 +23,8 @@ export type {
   ConfirmEmailVerificationRequest,
   ConfirmEmailVerificationResponse,
   RequestEmailVerificationResponse,
+  UpdateMyPersonalDataRequest,
+  UpdateMyPersonalDataResponse,
 };
 
 export type UserProfile = GetProfileResponse;
@@ -222,6 +226,33 @@ export async function uploadProfileAvatar(file: File): Promise<UploadProfileAvat
     imageUrl,
     uploadedAt: payload.uploadedAt ?? new Date().toISOString(),
   };
+}
+
+export async function updateMyPersonalData(
+  payload: UpdateMyPersonalDataRequest
+): Promise<UpdateMyPersonalDataResponse> {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/me/personal-data`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update personal data');
+  }
+
+  const updatedProfile = (await response.json()) as UpdateMyPersonalDataResponse;
+  storeUserProfile(updatedProfile);
+  return updatedProfile;
 }
 
 export function storeUserProfile(profile: UserProfile): void {

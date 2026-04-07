@@ -37,12 +37,19 @@ API Gateway (Port 4000)
 
 - `GET /users/me` - Get current user profile
   - Headers: `Authorization: Bearer {token}`
-  - Returns: `{ id, name, username, email, emailVerifiedAt, avatarUrl? }`
+  - Returns: `{ id, name, username, email, emailVerifiedAt, gender?, about?, avatarUrl? }`
+  - Guards: **JwtAuthGuard** (requires valid JWT)
+
+- `PATCH /users/me/personal-data` - Update current user's personal data
+  - Headers: `Authorization: Bearer {token}`
+  - Body: `{ name, gender, about }`
+  - Validation: `about` max 2000 characters
+  - Returns: `{ id, name, username, email, emailVerifiedAt, gender?, about?, avatarUrl? }`
   - Guards: **JwtAuthGuard** (requires valid JWT)
 
 - `GET /users/:username/profile` - Get public user profile by username
   - Headers: `Authorization: Bearer {token}`
-  - Returns: `{ id, name, username, emailVerifiedAt, avatarUrl? }`
+  - Returns: `{ id, name, username, emailVerifiedAt, gender?, about?, avatarUrl? }`
   - Guards: **JwtAuthGuard** (requires valid JWT)
 
 - `POST /users/avatar` - Upload current user's profile avatar
