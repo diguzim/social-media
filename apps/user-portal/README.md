@@ -10,7 +10,7 @@ React + Vite + TypeScript frontend SPA for user authentication and account manag
 - Unified profile page (avatar, name, username, stats) served by `/users/:username` for both self and public views
 - Ownership differentiation is explicit on `/users/:username`: route username is compared with authenticated user username to drive self/public behavior
 - URL-driven tabbed profile sections: Timeline, Photos, About, Friends, Personal Data
-- Photos section uses nested routes with Unsorted and Albums tabs, plus album detail navigation, owner-only album create/edit/delete actions, and photo modal viewing
+- Photos section uses nested routes with Unsorted and Albums tabs, plus album detail navigation, owner-only album create/edit/delete actions, owner-only contextual photo upload (unsorted or current album), owner-only photo delete actions, and photo modal viewing
 - Dedicated account-management area with left-side vertical navigation and URL subroutes under `/account/*`
 - Accepted-friends list in profile tabs (current-user data wired; public-user list placeholder until backend support)
 - Friends page for accepted friends plus incoming/outgoing pending requests
@@ -97,6 +97,7 @@ Examples:
 - UserProfile tabs: `user-profile-sections-tab-*`, `user-profile-photos-section`, `user-profile-about-section`, `user-profile-friends-section`, `user-profile-personal-section`
 - UserProfile photo tabs: `user-profile-photos-tabs`, `user-profile-photos-tab-unsorted`, `user-profile-photos-tab-albums`, `user-profile-photos-unsorted-section`, `user-profile-photos-albums-section`, `user-profile-photos-album-detail-section`, `user-profile-photos-album-back-button`
 - UserProfile album management: `user-profile-photos-new-album-button`, `user-profile-photos-new-album-inline-button`, `user-profile-photos-album-actions-trigger-*`, `user-profile-photos-album-edit-action-*`, `user-profile-photos-album-delete-action-*`, `user-profile-album-form-modal`, `user-profile-album-name-input`, `user-profile-album-description-input`, `user-profile-album-form-submit-button`, `user-profile-album-delete-modal`, `user-profile-album-delete-confirm-button`
+- UserProfile photo management: `user-profile-photos-upload-unsorted-button`, `user-profile-photos-upload-album-button`, `user-profile-photos-upload-input`, `user-profile-photo-upload-error`, `user-profile-photo-actions-trigger-*`, `user-profile-photo-delete-action-*`, `user-profile-photo-delete-modal`, `user-profile-photo-delete-confirm-button`
 - UserProfile avatar actions/modal: `user-profile-avatar-trigger`, `user-profile-avatar-actions-menu`, `user-profile-avatar-see-image-action`, `user-profile-avatar-change-image-action`, `user-profile-avatar-file-input`, `user-profile-avatar-upload-error`, `user-profile-avatar-modal`, `user-profile-avatar-modal-image`, `user-profile-avatar-modal-close-button`
 - Account settings: `account-settings-page`, `account-settings-navigation`, `account-settings-nav-*`
 

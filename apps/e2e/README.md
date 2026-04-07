@@ -234,7 +234,7 @@ Currently covers:
 
 ### Photos
 
-- **Photos/Albums**: Owner album create/update/delete, navigate nested unsorted/albums photo tabs, open/close photo modal, verify album detail navigation, and verify public profile rendering
+- **Photos/Albums**: Owner album create/update/delete, owner contextual photo upload (unsorted/album), owner photo delete via ellipsis actions, navigate nested unsorted/albums photo tabs, open/close photo modal, verify album detail navigation, and verify public profile rendering
 
 ## Best Practices
 

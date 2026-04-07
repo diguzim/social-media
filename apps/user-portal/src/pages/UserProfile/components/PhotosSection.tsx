@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { API } from '@repo/contracts';
 import {
   Button,
@@ -10,11 +10,18 @@ import {
   Section,
   useDropdownMenu,
 } from '@repo/ui';
-import { createMyAlbum, deleteMyAlbum, updateMyAlbum } from '../../../services/photos';
+import {
+  createMyAlbum,
+  deleteMyAlbum,
+  deleteMyPhoto,
+  updateMyAlbum,
+  uploadMyPhoto,
+} from '../../../services/photos';
 
 export type PhotoSectionKey = 'unsorted' | 'albums';
 
 type AlbumItem = API.GetUserPhotosResponse['albums'][number];
+type PhotoItem = API.GetUserPhotosResponse['unsortedPhotos'][number];
 
 type AlbumFormMode = 'create' | 'edit';
 
@@ -118,6 +125,68 @@ function AlbumActionsTrigger({
   );
 }
 
+interface PhotoActionsMenuProps {
+  photo: PhotoItem;
+  isPhotoDeleting: boolean;
+  onDelete: (photo: PhotoItem) => void;
+}
+
+function PhotoActionsMenu({ photo, isPhotoDeleting, onDelete }: PhotoActionsMenuProps) {
+  const { close } = useDropdownMenu();
+
+  return (
+    <Button
+      type="button"
+      variant="link"
+      fullWidth
+      data-testid={`user-profile-photo-delete-action-${photo.id}`}
+      onClick={() => {
+        close();
+        onDelete(photo);
+      }}
+      isPending={isPhotoDeleting}
+      pendingText="Deleting..."
+      className="justify-start rounded-none px-4 py-3 text-danger-600 hover:bg-slate-100"
+    >
+      Delete photo
+    </Button>
+  );
+}
+
+interface PhotoActionsTriggerProps {
+  photo: PhotoItem;
+  isPhotoDeleting: boolean;
+  onDelete: (photo: PhotoItem) => void;
+}
+
+function PhotoActionsTrigger({ photo, isPhotoDeleting, onDelete }: PhotoActionsTriggerProps) {
+  return (
+    <div className="absolute right-2 top-2 z-10">
+      <DropdownMenu className="inline-flex">
+        <DropdownMenuTrigger
+          type="button"
+          variant="ghost"
+          size="sm"
+          data-testid={`user-profile-photo-actions-trigger-${photo.id}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-white/80 p-0 text-lg font-semibold text-slate-600 opacity-70 shadow-sm backdrop-blur transition hover:opacity-100"
+          aria-label="Photo actions"
+        >
+          ⋯
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          dataTestId={`user-profile-photo-actions-menu-${photo.id}`}
+          align="end"
+          side="bottom"
+          offset="sm"
+        >
+          <PhotoActionsMenu photo={photo} isPhotoDeleting={isPhotoDeleting} onDelete={onDelete} />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
 interface PhotosSectionProps {
   profileUsername: string;
   isOwnProfile: boolean;
@@ -138,6 +207,7 @@ export function PhotosSection({
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const photoFileInputRef = useRef<HTMLInputElement>(null);
   const [albumFormMode, setAlbumFormMode] = useState<AlbumFormMode>('create');
   const [editingAlbum, setEditingAlbum] = useState<AlbumItem | null>(null);
   const [albumName, setAlbumName] = useState('');
@@ -148,6 +218,12 @@ export function PhotosSection({
   const [albumDeleteTarget, setAlbumDeleteTarget] = useState<AlbumItem | null>(null);
   const [albumDeleteError, setAlbumDeleteError] = useState('');
   const [isAlbumDeleting, setIsAlbumDeleting] = useState(false);
+  const [uploadTargetAlbumId, setUploadTargetAlbumId] = useState<string | null>(null);
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState('');
+  const [photoDeleteTarget, setPhotoDeleteTarget] = useState<PhotoItem | null>(null);
+  const [photoDeleteError, setPhotoDeleteError] = useState('');
+  const [isPhotoDeleting, setIsPhotoDeleting] = useState(false);
 
   const photoRouteSegments = location.pathname.split('/').filter(Boolean).slice(3);
   const photoRouteSection = normalizePhotoSection(photoRouteSegments[0]);
@@ -270,6 +346,74 @@ export function PhotosSection({
     }
   };
 
+  const openPhotoPicker = (albumId: string | null) => {
+    setPhotoUploadError('');
+    setUploadTargetAlbumId(albumId);
+    photoFileInputRef.current?.click();
+  };
+
+  const handlePhotoFileSelected = async (fileList: FileList | null) => {
+    const selectedFile = fileList?.[0] ?? null;
+
+    if (!selectedFile) {
+      return;
+    }
+
+    setPhotoUploadError('');
+    setIsPhotoUploading(true);
+
+    try {
+      await uploadMyPhoto({
+        file: selectedFile,
+        albumId: uploadTargetAlbumId,
+      });
+      await onRefreshPhotos();
+    } catch (err) {
+      setPhotoUploadError(err instanceof Error ? err.message : 'Failed to upload photo');
+    } finally {
+      setIsPhotoUploading(false);
+      if (photoFileInputRef.current) {
+        photoFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const openDeletePhotoDialog = (photo: PhotoItem) => {
+    setPhotoDeleteTarget(photo);
+    setPhotoDeleteError('');
+  };
+
+  const closeDeletePhotoDialog = () => {
+    if (isPhotoDeleting) {
+      return;
+    }
+
+    setPhotoDeleteTarget(null);
+    setPhotoDeleteError('');
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!photoDeleteTarget) {
+      return;
+    }
+
+    setPhotoDeleteError('');
+    setIsPhotoDeleting(true);
+
+    try {
+      await deleteMyPhoto(photoDeleteTarget.id);
+      if (selectedPhotoId === photoDeleteTarget.id) {
+        setSelectedPhotoId(null);
+      }
+      await onRefreshPhotos();
+      setPhotoDeleteTarget(null);
+    } catch (err) {
+      setPhotoDeleteError(err instanceof Error ? err.message : 'Failed to delete photo');
+    } finally {
+      setIsPhotoDeleting(false);
+    }
+  };
+
   return (
     <Section dataTestId="user-profile-photos-section" hasBorder background="primary" padding="p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
@@ -339,6 +483,23 @@ export function PhotosSection({
         </p>
       ) : null}
 
+      <input
+        ref={photoFileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/gif"
+        data-testid="user-profile-photos-upload-input"
+        className="hidden"
+        onChange={(event) => {
+          void handlePhotoFileSelected(event.target.files);
+        }}
+      />
+
+      {photoUploadError ? (
+        <p data-testid="user-profile-photo-upload-error" className="mt-3 text-sm text-danger-600">
+          {photoUploadError}
+        </p>
+      ) : null}
+
       {isPhotosLoading ? (
         <p data-testid="user-profile-photos-loading" className="mt-4 text-sm text-slate-600">
           Loading photos...
@@ -356,6 +517,21 @@ export function PhotosSection({
               </div>
 
               <div className="flex items-center gap-2">
+                {isOwnProfile ? (
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    data-testid="user-profile-photos-upload-album-button"
+                    onClick={() => {
+                      openPhotoPicker(selectedAlbum.id);
+                    }}
+                    isPending={isPhotoUploading}
+                    pendingText="Uploading..."
+                  >
+                    Add photo
+                  </Button>
+                ) : null}
                 {isOwnProfile ? (
                   <AlbumActionsTrigger
                     album={selectedAlbum}
@@ -387,23 +563,32 @@ export function PhotosSection({
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {selectedAlbum.photos.map((photo) => (
-                  <Button
-                    key={photo.id}
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    data-testid={`user-profile-photos-album-image-${photo.id}`}
-                    onClick={() => {
-                      setSelectedPhotoId(photo.id);
-                    }}
-                    className="p-0"
-                  >
-                    <img
-                      src={photo.imageUrl}
-                      alt={photo.description ?? `${selectedAlbum.name} photo`}
-                      className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                    />
-                  </Button>
+                  <div key={photo.id} className="relative block w-full">
+                    {isOwnProfile ? (
+                      <PhotoActionsTrigger
+                        photo={photo}
+                        isPhotoDeleting={isPhotoDeleting}
+                        onDelete={openDeletePhotoDialog}
+                      />
+                    ) : null}
+
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      data-testid={`user-profile-photos-album-image-${photo.id}`}
+                      onClick={() => {
+                        setSelectedPhotoId(photo.id);
+                      }}
+                      className="block w-full p-0"
+                    >
+                      <img
+                        src={photo.imageUrl}
+                        alt={photo.description ?? `${selectedAlbum.name} photo`}
+                        className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                      />
+                    </Button>
+                  </div>
                 ))}
               </div>
             )}
@@ -488,7 +673,24 @@ export function PhotosSection({
         )
       ) : (
         <section data-testid="user-profile-photos-unsorted-section" className="mt-5 space-y-3">
-          <h3 className="text-lg font-semibold text-slate-900">Unsorted Photos</h3>
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-lg font-semibold text-slate-900">Unsorted Photos</h3>
+            {isOwnProfile ? (
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                data-testid="user-profile-photos-upload-unsorted-button"
+                onClick={() => {
+                  openPhotoPicker(null);
+                }}
+                isPending={isPhotoUploading}
+                pendingText="Uploading..."
+              >
+                Add photo
+              </Button>
+            ) : null}
+          </div>
           {photosData.unsortedPhotos.length === 0 ? (
             <p data-testid="user-profile-photos-unsorted-empty" className="text-sm text-slate-600">
               No unsorted photos yet.
@@ -496,23 +698,32 @@ export function PhotosSection({
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {photosData.unsortedPhotos.map((photo) => (
-                <Button
-                  key={photo.id}
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
-                  onClick={() => {
-                    setSelectedPhotoId(photo.id);
-                  }}
-                  className="p-0"
-                >
-                  <img
-                    src={photo.imageUrl}
-                    alt={photo.description ?? 'Photo'}
-                    className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
-                  />
-                </Button>
+                <div key={photo.id} className="relative block w-full">
+                  {isOwnProfile ? (
+                    <PhotoActionsTrigger
+                      photo={photo}
+                      isPhotoDeleting={isPhotoDeleting}
+                      onDelete={openDeletePhotoDialog}
+                    />
+                  ) : null}
+
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    data-testid={`user-profile-photos-unsorted-image-${photo.id}`}
+                    onClick={() => {
+                      setSelectedPhotoId(photo.id);
+                    }}
+                    className="block w-full p-0"
+                  >
+                    <img
+                      src={photo.imageUrl}
+                      alt={photo.description ?? 'Photo'}
+                      className="aspect-square w-full rounded-md border border-slate-200 bg-slate-50 object-contain p-1"
+                    />
+                  </Button>
+                </div>
               ))}
             </div>
           )}
@@ -539,6 +750,54 @@ export function PhotosSection({
           />
         </Modal>
       ) : null}
+
+      <Modal
+        isOpen={Boolean(photoDeleteTarget)}
+        onClose={closeDeletePhotoDialog}
+        ariaLabel="Delete photo"
+        dataTestId="user-profile-photo-delete-modal"
+        closeButtonTestId="user-profile-photo-delete-modal-close-button"
+        dialogClassName="max-w-lg"
+      >
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">Delete photo?</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              This will permanently delete the selected photo.
+            </p>
+          </div>
+
+          {photoDeleteError ? (
+            <p data-testid="user-profile-photo-delete-error" className="text-sm text-danger-600">
+              {photoDeleteError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              data-testid="user-profile-photo-delete-cancel-button"
+              onClick={closeDeletePhotoDialog}
+              disabled={isPhotoDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              data-testid="user-profile-photo-delete-confirm-button"
+              onClick={() => {
+                void handleDeletePhoto();
+              }}
+              isPending={isPhotoDeleting}
+              pendingText="Deleting..."
+            >
+              Delete photo
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={isAlbumFormOpen}

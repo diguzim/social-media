@@ -2,6 +2,7 @@ import type {
   CreateUserAlbumBody,
   CreateUserAlbumResponse,
   DeleteUserAlbumResponse,
+  DeleteUserPhotoResponse,
   GetUserPhotosResponse,
   UpdateUserAlbumBody,
   UpdateUserAlbumResponse,
@@ -130,6 +131,24 @@ export async function uploadMyPhoto(input: {
       throw new Error(error.message || 'Failed to upload photo');
     }
     throw new Error('Failed to upload photo');
+  }
+
+  return response.json();
+}
+
+export async function deleteMyPhoto(photoId: string): Promise<DeleteUserPhotoResponse> {
+  const token = getTokenOrThrow();
+
+  const response = await fetch(`${API_BASE_URL}/users/me/photos/${photoId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to delete photo');
   }
 
   return response.json();

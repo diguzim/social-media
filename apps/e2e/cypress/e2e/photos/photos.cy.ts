@@ -180,4 +180,42 @@ describe("Photos nested navigation (alice)", () => {
       updatedAlbumName,
     ).should("not.exist");
   });
+
+  it("lets the owner upload to unsorted and delete from photo actions", () => {
+    const pngBase64 =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5M4jYAAAAASUVORK5CYII=";
+
+    cy.getByTestId("user-profile-photos-tab-unsorted").click();
+
+    cy.get('[data-testid^="user-profile-photos-unsorted-image-"]').then(
+      ($images) => {
+        const initialCount = $images.length;
+
+        cy.getByTestId("user-profile-photos-upload-unsorted-button").click();
+        cy.getByTestId("user-profile-photos-upload-input").selectFile(
+          {
+            contents: Cypress.Buffer.from(pngBase64, "base64"),
+            fileName: `fake-e2e-photo-${Date.now()}.png`,
+            mimeType: "image/png",
+            lastModified: Date.now(),
+          },
+          { force: true },
+        );
+
+        cy.get('[data-testid^="user-profile-photos-unsorted-image-"]').should(
+          "have.length.greaterThan",
+          initialCount,
+        );
+      },
+    );
+
+    cy.get('[data-testid^="user-profile-photo-actions-trigger-"]')
+      .first()
+      .click();
+    cy.get('[data-testid^="user-profile-photo-delete-action-"]')
+      .first()
+      .click();
+    cy.getByTestId("user-profile-photo-delete-confirm-button").click();
+    cy.getByTestId("user-profile-photo-delete-modal").should("not.exist");
+  });
 });

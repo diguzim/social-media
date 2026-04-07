@@ -2,17 +2,27 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { PhotosSection } from './PhotosSection';
-import { createMyAlbum, deleteMyAlbum, updateMyAlbum } from '../../../services/photos';
+import {
+  createMyAlbum,
+  deleteMyAlbum,
+  deleteMyPhoto,
+  updateMyAlbum,
+  uploadMyPhoto,
+} from '../../../services/photos';
 
 vi.mock('../../../services/photos', () => ({
   createMyAlbum: vi.fn(),
   updateMyAlbum: vi.fn(),
   deleteMyAlbum: vi.fn(),
+  uploadMyPhoto: vi.fn(),
+  deleteMyPhoto: vi.fn(),
 }));
 
 const mockedCreateMyAlbum = vi.mocked(createMyAlbum);
 const mockedUpdateMyAlbum = vi.mocked(updateMyAlbum);
 const mockedDeleteMyAlbum = vi.mocked(deleteMyAlbum);
+const mockedUploadMyPhoto = vi.mocked(uploadMyPhoto);
+const mockedDeleteMyPhoto = vi.mocked(deleteMyPhoto);
 
 const basePhotosData = {
   albums: [
@@ -170,6 +180,82 @@ describe('PhotosSection album management', () => {
     expect(screen.getByTestId('user-profile-photos-albums-section')).toBeInTheDocument();
   });
 
+  it('uploads a photo into unsorted from the unsorted tab context', async () => {
+    const onRefreshPhotos = vi.fn().mockResolvedValue(undefined);
+    mockedUploadMyPhoto.mockResolvedValue({
+      photo: {
+        id: 'photo-3',
+        imageUrl: 'http://localhost:4000/users/user-1/photos/photo-3',
+        description: null,
+        uploadedAt: '2026-03-10T10:00:00.000Z',
+        mimeType: 'image/png',
+        albumId: null,
+      },
+    });
+
+    renderPhotosSection('/users/alice/photos/unsorted', { onRefreshPhotos });
+
+    fireEvent.click(screen.getByTestId('user-profile-photos-upload-unsorted-button'));
+
+    const uploadInput = screen.getByTestId('user-profile-photos-upload-input') as HTMLInputElement;
+    const file = new File(['test'], 'unsorted.png', { type: 'image/png' });
+    fireEvent.change(uploadInput, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(mockedUploadMyPhoto).toHaveBeenCalledWith({
+        file,
+        albumId: null,
+      });
+    });
+    expect(onRefreshPhotos).toHaveBeenCalledTimes(1);
+  });
+
+  it('uploads a photo into the selected album from album detail context', async () => {
+    const onRefreshPhotos = vi.fn().mockResolvedValue(undefined);
+    mockedUploadMyPhoto.mockResolvedValue({
+      photo: {
+        id: 'photo-4',
+        imageUrl: 'http://localhost:4000/users/user-1/photos/photo-4',
+        description: null,
+        uploadedAt: '2026-03-10T10:00:00.000Z',
+        mimeType: 'image/png',
+        albumId: 'album-1',
+      },
+    });
+
+    renderPhotosSection('/users/alice/photos/albums/album-1', { onRefreshPhotos });
+
+    fireEvent.click(screen.getByTestId('user-profile-photos-upload-album-button'));
+
+    const uploadInput = screen.getByTestId('user-profile-photos-upload-input') as HTMLInputElement;
+    const file = new File(['test'], 'album.png', { type: 'image/png' });
+    fireEvent.change(uploadInput, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(mockedUploadMyPhoto).toHaveBeenCalledWith({
+        file,
+        albumId: 'album-1',
+      });
+    });
+    expect(onRefreshPhotos).toHaveBeenCalledTimes(1);
+  });
+
+  it('deletes a photo from the owner-only photo actions menu', async () => {
+    const onRefreshPhotos = vi.fn().mockResolvedValue(undefined);
+    mockedDeleteMyPhoto.mockResolvedValue({ success: true });
+
+    renderPhotosSection('/users/alice/photos/unsorted', { onRefreshPhotos });
+
+    fireEvent.click(screen.getByTestId('user-profile-photo-actions-trigger-photo-2'));
+    fireEvent.click(screen.getByTestId('user-profile-photo-delete-action-photo-2'));
+    fireEvent.click(screen.getByTestId('user-profile-photo-delete-confirm-button'));
+
+    await waitFor(() => {
+      expect(mockedDeleteMyPhoto).toHaveBeenCalledWith('photo-2');
+    });
+    expect(onRefreshPhotos).toHaveBeenCalledTimes(1);
+  });
+
   it('hides album management actions for non-owners', () => {
     render(
       <MemoryRouter initialEntries={['/users/alice/photos/albums']}>
@@ -193,7 +279,13 @@ describe('PhotosSection album management', () => {
 
     expect(screen.queryByTestId('user-profile-photos-new-album-button')).not.toBeInTheDocument();
     expect(
+      screen.queryByTestId('user-profile-photos-upload-unsorted-button')
+    ).not.toBeInTheDocument();
+    expect(
       screen.queryByTestId('user-profile-photos-album-actions-trigger-album-1')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('user-profile-photo-actions-trigger-photo-2')
     ).not.toBeInTheDocument();
   });
 });

@@ -72,7 +72,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
    - Profile sections are URL-driven tabs: Timeline, Photos, About, Friends, Personal Data
    - Photos section is a nested route area with Unsorted and Albums tabs (`/users/:username/photos/unsorted`, `/users/:username/photos/albums`, `/users/:username/photos/albums/:albumId`)
    - Account management lives in a dedicated settings-like area with left-side vertical navigation and URL-driven subroutes (`/account/personal-data`, `/account/privacy`, `/account/security`, `/account/notifications`, `/account/configurations`, `/account/help-support`)
-   - Photos tab is backend-driven with nested unsorted/albums navigation and photo modal viewing; profile owners can create, edit, and delete albums while public profiles remain read-only
+   - Photos tab is backend-driven with nested unsorted/albums navigation and photo modal viewing; profile owners can create/edit/delete albums, upload photos contextually inside unsorted or album detail, and delete photos via per-photo actions while public profiles remain read-only
    - Friends (`/friends`) shows accepted friends plus incoming/outgoing pending requests
    - Profile supports avatar upload (`POST /users/avatar`) and serves avatar by URL (`GET /users/:userId/avatar`)
    - Logout clears auth data and redirects to `/login`
