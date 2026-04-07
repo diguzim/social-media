@@ -190,7 +190,7 @@ LOKI_PORT=3100
 ## Features
 
 - **CORS**: Enabled for `http://localhost:3000` (frontend)
-- **JWT Authentication**: Authorization header validation via JwtAuthGuard
+- **JWT Authentication**: Authorization header validation via JwtAuthGuard (24h expiration)
 - **Request Validation**: Global `ValidationPipe` with DTO classes on users endpoints (`whitelist`, `forbidNonWhitelisted`, `forbidUnknownValues`)
 - **Exception Handling**: AllExceptionsFilter for serializing microservice errors
 - **Request Logging**: Correlation ID tracking and request duration
