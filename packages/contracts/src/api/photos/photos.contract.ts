@@ -50,15 +50,6 @@ export interface UploadUserPhotoResponse {
   photo: UserPhotoItem;
 }
 
-export interface UpdateUserPhotoBody {
-  description?: string | null;
-  albumId?: string | null;
-}
-
-export interface UpdateUserPhotoResponse {
-  photo: UserPhotoItem;
-}
-
 export interface DeleteUserPhotoResponse {
   success: boolean;
 }

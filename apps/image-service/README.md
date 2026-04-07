@@ -71,10 +71,6 @@ Image Service (Port 4004)
   - Input: `{ ownerUserId, albumId?, description?, fileBase64, mimeType, originalName, fileSize }`
   - Output: `{ photo }`
 
-- `IMAGE_COMMANDS.updateUserPhoto`
-  - Input: `{ ownerUserId, photoId, albumId?, description? }`
-  - Output: `{ photo }`
-
 - `IMAGE_COMMANDS.deleteUserPhoto`
   - Input: `{ ownerUserId, photoId }`
   - Output: `{ success }`

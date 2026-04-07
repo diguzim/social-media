@@ -10,7 +10,6 @@ export const IMAGE_COMMANDS = {
   deleteUserAlbum: "image.deleteUserAlbum",
   listUserPhotos: "image.listUserPhotos",
   uploadUserPhoto: "image.uploadUserPhoto",
-  updateUserPhoto: "image.updateUserPhoto",
   deleteUserPhoto: "image.deleteUserPhoto",
   getUserPhoto: "image.getUserPhoto",
 } as const;

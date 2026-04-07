@@ -139,49 +139,6 @@ export class PostsController {
     );
   }
 
-  @Get()
-  async getPosts(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('authorId') authorId?: string,
-    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
-  ): Promise<API.GetPostsResponse> {
-    this.logger.debug('API Gateway: forwarding list posts to posts service');
-
-    // Create RPC request
-    const rpcRequest: RPC.GetPostsRequest = {
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-      authorId,
-      sortOrder,
-      correlationId: getCorrelationId(),
-    };
-
-    // Call microservice
-    const rpcReply = await firstValueFrom(
-      this.postsClient.send<RPC.GetPostsReply, RPC.GetPostsRequest>(
-        { cmd: POST_COMMANDS.getPosts },
-        rpcRequest,
-      ),
-    );
-
-    // Transform RPC reply to API response (same structure in this case)
-    return {
-      data: rpcReply.data.map((post) => ({
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        authorId: post.authorId,
-        createdAt: post.createdAt,
-        images: this.mapRpcPostImages(post.id, post.images),
-      })),
-      total: rpcReply.total,
-      page: rpcReply.page,
-      limit: rpcReply.limit,
-      totalPages: rpcReply.totalPages,
-    };
-  }
-
   @Get(':id')
   async getPost(@Param('id') id: string): Promise<API.GetPostResponse> {
     this.logger.debug('API Gateway: forwarding get post to posts service');

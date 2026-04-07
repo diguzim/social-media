@@ -55,6 +55,54 @@ API Gateway (Port 4000)
   - Returns: image stream with proper `Content-Type`
   - Implementation note: gateway streams bytes returned by image-service RPC (no shared filesystem path dependency)
 
+- `POST /users/email-verification/confirm` - Confirm email using verification token
+  - Body: `{ token }`
+  - Returns: `{ status, emailVerifiedAt? }`
+
+- `POST /users/email-verification/request` - Request verification email resend
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ message }`
+
+### Photos & Albums
+
+- `GET /users/:username/photos` - Get user's albums and unsorted photos
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ albums, unsortedPhotos }`
+
+- `POST /users/me/albums` - Create album for current user
+  - Headers: `Authorization: Bearer {token}`
+  - Body: `{ name, description? }`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ album }`
+
+- `PATCH /users/me/albums/:albumId` - Update current user's album
+  - Headers: `Authorization: Bearer {token}`
+  - Body: `{ name?, description?, coverPhotoId? }`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ album }`
+
+- `DELETE /users/me/albums/:albumId` - Delete current user's album
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ success: true }`
+
+- `POST /users/me/photos` - Upload photo for current user
+  - Content-Type: `multipart/form-data` with `file`, optional `albumId`, optional `description`
+  - Headers: `Authorization: Bearer {token}`
+  - Validation: JPG/PNG/GIF only, max 10MB
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ photo }`
+
+- `DELETE /users/me/photos/:photoId` - Delete current user's photo
+  - Headers: `Authorization: Bearer {token}`
+  - Guards: **JwtAuthGuard**
+  - Returns: `{ success: true }`
+
+- `GET /users/:userId/photos/:photoId` - Retrieve user photo bytes
+  - Returns: image stream with proper `Content-Type`
+
 ### Friends
 
 - `POST /friends/requests` - Send friend request
@@ -94,10 +142,6 @@ API Gateway (Port 4000)
   - Validation: up to 10 images, JPG/PNG/GIF, max 10MB each
   - Returns: `{ id, title, content, authorId, createdAt, images[] }`
   - Guards: **JwtAuthGuard**
-
-- `GET /posts` - List all posts with pagination and filtering
-  - Query params: `?page=1&limit=10&authorId=user-1&sortOrder=desc`
-  - Returns: `{ data: [posts], total, page, limit, totalPages }`
 
 - `GET /posts/feed` - Get author-enriched feed (id, name, optional avatarUrl) with reaction summary from current user perspective
   - Query params: `?page=1&limit=10&authorId=user-1&sortOrder=desc`

@@ -76,18 +76,6 @@ export interface UploadUserPhotoReply {
   photo: RpcUserPhotoItem;
 }
 
-export interface UpdateUserPhotoRequest {
-  ownerUserId: string;
-  photoId: string;
-  albumId?: string | null;
-  description?: string | null;
-  correlationId?: string;
-}
-
-export interface UpdateUserPhotoReply {
-  photo: RpcUserPhotoItem;
-}
-
 export interface DeleteUserPhotoRequest {
   ownerUserId: string;
   photoId: string;

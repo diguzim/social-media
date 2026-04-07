@@ -20,7 +20,6 @@ import { UpdateUserAlbumUseCase } from "./core/application/image/update-user-alb
 import { DeleteUserAlbumUseCase } from "./core/application/image/delete-user-album.use-case";
 import { ListUserPhotosUseCase } from "./core/application/image/list-user-photos.use-case";
 import { UploadUserPhotoUseCase } from "./core/application/image/upload-user-photo.use-case";
-import { UpdateUserPhotoUseCase } from "./core/application/image/update-user-photo.use-case";
 import { DeleteUserPhotoUseCase } from "./core/application/image/delete-user-photo.use-case";
 import { GetUserPhotoUseCase } from "./core/application/image/get-user-photo.use-case";
 import { DatabaseModule } from "./infra/database/database.module";
@@ -79,7 +78,6 @@ const lokiTransport = logsToLokiEnabled
     DeleteUserAlbumUseCase,
     ListUserPhotosUseCase,
     UploadUserPhotoUseCase,
-    UpdateUserPhotoUseCase,
     DeleteUserPhotoUseCase,
     GetUserPhotoUseCase,
     {

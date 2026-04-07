@@ -5,7 +5,6 @@ export * from "./delete-comment.contract.js";
 export * from "./feed.contract.js";
 export * from "./get-comments.contract.js";
 export * from "./get-post.contract.js";
-export * from "./get-posts.contract.js";
 export * from "./update-comment.contract.js";
 export * from "./update-post.contract.js";
 export * from "./toggle-reaction.contract.js";

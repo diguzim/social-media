@@ -32,7 +32,6 @@ import { UsernameParamDto } from './dto/username-param.dto';
 import { ConfirmEmailVerificationBodyDto } from './dto/confirm-email-verification-body.dto';
 import { CreateUserAlbumBodyDto } from './dto/create-user-album-body.dto';
 import { UpdateUserAlbumBodyDto } from './dto/update-user-album-body.dto';
-import { UpdateUserPhotoBodyDto } from './dto/update-user-photo-body.dto';
 import { AlbumIdParamDto } from './dto/album-id-param.dto';
 import { PhotoIdParamDto } from './dto/photo-id-param.dto';
 import { IMAGE_SERVICE } from 'src/images/image.client';
@@ -373,34 +372,6 @@ export class UsersController {
           mimeType: file.mimetype,
           originalName: file.originalname,
           fileSize: file.size,
-          correlationId: getCorrelationId(),
-        },
-      ),
-    );
-
-    return {
-      photo: this.mapUserPhotoItem(req.user.userId, rpcReply.photo),
-    };
-  }
-
-  @Patch('me/photos/:photoId')
-  @UseGuards(JwtAuthGuard)
-  async updateUserPhoto(
-    @Param() params: PhotoIdParamDto,
-    @Body() body: UpdateUserPhotoBodyDto,
-    @Request() req: { user: { userId: string } },
-  ): Promise<API.UpdateUserPhotoResponse> {
-    const rpcReply = await firstValueFrom(
-      this.imageClient.send<
-        RPC.UpdateUserPhotoReply,
-        RPC.UpdateUserPhotoRequest
-      >(
-        { cmd: IMAGE_COMMANDS.updateUserPhoto },
-        {
-          ownerUserId: req.user.userId,
-          photoId: params.photoId,
-          albumId: body.albumId,
-          description: body.description,
           correlationId: getCorrelationId(),
         },
       ),

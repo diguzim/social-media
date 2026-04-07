@@ -13,7 +13,6 @@ import { UpdateUserAlbumUseCase } from "src/core/application/image/update-user-a
 import { DeleteUserAlbumUseCase } from "src/core/application/image/delete-user-album.use-case";
 import { ListUserPhotosUseCase } from "src/core/application/image/list-user-photos.use-case";
 import { UploadUserPhotoUseCase } from "src/core/application/image/upload-user-photo.use-case";
-import { UpdateUserPhotoUseCase } from "src/core/application/image/update-user-photo.use-case";
 import { DeleteUserPhotoUseCase } from "src/core/application/image/delete-user-photo.use-case";
 import { GetUserPhotoUseCase } from "src/core/application/image/get-user-photo.use-case";
 
@@ -33,7 +32,6 @@ export class ImageController {
     private readonly deleteUserAlbumUseCase: DeleteUserAlbumUseCase,
     private readonly listUserPhotosUseCase: ListUserPhotosUseCase,
     private readonly uploadUserPhotoUseCase: UploadUserPhotoUseCase,
-    private readonly updateUserPhotoUseCase: UpdateUserPhotoUseCase,
     private readonly deleteUserPhotoUseCase: DeleteUserPhotoUseCase,
     private readonly getUserPhotoUseCase: GetUserPhotoUseCase,
   ) {}
@@ -255,29 +253,6 @@ export class ImageController {
       mimeType: request.mimeType,
       originalName: request.originalName,
       fileSize: request.fileSize,
-    });
-
-    return {
-      photo: {
-        id: photo.id,
-        ownerUserId: photo.ownerUserId,
-        albumId: photo.albumId,
-        description: photo.description,
-        mimeType: photo.mimeType,
-        uploadedAt: photo.uploadedAt.toISOString(),
-      },
-    };
-  }
-
-  @MessagePattern({ cmd: IMAGE_COMMANDS.updateUserPhoto })
-  async handleUpdateUserPhoto(
-    request: RPC.UpdateUserPhotoRequest,
-  ): Promise<RPC.UpdateUserPhotoReply> {
-    const photo = await this.updateUserPhotoUseCase.execute({
-      ownerUserId: request.ownerUserId,
-      photoId: request.photoId,
-      albumId: request.albumId,
-      description: request.description,
     });
 
     return {

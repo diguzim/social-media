@@ -1,8 +1,6 @@
 import type {
   Comment,
   PostImage,
-  GetPostsRequest,
-  GetPostsResponse,
   GetFeedRequest,
   GetFeedResponse,
   FeedPost as ApiFeedPost,
@@ -34,29 +32,6 @@ export interface CreatePostInput extends CreatePostRequest {
 
 export interface ReorderPostImagesRequest {
   imageOrder: string[];
-}
-
-export async function getPosts(params: GetPostsRequest = {}): Promise<GetPostsResponse> {
-  const query = new URLSearchParams();
-
-  if (params.page !== undefined) query.set('page', String(params.page));
-  if (params.limit !== undefined) query.set('limit', String(params.limit));
-  if (params.authorId) query.set('authorId', params.authorId);
-  if (params.sortOrder) query.set('sortOrder', params.sortOrder);
-
-  const endpoint = `${API_BASE_URL}/posts${query.toString() ? `?${query.toString()}` : ''}`;
-  const response = await fetch(endpoint, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch posts');
-  }
-
-  return response.json();
 }
 
 export async function getFeed(params: GetFeedRequest = {}): Promise<GetFeedResponse> {
