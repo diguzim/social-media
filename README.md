@@ -264,7 +264,17 @@ Each service has a production Dockerfile for deployment:
 
 ## TODO
 
+### Portal Features
+
 - [ ] Reaction types (phase 2: extend from just "like" to emoji reactions)
+- [ ] Friends/followers graph (follow/unfollow + follower/following lists)
+- [ ] Notifications center (in-app + delivery channels)
+- [ ] Privacy controls (public/private profiles and visibility rules)
+- [ ] Reintroduce own-profile management UI on `/users/:username` (avatar upload + album/photo CRUD/edit placeholders)
+- [ ] Backoffice UI (user management, content moderation, analytics dashboards)
+
+### Infrastructure
+
 - [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)
 - [ ] Production docker-compose (all services)
@@ -277,10 +287,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] Caching (Redis)
 - [ ] Rate limiting
 - [ ] Search service (Elasticsearch)
-- [ ] Friends/followers graph (follow/unfollow + follower/following lists)
-- [ ] Notifications center (in-app + delivery channels)
-- [ ] Privacy controls (public/private profiles and visibility rules)
-- [ ] Reintroduce own-profile management UI on `/users/:username` (avatar upload + album/photo CRUD/edit placeholders)
 
 ## Notes
 
