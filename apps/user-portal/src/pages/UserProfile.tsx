@@ -97,6 +97,7 @@ export function UserProfile() {
     postsError,
     postsLoadMoreError,
     friends,
+    friendsCount,
     isFriendsLoading,
     friendsError,
     canViewAcceptedFriends,
@@ -359,6 +360,7 @@ export function UserProfile() {
           username={profile.username}
           avatarUrl={profile.avatarUrl}
           postsCount={posts.length}
+          friendsCount={friendsCount}
           isVerified={Boolean(profile.emailVerifiedAt)}
         />
 

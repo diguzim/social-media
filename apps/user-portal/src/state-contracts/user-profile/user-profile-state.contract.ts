@@ -17,6 +17,7 @@ export interface UserProfileState {
   postsError: string;
   postsLoadMoreError: string;
   friends: FriendUserSummary[];
+  friendsCount: number;
   isFriendsLoading: boolean;
   friendsError: string;
   canViewAcceptedFriends: boolean;

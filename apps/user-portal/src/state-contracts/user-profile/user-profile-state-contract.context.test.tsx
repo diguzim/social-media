@@ -67,6 +67,7 @@ describe('UserProfileStateContractProvider', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 0,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,

@@ -13,6 +13,7 @@ interface ProfileHeaderCardProps {
   avatarUrl?: string;
   avatarSlot?: ReactNode;
   postsCount: number;
+  friendsCount: number;
   isVerified?: boolean;
 }
 
@@ -32,6 +33,7 @@ export function ProfileHeaderCard({
   avatarUrl,
   avatarSlot,
   postsCount,
+  friendsCount,
   isVerified,
 }: ProfileHeaderCardProps) {
   return (
@@ -83,12 +85,12 @@ export function ProfileHeaderCard({
         </div>
         <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
           <p className="text-xs uppercase tracking-wide text-slate-500">Friends</p>
-          <p className="text-lg font-semibold text-slate-900">—</p>
+          <p className="text-lg font-semibold text-slate-900">{friendsCount}</p>
         </div>
       </div>
 
       <p data-testid={comingSoonTestId} className="mt-3 text-xs text-slate-500">
-        Following/followers/friends counts are coming soon.
+        Following/followers counts are coming soon.
       </p>
     </section>
   );

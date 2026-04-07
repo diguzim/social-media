@@ -43,3 +43,7 @@ export interface ListFriendsResponse {
 export interface GetFriendshipStatusResponse {
   status: FriendshipStatus;
 }
+
+export interface GetFriendCountResponse {
+  count: number;
+}

@@ -134,6 +134,10 @@ API Gateway (Port 4000)
   - Headers: `Authorization: Bearer {token}`
   - Returns: `{ status: 'none' | 'pending_outgoing' | 'pending_incoming' | 'friends' }`
 
+- `GET /friends/count/:username` - Confirmed friends count for a user profile
+  - Headers: `Authorization: Bearer {token}`
+  - Returns: `{ count: number }`
+
 ### Posts
 
 - `POST /posts` - Create a new post

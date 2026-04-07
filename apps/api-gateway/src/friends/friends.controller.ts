@@ -230,6 +230,38 @@ export class FriendsController {
     };
   }
 
+  @Get('count/:username')
+  async getFriendCount(
+    @Param() params: UsernameParamDto,
+  ): Promise<API.GetFriendCountResponse> {
+    const targetProfile = await firstValueFrom(
+      this.authClient.send<
+        RPC.GetProfileByUsernameReply,
+        RPC.GetProfileByUsernameRequest
+      >(
+        { cmd: GET_PROFILE_BY_USERNAME_CMD },
+        {
+          username: params.username,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    const rpcReply = await firstValueFrom(
+      this.friendshipClient.send<RPC.ListFriendsReply, RPC.ListFriendsRequest>(
+        { cmd: FRIENDS_COMMANDS.listFriends },
+        {
+          userId: targetProfile.id,
+          correlationId: getCorrelationId(),
+        },
+      ),
+    );
+
+    return {
+      count: rpcReply.friendUserIds.length,
+    };
+  }
+
   private async mapRequestItem(
     request: RPC.RpcFriendRequestItem,
   ): Promise<API.FriendRequestItem> {

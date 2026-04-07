@@ -584,9 +584,9 @@ The app communicates with the API Gateway which routes requests to microservices
 - Feed refreshes preserve already rendered posts and show local refresh feedback instead of blanking the page
 - Home feed, My Posts, and User Profile use infinite scroll (IntersectionObserver + paginated `/posts/feed` requests)
 - Feed, My Posts, and User Profile share a common paginated posts data hook for refresh/load-more behavior
-- UserProfile header includes placeholder social counters (`Following`, `Followers`, `Friends`) for future backend integration
+- UserProfile header shows confirmed friends count; `Following` and `Followers` remain placeholders for future backend integration
 - About and Personal Data currently render frontend placeholders while backend schema/endpoints are pending
-- UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API
+- UserProfile friends tab shows accepted friends only when viewing self; public accepted-friends listing remains TODO in backend/API (public header friend count is available)
 - Unified UserProfile avatar behavior: viewing your own profile opens a floating actions menu (`See image`, `Change image`), while viewing another profile opens avatar preview directly in a modal
 - Like button uses optimistic updates: UI updates immediately, reverts on network error
 - PostCard displays like count and "liked by me" status from reaction summary

@@ -5,6 +5,7 @@ import type {
   ListFriendRequestsResponse,
   ListFriendsResponse,
   GetFriendshipStatusResponse,
+  GetFriendCountResponse,
 } from '@repo/contracts/api';
 
 const API_BASE_URL = 'http://localhost:4000';
@@ -148,6 +149,24 @@ export async function getFriendshipStatus(username: string): Promise<GetFriendsh
 
   if (!response.ok) {
     throw new Error('Failed to load friendship status');
+  }
+
+  return response.json();
+}
+
+export async function getFriendCount(username: string): Promise<GetFriendCountResponse> {
+  const token = getTokenOrThrow();
+
+  const response = await fetch(`${API_BASE_URL}/friends/count/${username}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load friend count');
   }
 
   return response.json();

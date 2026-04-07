@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getPublicProfile, getUserProfile } from '../../../../services/auth';
-import { getFriendshipStatus, listFriends, sendFriendRequest } from '../../../../services/friends';
+import {
+  getFriendCount,
+  getFriendshipStatus,
+  listFriends,
+  sendFriendRequest,
+} from '../../../../services/friends';
 import { usePaginatedFeedPosts } from '../../../../hooks/usePaginatedFeedPosts';
 import type { UserProfileStateContract } from '../../user-profile-state.contract';
 
@@ -18,6 +23,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
   const [isFriendshipActionPending, setIsFriendshipActionPending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [friends, setFriends] = useState<UserProfileStateContract['state']['friends']>([]);
+  const [friendsCount, setFriendsCount] = useState(0);
   const [isFriendsLoading, setIsFriendsLoading] = useState(false);
   const [friendsError, setFriendsError] = useState('');
   const [canViewAcceptedFriends, setCanViewAcceptedFriends] = useState(false);
@@ -60,20 +66,31 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
         try {
           const friendsResponse = await listFriends();
           setFriends(friendsResponse.data);
+          setFriendsCount(friendsResponse.data.length);
         } catch (friendsErr) {
           setFriendsError(
             friendsErr instanceof Error ? friendsErr.message : 'Failed to load friends'
           );
+          setFriendsCount(0);
         } finally {
           setIsFriendsLoading(false);
         }
       } else {
+        setIsFriendsLoading(true);
         const friendship = await getFriendshipStatus(response.username);
         setFriendshipStatus(friendship.status);
         setCanViewAcceptedFriends(false);
         setFriends([]);
-        setIsFriendsLoading(false);
         setFriendsError('');
+
+        try {
+          const friendCountResponse = await getFriendCount(response.username);
+          setFriendsCount(friendCountResponse.count);
+        } catch {
+          setFriendsCount(0);
+        } finally {
+          setIsFriendsLoading(false);
+        }
       }
       setFriendshipError('');
     } catch (err) {
@@ -85,6 +102,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
       setFriendshipError('');
       setCanViewAcceptedFriends(false);
       setFriends([]);
+      setFriendsCount(0);
       setIsFriendsLoading(false);
       setFriendsError('');
     } finally {
@@ -143,6 +161,7 @@ export function useUserProfileStatePresenter(): UserProfileStateContract {
         : 'Invalid user profile route',
       postsLoadMoreError: postsState.loadMoreError,
       friends,
+      friendsCount,
       isFriendsLoading,
       friendsError,
       canViewAcceptedFriends,

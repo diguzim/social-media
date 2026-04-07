@@ -45,6 +45,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 0,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,
@@ -97,6 +98,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 3,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,
@@ -120,6 +122,7 @@ describe('UserProfile', () => {
     expect(screen.getByTestId('user-profile-username')).toHaveTextContent('@eve');
     expect(screen.getByTestId('user-profile-avatar-image')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-stats')).toHaveTextContent('Posts');
+    expect(screen.getByTestId('user-profile-stats')).toHaveTextContent('3');
     expect(screen.getByTestId('user-profile-stats-coming-soon')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-sections-tabs')).toBeInTheDocument();
     expect(screen.getByTestId('user-profile-sections-tab-timeline')).toBeInTheDocument();
@@ -153,6 +156,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 0,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: true,
@@ -204,6 +208,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 1,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,
@@ -274,6 +279,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 0,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,
@@ -343,6 +349,7 @@ describe('UserProfile', () => {
         postsError: '',
         postsLoadMoreError: '',
         friends: [],
+        friendsCount: 0,
         isFriendsLoading: false,
         friendsError: '',
         canViewAcceptedFriends: false,
