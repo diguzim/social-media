@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { API } from '@repo/contracts';
 import {
@@ -140,39 +140,41 @@ export function UserProfile() {
     }
   }, [activeSection, location.pathname, navigate, section, username]);
 
-  useEffect(() => {
-    if (activeSection !== 'photos' || !profile?.username) {
-      return;
-    }
+  const loadPhotos = useCallback(
+    async (cancelState?: { cancelled: boolean }) => {
+      if (activeSection !== 'photos' || !profile?.username) {
+        return;
+      }
 
-    let isCancelled = false;
-
-    const loadPhotos = async () => {
       setIsPhotosLoading(true);
       setPhotosError('');
 
       try {
         const response = await getUserPhotos(profile.username);
-        if (!isCancelled) {
+        if (!cancelState?.cancelled) {
           setPhotosData(response);
         }
       } catch (err) {
-        if (!isCancelled) {
+        if (!cancelState?.cancelled) {
           setPhotosError(err instanceof Error ? err.message : 'Failed to load photos');
         }
       } finally {
-        if (!isCancelled) {
+        if (!cancelState?.cancelled) {
           setIsPhotosLoading(false);
         }
       }
-    };
+    },
+    [activeSection, profile?.username]
+  );
 
-    void loadPhotos();
+  useEffect(() => {
+    const cancelState = { cancelled: false };
+    void loadPhotos(cancelState);
 
     return () => {
-      isCancelled = true;
+      cancelState.cancelled = true;
     };
-  }, [activeSection, profile?.username]);
+  }, [loadPhotos]);
 
   useEffect(() => {
     setUploadedAvatarUrl(null);
@@ -418,9 +420,11 @@ export function UserProfile() {
         {activeSection === 'photos' ? (
           <PhotosSection
             profileUsername={profile.username}
+            isOwnProfile={isOwnProfile}
             photosData={photosData}
             isPhotosLoading={isPhotosLoading}
             photosError={photosError}
+            onRefreshPhotos={() => loadPhotos()}
           />
         ) : null}
 

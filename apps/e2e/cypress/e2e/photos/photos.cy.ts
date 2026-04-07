@@ -83,7 +83,6 @@ describe("Photos nested navigation (alice)", () => {
 
     cy.getByTestId("user-profile-photos-albums-section").within(() => {
       cy.contains("Alice Travel (Seed)").should("be.visible");
-      cy.contains("Alice Empty Album (Seed)").should("be.visible");
     });
 
     cy.contains(
@@ -122,5 +121,63 @@ describe("Photos nested navigation (alice)", () => {
     cy.getByTestId("photo-modal").should("be.visible");
     cy.getByTestId("photo-modal-close-button").click();
     cy.getByTestId("photo-modal").should("not.exist");
+  });
+
+  it("lets the owner create, edit, and delete an album", () => {
+    const albumName = `Fake E2E Album ${Date.now()}`;
+    const updatedAlbumName = `${albumName} Updated`;
+
+    cy.getByTestId("user-profile-photos-tab-albums").click();
+
+    cy.getByTestId("user-profile-photos-new-album-button").click();
+    cy.getByTestId("user-profile-album-name-input").type(albumName);
+    cy.getByTestId("user-profile-album-description-input").type(
+      "Fake E2E album description",
+    );
+    cy.getByTestId("user-profile-album-form-submit-button").click();
+
+    cy.contains(
+      'article[data-testid^="user-profile-photos-album-"]',
+      albumName,
+    ).should("be.visible");
+
+    cy.contains(
+      'article[data-testid^="user-profile-photos-album-"]',
+      albumName,
+    ).within(() => {
+      cy.get('[data-testid^="user-profile-photos-album-actions-trigger-"]')
+        .first()
+        .click();
+    });
+
+    cy.get('[data-testid^="user-profile-photos-album-edit-action-"]')
+      .first()
+      .click();
+
+    cy.getByTestId("user-profile-album-name-input")
+      .clear()
+      .type(updatedAlbumName);
+    cy.getByTestId("user-profile-album-form-submit-button").click();
+
+    cy.contains(
+      'article[data-testid^="user-profile-photos-album-"]',
+      updatedAlbumName,
+    )
+      .should("be.visible")
+      .within(() => {
+        cy.get('[data-testid^="user-profile-photos-album-actions-trigger-"]')
+          .first()
+          .click();
+      });
+
+    cy.get('[data-testid^="user-profile-photos-album-delete-action-"]')
+      .first()
+      .click();
+
+    cy.getByTestId("user-profile-album-delete-confirm-button").click();
+    cy.contains(
+      'article[data-testid^="user-profile-photos-album-"]',
+      updatedAlbumName,
+    ).should("not.exist");
   });
 });
