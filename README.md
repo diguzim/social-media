@@ -9,6 +9,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - Turborepo
 - NestJS microservices (TCP transport)
 - Node.js EventEmitter for event-driven architecture
+- API gateway IP rate limiting (`@nestjs/throttler`)
 - Docker Compose (infra only in dev)
 
 ## Apps
@@ -284,7 +285,6 @@ Each service has a production Dockerfile for deployment:
 - [ ] API documentation (Swagger)
 - [ ] Code coverage reports
 - [ ] Caching (Redis)
-- [ ] Rate limiting
 - [ ] Search service (Elasticsearch)
 
 ## Notes

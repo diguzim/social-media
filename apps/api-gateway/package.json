@@ -28,6 +28,7 @@
     "@nestjs/microservices": "^11.1.12",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/throttler": "^6.5.0",
     "@repo/contracts": "workspace:*",
     "@repo/exception-filters": "workspace:*",
     "@repo/log-context": "workspace:*",

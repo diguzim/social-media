@@ -225,6 +225,9 @@ PORT=4000
 JWT_SECRET=your-secret-key
 CORS_ORIGIN=http://localhost:3000
 
+THROTTLE_LIMIT=120
+THROTTLE_TTL_MS=60000
+
 AUTH_SERVICE_HOST=localhost
 AUTH_SERVICE_PORT=4001
 
@@ -251,6 +254,7 @@ SENTRY_TRACES_SAMPLE_RATE=1.0
 - **CORS**: Enabled for `http://localhost:3000` (frontend)
 - **JWT Authentication**: Authorization header validation via JwtAuthGuard (24h expiration)
 - **Request Validation**: Global `ValidationPipe` with DTO classes on users endpoints (`whitelist`, `forbidNonWhitelisted`, `forbidUnknownValues`)
+- **Rate Limiting**: Global IP-based throttling via `@nestjs/throttler` (`THROTTLE_LIMIT` requests per `THROTTLE_TTL_MS`)
 - **Exception Handling**: AllExceptionsFilter for serializing microservice errors
 - **Request Logging**: Correlation ID tracking and request duration
 - **RPC Routing**: @nestjs/microservices ClientProxy pattern
