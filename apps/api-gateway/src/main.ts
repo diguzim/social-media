@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import * as Sentry from '@sentry/node';
 import { AppModule } from './app.module';
 import { RpcExceptionFilter } from '@repo/exception-filters';
+import { configureGatewaySecurity } from './security/gateway-security';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,11 +19,7 @@ async function bootstrap() {
     });
   }
 
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    credentials: true,
-  });
+  configureGatewaySecurity(app);
   app.useGlobalFilters(new RpcExceptionFilter());
   await app.listen(process.env.PORT ?? 4000);
 }

@@ -4,6 +4,7 @@
   "globalEnv": [
     "AUTH_SERVICE_HOST",
     "AUTH_SERVICE_PORT",
+    "CORS_ORIGINS",
     "CORS_ORIGIN",
     "API_PUBLIC_BASE_URL",
     "FRIENDSHIP_SERVICE_HOST",

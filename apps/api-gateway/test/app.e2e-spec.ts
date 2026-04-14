@@ -4,6 +4,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { RpcExceptionFilter } from '@repo/exception-filters';
+import { configureGatewaySecurity } from '../src/security/gateway-security';
 
 function getErrorMessages(body: unknown): string[] {
   if (typeof body !== 'object' || body === null || !('message' in body)) {
@@ -25,6 +26,7 @@ describe('Users validation (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureGatewaySecurity(app);
     app.useGlobalFilters(new RpcExceptionFilter());
     await app.init();
   });
@@ -109,5 +111,30 @@ describe('Users validation (e2e)', () => {
     expect(messages).toEqual(
       expect.arrayContaining([expect.stringMatching(/token/i)]),
     );
+  });
+
+  it('sets helmet headers and only allows configured CORS origins', async () => {
+    const allowedOrigin = 'http://localhost:3000';
+    const allowedResponse = await request(app.getHttpServer())
+      .options('/users')
+      .set('Origin', allowedOrigin)
+      .set('Access-Control-Request-Method', 'POST');
+
+    expect(allowedResponse.status).toBe(204);
+    expect(allowedResponse.headers['access-control-allow-origin']).toBe(
+      allowedOrigin,
+    );
+    expect(allowedResponse.headers['x-dns-prefetch-control']).toBe('off');
+    expect(allowedResponse.headers['x-content-type-options']).toBe('nosniff');
+
+    const disallowedResponse = await request(app.getHttpServer())
+      .options('/users')
+      .set('Origin', 'https://evil.example')
+      .set('Access-Control-Request-Method', 'POST');
+
+    expect(disallowedResponse.status).toBe(404);
+    expect(
+      disallowedResponse.headers['access-control-allow-origin'],
+    ).toBeUndefined();
   });
 });

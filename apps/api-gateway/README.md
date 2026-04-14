@@ -5,7 +5,8 @@ HTTP entrypoint for the social media platform. Routes HTTP requests from clients
 ## Purpose
 
 - Single entry point for frontend clients
-- CORS enabled for cross-origin requests from React SPA
+- Helmet baseline HTTP security headers
+- CORS allowlist for trusted browser origins
 - JWT verification for protected endpoints
 - Request routing to auth-service, posts-service, image-service, and friendship-service microservices
 - Translation layer between `API` (public HTTP) and `RPC` (internal TCP) contracts
@@ -223,7 +224,8 @@ Environment variables (see `.env.example`):
 ```env
 PORT=4000
 JWT_SECRET=your-secret-key
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGINS=http://localhost:3000,https://app.example.com
+# CORS_ORIGIN=http://localhost:3000
 
 THROTTLE_LIMIT=120
 THROTTLE_TTL_MS=60000
@@ -251,7 +253,8 @@ SENTRY_TRACES_SAMPLE_RATE=1.0
 
 ## Features
 
-- **CORS**: Enabled for `http://localhost:3000` (frontend)
+- **Helmet**: Baseline security headers for browser-facing responses
+- **CORS**: Explicit allowlist for trusted browser origins
 - **JWT Authentication**: Authorization header validation via JwtAuthGuard (24h expiration)
 - **Request Validation**: Global `ValidationPipe` with DTO classes on users endpoints (`whitelist`, `forbidNonWhitelisted`, `forbidUnknownValues`)
 - **Rate Limiting**: Global IP-based throttling via `@nestjs/throttler` (`THROTTLE_LIMIT` requests per `THROTTLE_TTL_MS`)
