@@ -2,3 +2,4 @@ export * from "./auth/index.js";
 export * from "./posts/index.js";
 export * from "./image/index.js";
 export * from "./friends/index.js";
+export * from "./email/index.js";

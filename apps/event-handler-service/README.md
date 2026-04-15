@@ -2,9 +2,11 @@
 
 Background worker service that listens to domain events via RabbitMQ and performs asynchronous side effects. This keeps event handling logic decoupled from the services that emit events.
 
+Email delivery handling has been migrated to `email-service`. Legacy user-email handlers in this service are disabled by default.
+
 ## Purpose
 
-- Listen to domain events published by other services (e.g., `user.registered`, `user.emailVerificationRequested`)
+- Optionally listen to domain events published by other services (legacy user-email handlers are feature-flagged)
 - Execute event handlers that perform business logic and side effects
 - Process messages asynchronously to avoid blocking upstream services
 - Keep business logic independent from event-driven workflows
@@ -17,7 +19,12 @@ Auth Service
   ↓ publishes user.registered / user.emailVerificationRequested events
 RabbitMQ Topic Exchange (social-media.events)
   ↓ routes to queue by key
-event-handler-service
+email-service
+  ├─→ Consume from queue
+  ├─→ Execute handlers (EmailService)
+  └─→ Track delivery status
+
+event-handler-service (legacy path only)
   ├─→ Consume from queue
   ├─→ Execute handlers (UserRegistrationHandler)
   └─→ Health check endpoint
@@ -26,6 +33,8 @@ event-handler-service
 ## Event Handlers
 
 ### UserRegistrationHandler
+
+Legacy path: disabled by default.
 
 **Event**: `user.registered`\
 **Queue**: `social-media.user-registered`\
@@ -49,6 +58,8 @@ Triggered when a user successfully registers. Sends the initial verification ema
 The verification link sent in the email points to `http://localhost:3000/verify-email?token={verificationToken}`.
 
 ### VerificationEmailRequestedHandler (same consumer)
+
+Legacy path: disabled by default.
 
 **Event**: `user.emailVerificationRequested`\
 **Queue**: `social-media.user-registered`\
@@ -126,6 +137,7 @@ PORT=4003
 RABBITMQ_URL=amqp://guest:guest@localhost:5672
 RABBITMQ_EXCHANGE=social-media.events
 RABBITMQ_USER_REGISTERED_QUEUE=social-media.user-registered
+EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS=false
 LOGS_TO_LOKI=true
 LOKI_HOST=http://localhost
 LOKI_PORT=3100
@@ -146,11 +158,15 @@ Message sent to exchange with routing key "user.registered"
   ↓
 RabbitMQ routes to "social-media.user-registered" queue
   ↓
-event-handler-service consumes from queue
+email-service consumes from queue by default
+  ↓
+EmailService sends verification email
+
+event-handler-service legacy flow (optional)
   ↓
 channel.consume() listener receives message
   ↓
-UserRegistrationHandler.handleUserRegistered(event)
+UserRegistrationHandler.handleUserRegistered(event) when EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS=true
   ↓ [Currently: Log the event]
   → [Ready for: Send email, create profile, analytics, etc.]
   ↓

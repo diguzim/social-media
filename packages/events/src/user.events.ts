@@ -1,6 +1,7 @@
 export const USER_EVENTS = {
   REGISTERED: "user.registered",
   EMAIL_VERIFICATION_REQUESTED: "user.emailVerificationRequested",
+  EMAIL_DELIVERY_STATUS_CHANGED: "user.emailDeliveryStatusChanged",
 } as const;
 
 export const EVENT_BUS = {
@@ -28,4 +29,22 @@ export interface VerificationEmailRequestedEvent {
   verificationToken: string;
   /** ISO string expiry of the token. */
   tokenExpiresAt: string;
+}
+
+export type EmailDeliveryStatus =
+  | "queued"
+  | "sending"
+  | "sent"
+  | "delivered"
+  | "failed"
+  | "bounced";
+
+export interface UserEmailDeliveryStatusChangedEvent {
+  userId: string;
+  deliveryId: string;
+  email: string;
+  status: EmailDeliveryStatus;
+  provider: string;
+  providerMessageId: string | null;
+  updatedAt: string;
 }

@@ -318,6 +318,46 @@ Requirements:
 
 - Tailwind is the primary styling mechanism.
 - Styling should come from tokens, Tailwind config, and component variants.
+
+---
+
+## ADR-010: Dedicated Email-Service with Sync RPC and Async Event Delivery
+
+**Date:** 2026-04  
+**Status:** Accepted
+
+### Context
+
+Email delivery started as a fake/logging side effect inside `event-handler-service`.
+The platform now needs:
+
+1. synchronous email operations callable over RPC
+2. asynchronous email operations driven by RabbitMQ domain events
+3. provider swappability (fake/logging in local environments, real provider in production)
+4. delivery tracking visibility
+
+Keeping all of this inside `event-handler-service` would over-couple unrelated concerns and make provider evolution harder.
+
+### Decision
+
+Introduce a standalone `email-service` microservice (TCP port 4006) that:
+
+- exposes RPC commands under `RPC.EMAIL_COMMANDS`
+- consumes `user.registered` and `user.emailVerificationRequested` from RabbitMQ
+- supports provider selection by environment variable (`EMAIL_PROVIDER=logging|sendgrid`)
+- stores in-memory delivery records with lifecycle status (`queued`, `sending`, `sent`, `delivered`, `failed`, `bounced`)
+
+`event-handler-service` keeps legacy user-email handlers but they are disabled by default using `EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS=false` to avoid duplicate processing during migration.
+
+### Consequences
+
+✅ Email logic and provider integration are isolated in one service boundary  
+✅ Both synchronous and asynchronous delivery paths are supported immediately  
+✅ Real provider rollout can be toggled by configuration without code changes  
+✅ Shared RPC contracts allow future gateway/user-triggered email workflows  
+⚠️ One additional microservice increases operational complexity  
+⚠️ Current delivery store is in-memory and resets on restart  
+⚠️ Webhook reconciliation and retry orchestration remain incremental follow-up steps
 - Arbitrary values should be rare and justified.
 - Base components should keep a small variant surface such as `size`, `variant`, and `state`.
 - Complex styling should live inside components, not be rebuilt ad hoc in apps.

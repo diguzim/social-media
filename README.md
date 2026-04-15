@@ -1,6 +1,6 @@
 # Social Media Monorepo
 
-Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, auth/posts/image/friendship services, an event handler service, and shared packages.
+Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway, auth/posts/image/friendship/email services, an event handler service, and shared packages.
 
 ## Stack
 
@@ -20,6 +20,7 @@ Microservices monorepo powered by Turborepo and pnpm. It includes an API gateway
 - `image-service`: Image microservice listening on TCP (port 4004) for profile picture upload/storage
   - Avatar retrieval is transport-safe (byte payload), avoiding cross-service filesystem path coupling
 - `friendship-service`: Friendship microservice listening on TCP (port 4005) for friend requests and relationship status
+- `email-service`: Email delivery microservice listening on TCP (port 4006) and RabbitMQ for synchronous and asynchronous sending
 - `event-handler-service`: Background worker that processes domain events (port 4003)
 - `user-portal`: React + Vite frontend for user management (port 3000)
 - `ui-showcase`: Storybook app for shared component demos (port 6006)
@@ -83,7 +84,7 @@ RabbitMQ Management UI: [http://localhost:15672](http://localhost:15672) (guest/
 Services emit domain events that are processed by handlers via RabbitMQ:
 
 1. **Event Emitters**: Services create events when domain events occur (e.g., `user.registered`)
-2. **Event Handlers**: Background workers (event-handler-service) listen on RabbitMQ and perform side effects
+2. **Event Handlers**: Background workers (email-service and other handlers) listen on RabbitMQ and perform side effects
 3. **Message Broker**: RabbitMQ manages event distribution with topic exchanges
 4. **Decoupling**: Services don't know about or depend on event handlers
 
@@ -101,10 +102,9 @@ RegisterUseCase emits USER_EVENTS.REGISTERED to RabbitMQ
 RabbitMQ publishes to "social-media.events" exchange
 (routing key: user.registered)
 ↓
-event-handler-service consumes from queue
+email-service consumes from queue
 ↓
-UserRegistrationHandler processes the event
-(currently logs, ready for: welcome email, profile creation, etc.)
+EmailService composes and sends verification email
 ```
 
 ## API and RPC Contracts
@@ -171,6 +171,7 @@ cp apps/api-gateway/.env.example apps/api-gateway/.env
 cp apps/auth-service/.env.example apps/auth-service/.env
 cp apps/posts-service/.env.example apps/posts-service/.env
 cp apps/image-service/.env.example apps/image-service/.env
+cp apps/email-service/.env.example apps/email-service/.env
 cp apps/event-handler-service/.env.example apps/event-handler-service/.env
 ```
 
@@ -200,7 +201,7 @@ Backend services emit structured logs with Pino and now ship logs directly to Lo
 Current pipeline:
 
 ```text
-api-gateway/auth-service/posts-service/image-service/event-handler-service
+api-gateway/auth-service/posts-service/image-service/friendship-service/email-service/event-handler-service
    -> nestjs-pino
    -> pino-loki transport
    -> Loki (http://localhost:3100)
@@ -235,6 +236,8 @@ pnpm --filter api-gateway dev
 pnpm --filter auth-service dev
 pnpm --filter posts-service dev
 pnpm --filter image-service dev
+pnpm --filter friendship-service dev
+pnpm --filter email-service dev
 pnpm --filter event-handler-service dev
 pnpm --filter user-portal dev
 pnpm --filter user-portal storybook
@@ -248,6 +251,9 @@ pnpm --filter ui-showcase storybook
 - `pnpm test`: Run all tests
 - `pnpm lint`: Lint all code
 - `pnpm check-types`: Type-check all packages
+- `./kill-services.sh`: Stop known local app dev servers by project ports
+
+When adding a new app with its own local dev port, update `kill-services.sh` in the same task to keep process cleanup accurate.
 
 ## Docker (Production Builds)
 
@@ -257,6 +263,8 @@ Each service has a production Dockerfile for deployment:
 - [apps/auth-service/Dockerfile](apps/auth-service/Dockerfile)
 - [apps/posts-service/Dockerfile](apps/posts-service/Dockerfile)
 - [apps/event-handler-service/Dockerfile](apps/event-handler-service/Dockerfile)
+
+Email-service Dockerfile can be added when production containerization for this service is enabled.
 
 ## Environment Variables
 

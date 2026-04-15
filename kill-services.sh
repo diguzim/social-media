@@ -1,7 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_PORTS="3000 4000 4001 4002 4003 4004 4005"
+# Keep this list in sync with app ports documented in README/.github instructions.
+# Whenever a new app is created with a local dev port, add it here in the same task.
+PORT_LABELS=(
+  "3000:user-portal"
+  "4000:api-gateway"
+  "4001:auth-service"
+  "4002:posts-service"
+  "4003:event-handler-service"
+  "4004:image-service"
+  "4005:friendship-service"
+  "4006:email-service"
+  "6006:ui-showcase"
+)
+
+APP_PORTS=""
+for entry in "${PORT_LABELS[@]}"; do
+  APP_PORTS+=" ${entry%%:*}"
+done
+APP_PORTS="${APP_PORTS# }"
+
+label_for_port() {
+  local port="$1"
+  for entry in "${PORT_LABELS[@]}"; do
+    if [[ "${entry%%:*}" == "$port" ]]; then
+      printf "%s" "${entry##*:}"
+      return 0
+    fi
+  done
+  printf "unknown"
+}
 
 collect_listener_pids() {
   local port="$1"
@@ -37,7 +66,7 @@ kill_pid_and_group() {
 echo "== PIDs by service ports =="
 for p in $APP_PORTS; do
   pids="$(collect_listener_pids "$p" | xargs)"
-  echo "port $p -> ${pids:-none}"
+  echo "port $p ($(label_for_port "$p")) -> ${pids:-none}"
 done
 
 echo
@@ -45,7 +74,7 @@ echo
 echo "== Stopping app services (SIGTERM) =="
 for p in $APP_PORTS; do
   for pid in $(collect_listener_pids "$p"); do
-    echo "kill -15 $pid (port $p)"
+    echo "kill -15 $pid (port $p: $(label_for_port "$p"))"
     kill_pid_and_group TERM "$pid"
   done
 done
@@ -57,7 +86,7 @@ echo
 echo "== Force stopping remaining app services (SIGKILL) =="
 for p in $APP_PORTS; do
   for pid in $(collect_listener_pids "$p"); do
-    echo "kill -9 $pid (port $p)"
+    echo "kill -9 $pid (port $p: $(label_for_port "$p"))"
     kill_pid_and_group KILL "$pid"
   done
 done
@@ -77,7 +106,7 @@ echo
 echo "== Remaining listeners on service ports =="
 for p in $APP_PORTS; do
   pids="$(collect_listener_pids "$p" | xargs)"
-  echo "port $p -> ${pids:-none}"
+  echo "port $p ($(label_for_port "$p")) -> ${pids:-none}"
 done
 
 echo

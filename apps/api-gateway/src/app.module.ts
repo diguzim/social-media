@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { ImagesModule } from './images/images.module';
 import { FriendsModule } from './friends/friends.module';
+import { EmailModule } from './email/email.module';
 import {
   LogContextMiddleware,
   getCorrelationId,
@@ -98,6 +99,7 @@ const lokiTransport = logsToLokiEnabled
     PostsModule,
     ImagesModule,
     FriendsModule,
+    EmailModule,
   ],
   controllers: [UsersController, PostsController, FriendsController],
   providers: [

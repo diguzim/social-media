@@ -11,8 +11,8 @@ import {
   type UserRegisteredEvent,
   type VerificationEmailRequestedEvent,
 } from "@repo/events";
-import { UserRegistrationHandler } from "./user-registration.handler";
-import { RabbitMqHealthService } from "./rabbitmq-health.service";
+import * as Sentry from "@sentry/node";
+import { EmailService } from "../email/email.service";
 
 const RABBITMQ_MAX_CONNECT_ATTEMPTS = 10;
 const RABBITMQ_INITIAL_RETRY_DELAY_MS = 1000;
@@ -53,10 +53,10 @@ async function connectRabbitMqWithRetry(
 }
 
 @Injectable()
-export class RabbitMqUserRegisteredConsumer
+export class RabbitMqUserEventsConsumer
   implements OnModuleInit, OnModuleDestroy
 {
-  private readonly logger = new Logger(RabbitMqUserRegisteredConsumer.name);
+  private readonly logger = new Logger(RabbitMqUserEventsConsumer.name);
   private connection: ChannelModel | null = null;
   private channel: Channel | null = null;
 
@@ -65,29 +65,11 @@ export class RabbitMqUserRegisteredConsumer
   private readonly exchange =
     process.env.RABBITMQ_EXCHANGE ?? EVENT_BUS.EXCHANGE;
   private readonly queueName =
-    process.env.RABBITMQ_USER_REGISTERED_QUEUE ??
-    EVENT_BUS.USER_REGISTERED_QUEUE;
+    process.env.RABBITMQ_EMAIL_QUEUE ?? "social-media.email-delivery";
 
-  constructor(
-    private readonly userRegistrationHandler: UserRegistrationHandler,
-    private readonly rabbitMqHealthService: RabbitMqHealthService,
-  ) {}
+  constructor(private readonly emailService: EmailService) {}
 
   async onModuleInit(): Promise<void> {
-    const enabled =
-      (process.env.EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS ?? "false") ===
-      "true";
-
-    if (!enabled) {
-      this.rabbitMqHealthService.markDisconnected(
-        "legacy user email handlers disabled",
-      );
-      this.logger.log(
-        "Legacy user email handlers are disabled. Set EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS=true to re-enable.",
-      );
-      return;
-    }
-
     try {
       this.connection = await connectRabbitMqWithRetry(
         this.logger,
@@ -116,46 +98,75 @@ export class RabbitMqUserRegisteredConsumer
           return;
         }
 
-        try {
+        const handleMessage = async () => {
           const routingKey = msg.fields.routingKey;
           const parsedEvent = JSON.parse(
             msg.content.toString("utf-8"),
           ) as unknown;
 
           if (routingKey === USER_EVENTS.REGISTERED) {
-            this.userRegistrationHandler.handleUserRegistered(
-              parsedEvent as UserRegisteredEvent,
-            );
-          } else if (routingKey === USER_EVENTS.EMAIL_VERIFICATION_REQUESTED) {
-            this.userRegistrationHandler.handleVerificationEmailRequested(
-              parsedEvent as VerificationEmailRequestedEvent,
-            );
-          } else {
-            throw new Error(`Unsupported routing key: ${routingKey}`);
+            const event = parsedEvent as UserRegisteredEvent;
+            await this.emailService.sendVerificationEmail({
+              to: event.email,
+              name: event.name,
+              verificationToken: event.verificationToken,
+            });
+            return;
           }
 
-          channel.ack(msg);
-        } catch (error) {
-          this.logger.error(
-            `Failed to process message: ${error instanceof Error ? error.message : String(error)}`,
-          );
-          channel.nack(msg, false, false);
-        }
-      });
+          if (routingKey === USER_EVENTS.EMAIL_VERIFICATION_REQUESTED) {
+            const event = parsedEvent as VerificationEmailRequestedEvent;
+            await this.emailService.sendVerificationEmail({
+              to: event.email,
+              name: event.name,
+              verificationToken: event.verificationToken,
+            });
+            return;
+          }
 
-      this.rabbitMqHealthService.markConnected({
-        exchange: this.exchange,
-        queue: this.queueName,
-        url: this.rabbitMqUrl,
+          throw new Error(`Unsupported routing key: ${routingKey}`);
+        };
+
+        void handleMessage()
+          .then(() => {
+            channel.ack(msg);
+          })
+          .catch((error: unknown) => {
+            Sentry.captureException(error, {
+              tags: {
+                service: "email-service",
+                component: "rabbitmq-user-events-consumer",
+              },
+              extra: {
+                queue: this.queueName,
+                exchange: this.exchange,
+                routingKey: msg.fields.routingKey,
+                message: msg.content.toString("utf-8"),
+              },
+            });
+            this.logger.error(
+              `Failed to process message: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            channel.nack(msg, false, false);
+          });
       });
 
       this.logger.log(
-        `Consuming '${USER_EVENTS.REGISTERED}' and '${USER_EVENTS.EMAIL_VERIFICATION_REQUESTED}' from queue '${this.queueName}'`,
+        `Email service consuming '${USER_EVENTS.REGISTERED}' and '${USER_EVENTS.EMAIL_VERIFICATION_REQUESTED}' from queue '${this.queueName}'`,
       );
     } catch (error) {
-      this.rabbitMqHealthService.markDisconnected(
-        error instanceof Error ? error.message : String(error),
-      );
+      Sentry.captureException(error, {
+        tags: {
+          service: "email-service",
+          component: "rabbitmq-user-events-consumer",
+          phase: "startup",
+        },
+        extra: {
+          queue: this.queueName,
+          exchange: this.exchange,
+          rabbitMqUrl: this.rabbitMqUrl,
+        },
+      });
       this.logger.error(
         `RabbitMQ consumer startup failed: ${error instanceof Error ? error.message : String(error)}`,
       );
@@ -163,7 +174,6 @@ export class RabbitMqUserRegisteredConsumer
   }
 
   async onModuleDestroy(): Promise<void> {
-    this.rabbitMqHealthService.markDisconnected("consumer stopped");
     await this.channel?.close();
     await this.connection?.close();
   }

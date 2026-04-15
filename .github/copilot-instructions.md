@@ -15,6 +15,7 @@ apps/
   auth-service/      # NestJS TCP microservice (port 4001) — user registration + JWT auth
   posts-service/     # NestJS TCP microservice (port 4002) — post CRUD
   image-service/     # NestJS TCP microservice (port 4004) — profile image upload/storage
+  email-service/     # NestJS TCP microservice (port 4006) — sync/async email delivery
   event-handler-service/ # NestJS — consumes domain events
   user-portal/       # React 18 + Vite + Tailwind CSS (port 3000)
   e2e/               # Cypress 13 E2E tests
@@ -222,3 +223,6 @@ pnpm build
 | posts-service         | 4002 |
 | event-handler-service | 4003 |
 | image-service         | 4004 |
+| email-service         | 4006 |
+
+When adding a new app/service with a new local development port, always update `kill-services.sh` in the same task so local process cleanup remains complete.

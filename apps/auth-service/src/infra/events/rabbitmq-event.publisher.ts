@@ -7,6 +7,44 @@ import {
 import { connect, type Channel, type ChannelModel } from 'amqplib';
 import { EVENT_BUS } from '@repo/events';
 
+const RABBITMQ_MAX_CONNECT_ATTEMPTS = 10;
+const RABBITMQ_INITIAL_RETRY_DELAY_MS = 1000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function connectRabbitMqWithRetry(
+  logger: Logger,
+  rabbitMqUrl: string,
+  maxAttempts = RABBITMQ_MAX_CONNECT_ATTEMPTS,
+  initialDelayMs = RABBITMQ_INITIAL_RETRY_DELAY_MS,
+): Promise<ChannelModel> {
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await connect(rabbitMqUrl);
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === maxAttempts) {
+        break;
+      }
+
+      const delayMs = Math.min(initialDelayMs * 2 ** (attempt - 1), 10_000);
+      logger.warn(
+        `RabbitMQ connection attempt ${attempt}/${maxAttempts} failed. Retrying in ${delayMs}ms. Reason: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      await delay(delayMs);
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
 @Injectable()
 export class RabbitMqEventPublisher implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RabbitMqEventPublisher.name);
@@ -19,7 +57,10 @@ export class RabbitMqEventPublisher implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     try {
-      this.connection = await connect(this.rabbitMqUrl);
+      this.connection = await connectRabbitMqWithRetry(
+        this.logger,
+        this.rabbitMqUrl,
+      );
       const channel = await this.connection.createChannel();
       this.channel = channel;
       await channel.assertExchange(this.exchange, 'topic', {
