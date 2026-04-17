@@ -194,6 +194,17 @@ docker compose -f docker-compose.infra.yml up -d
 pnpm dev
 ```
 
+## MCP Servers
+
+This workspace includes MCP server configuration in [.vscode/mcp.json](.vscode/mcp.json).
+
+- `io.github.getsentry/sentry-mcp` is already configured for Sentry.
+- `sendgrid-mcp` is configured to run from `/home/diguzim/sendgrid-mcp/build/index.js` and will prompt for `SENDGRID_API_KEY` the first time VS Code starts or uses that server.
+
+To enter the key, open the Command Palette and run `MCP: List Servers`, then start `sendgrid-mcp` or open Chat and call one of its tools. VS Code will show a password prompt for the API key.
+
+If you change the SendGrid MCP checkout path, update [.vscode/mcp.json](.vscode/mcp.json) accordingly.
+
 ## Logging and Observability (Loki + Grafana)
 
 Backend services emit structured logs with Pino and now ship logs directly to Loki via `pino-loki`.

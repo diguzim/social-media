@@ -19,6 +19,9 @@ pnpm --filter email-service dev
 
 Copy `.env.example` to `.env` and configure provider credentials when using SendGrid.
 
+For live delivery tests, set `EMAIL_PROVIDER=sendgrid` and use a verified sender address in `DEFAULT_FROM_EMAIL`.
+If you want the seeded auth account to receive test mail, the workspace seed user 1 now uses `rodrigomarcondes2000@gmail.com`.
+
 ## Sentry Setup
 
 The service initializes Sentry when `SENTRY_DSN` is present.

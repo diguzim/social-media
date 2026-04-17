@@ -10,7 +10,7 @@ describe("Friendship seed data", () => {
       method: "POST",
       url: `${API_BASE_URL}/users/login`,
       body: {
-        email: "alice@example.com",
+        email: "rodrigomarcondes2000@gmail.com",
         password: "password",
       },
     }).then((response) => {

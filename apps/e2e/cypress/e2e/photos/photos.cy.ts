@@ -32,7 +32,7 @@ describe("Photos nested navigation (alice)", () => {
       method: "POST",
       url: `${apiBaseUrl}/users/login`,
       body: {
-        email: "alice@example.com",
+        email: "rodrigomarcondes2000@gmail.com",
         password: "password",
       },
     }).then((loginResponse) => {

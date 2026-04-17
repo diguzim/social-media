@@ -156,6 +156,7 @@ SENTRY_TRACES_SAMPLE_RATE=1.0
 Currently uses **in-memory storage** for development:
 
 - Seeded users are pre-marked with `emailVerifiedAt` so existing E2E flows work without manual verification
+- One seeded account (`alice` / `rodrigomarcondes2000@gmail.com`) is intentionally left unverified so you can trigger the email verification flow and test real delivery
 - Usernames are stored with a canonical value (`usernameCanonical`) for consistent uniqueness checks
 - Reserved usernames are blocked (e.g., `admin`, `support`, `root`, `system`)
 - Data persists only during service runtime

@@ -87,13 +87,13 @@ export class InMemoryUserRepository implements UserRepository {
         name: 'Alice Johnson',
         username: 'alice',
         usernameCanonical: 'alice',
-        email: 'alice@example.com',
+        email: 'rodrigomarcondes2000@gmail.com',
         gender: 'female',
         about: 'Loves sharing travel moments and coffee photos.',
         passwordHash: hashedPassword,
         createdAt: new Date('2025-01-01'),
-        // Seed users are pre-verified so E2E tests work without a verification step
-        emailVerifiedAt: new Date('2025-01-01'),
+        // Intentionally left unverified so the verification email flow can be tested
+        emailVerifiedAt: null,
       },
       {
         id: '2',

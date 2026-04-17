@@ -3,12 +3,33 @@
   // These servers give GitHub Copilot additional tools and context.
   // Each team member needs the referenced tools installed locally.
   // See: https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "SENDGRID_API_KEY",
+      "description": "SendGrid API key for the sendgrid-mcp server",
+      "password": true
+    }
+  ],
   "servers": {
     // GitKraken: git operations, PR management, issue tracking, commit composer
     // Requires: GitKraken desktop app installed + signed in
     "gitkraken": {
       "command": "npx",
       "args": ["-y", "@gitkraken/mcp-server"]
+    },
+    // SendGrid MCP server for email workflows, marketing contacts, and templates
+    // Local checkout lives at /home/diguzim/sendgrid-mcp and must be built first.
+    "sendgrid-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/home/diguzim/sendgrid-mcp/build/index.js"],
+      "cwd": "/home/diguzim/sendgrid-mcp",
+      "env": {
+        "SENDGRID_API_KEY": "${input:SENDGRID_API_KEY}"
+      },
+      "gallery": "https://api.mcp.github.com",
+      "version": "1.0.0"
     },
     "io.github.getsentry/sentry-mcp": {
       "type": "stdio",
