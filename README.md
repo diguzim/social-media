@@ -295,7 +295,6 @@ Email-service Dockerfile can be added when production containerization for this 
 
 ### Infrastructure
 
-- [ ] Email service integration (welcome emails)
 - [ ] PostgreSQL integration (currently in-memory storage)
 - [ ] Production docker-compose (all services)
 - [ ] Observability platform (Datadog)
