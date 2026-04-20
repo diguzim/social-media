@@ -344,7 +344,7 @@ Introduce a standalone `email-service` microservice (TCP port 4006) that:
 
 - exposes RPC commands under `RPC.EMAIL_COMMANDS`
 - consumes `user.registered` and `user.emailVerificationRequested` from RabbitMQ
-- supports provider selection by environment variable (`EMAIL_PROVIDER=logging|sendgrid`)
+- supports provider selection by environment variable (`EMAIL_PROVIDER=logging|sendgrid|resend`)
 - stores in-memory delivery records with lifecycle status (`queued`, `sending`, `sent`, `delivered`, `failed`, `bounced`)
 
 `event-handler-service` keeps legacy user-email handlers but they are disabled by default using `EVENT_HANDLER_ENABLE_USER_EMAIL_HANDLERS=false` to avoid duplicate processing during migration.
