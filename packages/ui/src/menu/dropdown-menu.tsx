@@ -233,7 +233,7 @@ export function DropdownMenuTrigger({
       className: cx(child.props.className, className),
       "aria-haspopup": "menu",
       "aria-expanded": open,
-      "data-testid": dataTestId,
+      ...(dataTestId !== undefined ? { "data-testid": dataTestId } : {}),
     } as any);
   }
 

@@ -160,6 +160,11 @@ When introducing a new domain/entity backed by an in-memory repository, always a
 - For each new in-memory domain/entity, seed at least one representative scenario set and add automated assertions
 - In `apps/user-portal`, use `pnpm test`/`pnpm test:run` for one-shot runs and `pnpm test:watch` for interactive watch mode
 
+### Git Commits
+
+- Do not include a `Co-Authored-By: Claude` (or any other Claude/Anthropic) trailer in commit messages — keep commits attributed solely to the human author
+- Match the existing repo style: short, descriptive subject; body only when extra context is genuinely useful
+
 ### Documentation Maintenance
 
 - Treat documentation updates as part of every coding task, not as optional follow-up work

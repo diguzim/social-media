@@ -113,6 +113,7 @@ describe('FeedService', () => {
     expect(result.data[0]?.author).toEqual({
       id: 'u-missing',
       name: 'Unknown User',
+      username: 'unknown',
     });
   });
 
